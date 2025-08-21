@@ -77,18 +77,54 @@ DEMO_MODE=false
 
 ## Project Structure
 
-\`\`\`
-src/
-├── ai/                     # Genkit AI flows and tools
-│   ├── flows/             # AI conversation flows
-│   └── config.ts          # AI configuration
-├── components/            # React components
-│   ├── restaurant/        # Restaurant-specific components
-│   └── ui/               # ShadCN UI components
-├── hooks/                # Custom React hooks
-├── lib/                  # Utility functions and services
-└── app/                  # Next.js app router pages
-\`\`\`
+```text
+.
+├─ app/                             # Next.js App Router
+│  ├─ api/
+│  │  ├─ whatsapp/route.ts          # WhatsApp webhook (GET verify, POST messages)
+│  │  └─ restaurants/[id]/route.ts  # Restaurant API
+│  ├─ analytics/page.tsx
+│  ├─ restaurants/[id]/
+│  ├─ restaurants/page.tsx
+│  ├─ settings/page.tsx
+│  ├─ page.tsx                      # Landing page
+│  └─ layout.tsx
+│
+├─ components/
+│  ├─ ui/                           # ShadCN UI components
+│  └─ theme-provider.tsx
+│
+├─ prisma/
+│  ├─ schema.prisma                 # Postgres models
+│  └─ dev.db                        # Local SQLite (dev only)
+│
+├─ public/                          # Static assets (logos, images)
+│  └─ ...
+│
+├─ src/
+│  ├─ ai/
+│  │  ├─ flows/                     # Genkit flows (generate, menu info, totals)
+│  │  ├─ config.ts
+│  │  └─ index.ts                   # Flow registry
+│  ├─ components/restaurant/        # Dashboard components
+│  ├─ hooks/
+│  │  └─ use-restaurants.tsx
+│  ├─ lib/
+│  │  ├─ ai-client.ts               # Server runner for flows
+│  │  ├─ conversation-manager.ts    # In-memory conv + metadata (name/location/delivery)
+│  │  ├─ data-utils.ts
+│  │  ├─ delivery.ts                # Delivery zone fee/ETA estimator
+│  │  └─ ... other utils
+│  └─ ...
+│
+├─ styles/
+│  └─ globals.css
+│
+├─ package.json
+├─ next.config.mjs
+├─ tsconfig.json
+└─ README.md
+```
 
 ## Key Components
 
