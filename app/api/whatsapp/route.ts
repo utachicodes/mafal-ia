@@ -117,17 +117,15 @@ async function processIncomingMessage(message: any, contacts: any[], metadata: a
 
     // Support text and location messages
     let messageText = ""
+    let locationFromMessage: string | null = null
     if (message.type === "text" && message.text?.body) {
       messageText = message.text.body
     } else if (message.type === "location" && message.location) {
       const lat = message.location.latitude
       const lng = message.location.longitude
       const locString = `coords:${lat},${lng}`
-      // Save a generic estimate for coordinates (fallback zone)
-      ConversationManager.updateMetadata(restaurant.id, phoneNumber, {
-        locationText: locString,
-        delivery: { zone: "Coordinates", fee: 2000, etaMinutes: 50, notes: "Approximate from GPS" },
-      })
+      // Defer metadata update until after restaurant is loaded
+      locationFromMessage = locString
       messageText = `My location is ${locString}`
     } else {
       console.log("[WhatsApp] Skipping unsupported message type", message.type)
@@ -182,6 +180,14 @@ async function processIncomingMessage(message: any, contacts: any[], metadata: a
       if (est) {
         ConversationManager.updateMetadata(restaurant.id, phoneNumber, { locationText: est.zone, delivery: est })
       }
+    }
+
+    // If user shared GPS location, save a generic estimate now that we have restaurant id
+    if (locationFromMessage) {
+      ConversationManager.updateMetadata(restaurant.id, phoneNumber, {
+        locationText: locationFromMessage,
+        delivery: { zone: "Coordinates", fee: 2000, etaMinutes: 50, notes: "Approximate from GPS" },
+      })
     }
 
     // Intercept order confirmation/cancellation if a pending order exists

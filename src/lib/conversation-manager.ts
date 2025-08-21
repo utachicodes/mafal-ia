@@ -21,7 +21,7 @@ export class ConversationManager {
       name?: string
       locationText?: string
       delivery?: DeliveryEstimate
-      pendingOrder?: PendingOrder
+      pendingOrder?: PendingOrder | undefined
     }
   >()
 
@@ -109,7 +109,7 @@ export class ConversationManager {
   static getMetadata(
     restaurantId: string,
     phoneNumber: string,
-  ): { name?: string; locationText?: string; delivery?: DeliveryEstimate } {
+  ): { name?: string; locationText?: string; delivery?: DeliveryEstimate; pendingOrder?: PendingOrder | undefined } {
     const key = this.getConversationKey(restaurantId, phoneNumber)
     return this.metadata.get(key) || {}
   }
@@ -117,7 +117,7 @@ export class ConversationManager {
   static updateMetadata(
     restaurantId: string,
     phoneNumber: string,
-    patch: Partial<{ name: string; locationText: string; delivery: DeliveryEstimate }>,
+    patch: Partial<{ name: string; locationText: string; delivery: DeliveryEstimate; pendingOrder: PendingOrder | undefined }>,
   ): void {
     const key = this.getConversationKey(restaurantId, phoneNumber)
     const current = this.metadata.get(key) || {}

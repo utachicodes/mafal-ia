@@ -1,5 +1,3 @@
-import { env } from "@/src/lib/env"
-
 export type OrderRecord = {
   id: string
   restaurantId: string
