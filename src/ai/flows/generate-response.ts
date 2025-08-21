@@ -18,6 +18,12 @@ interface GenerateResponseOutput {
   response: string
   detectedLanguage: string
   usedTools: string[]
+  orderQuote?: {
+    total: number
+    itemsSummary: string
+    notFoundItems: string
+    orderItems: { itemName: string; quantity: number }[]
+  }
 }
 
 // Main conversational flow - the central AI brain
@@ -104,6 +110,7 @@ export const generateResponseFlow = defineFlow(
 
     const intent = getText(intentAnalysis).toLowerCase()
     let toolResponse = ""
+    let orderQuote: GenerateResponseOutput["orderQuote"] | undefined
 
     // Use appropriate tools based on intent
     if (intent === "menu_question") {
@@ -124,6 +131,12 @@ export const generateResponseFlow = defineFlow(
           menuItems,
         })
         toolResponse = `Order Total: ${orderCalc.total} FCFA\nItems: ${orderCalc.itemsSummary}\n${orderCalc.notFoundItems ? `Items not found: ${orderCalc.notFoundItems}` : ""}`
+        orderQuote = {
+          total: orderCalc.total,
+          itemsSummary: orderCalc.itemsSummary,
+          notFoundItems: orderCalc.notFoundItems,
+          orderItems: orderCalc.orderItems,
+        }
         usedTools.push("calculateOrderTotal")
       } catch (error) {
         console.error("Error using order calculation tool:", error)
@@ -192,6 +205,7 @@ Respond naturally as the restaurant's AI assistant:
       response: getText(finalResponse),
       detectedLanguage,
       usedTools,
+      orderQuote,
     }
   },
 )

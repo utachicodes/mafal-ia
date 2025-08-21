@@ -1,6 +1,13 @@
 import type { ChatMessage } from "@/lib/data"
 import type { DeliveryEstimate } from "./delivery"
 
+type PendingOrder = {
+  total: number
+  itemsSummary: string
+  notFoundItems: string
+  orderItems: { itemName: string; quantity: number }[]
+}
+
 // Enhanced conversation management (in production, use a database)
 export class ConversationManager {
   private static conversations = new Map<string, ChatMessage[]>()
@@ -14,6 +21,7 @@ export class ConversationManager {
       name?: string
       locationText?: string
       delivery?: DeliveryEstimate
+      pendingOrder?: PendingOrder
     }
   >()
 

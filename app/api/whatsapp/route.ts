@@ -8,6 +8,7 @@ import { validateEnv } from "@/src/lib/env"
 import { WebhookValidator } from "@/src/lib/webhook-validator"
 import { ConversationManager } from "@/src/lib/conversation-manager"
 import { estimateDelivery, formatEstimate } from "@/src/lib/delivery"
+import { OrderService } from "@/src/lib/order-service"
 
 // Validate required environment variables at module load (skip in demo mode)
 if (!env.DEMO_MODE) {
@@ -183,6 +184,39 @@ async function processIncomingMessage(message: any, contacts: any[], metadata: a
       }
     }
 
+    // Intercept order confirmation/cancellation if a pending order exists
+    const pending = existingMeta.pendingOrder
+    const normalized = messageText.trim().toLowerCase()
+    const isYes = ["yes", "y", "confirm", "ok", "okay", "oui"].includes(normalized)
+    const isNo = ["no", "n", "cancel", "non"].includes(normalized)
+    if (pending && (isYes || isNo)) {
+      if (isYes) {
+        const order = await OrderService.createOrder({
+          restaurantId: restaurant.id,
+          phoneNumber,
+          total: pending.total,
+          itemsSummary: pending.itemsSummary,
+          notFoundItems: pending.notFoundItems,
+          orderItems: pending.orderItems,
+        })
+        ConversationManager.updateMetadata(restaurant.id, phoneNumber, { pendingOrder: undefined })
+        const deliveryLine = existingMeta.delivery ? `\n${formatEstimate(existingMeta.delivery)}` : ""
+        await WhatsAppClient.sendMessage(
+          businessPhoneNumberId,
+          phoneNumber,
+          `✅ Order confirmed!\nOrder ID: ${order.id}\nTotal: ${order.total} FCFA\nItems: ${order.itemsSummary}${deliveryLine}`,
+        )
+      } else {
+        ConversationManager.updateMetadata(restaurant.id, phoneNumber, { pendingOrder: undefined })
+        await WhatsAppClient.sendMessage(
+          businessPhoneNumberId,
+          phoneNumber,
+          "❌ Order canceled. You can send a new order anytime.",
+        )
+      }
+      return
+    }
+
     // Get conversation history for this phone number
     const conversationHistory = ConversationManager.getConversation(restaurant.id, phoneNumber)
 
@@ -222,14 +256,21 @@ Ordering Enabled: ${restaurant.chatbotContext.orderingEnabled ? "Yes" : "No"}
       tools: aiResponse.usedTools,
     })
 
+    // If an order quote is present, store it as pending and append confirmation prompt
+    let outbound = aiResponse.response
+    if (aiResponse.orderQuote && aiResponse.orderQuote.orderItems?.length) {
+      ConversationManager.updateMetadata(restaurant.id, phoneNumber, { pendingOrder: aiResponse.orderQuote })
+      outbound = `${outbound}\n\nReply YES to confirm this order or NO to cancel.`
+    }
+
     // Send response back to WhatsApp
-    await WhatsAppClient.sendMessage(businessPhoneNumberId, phoneNumber, aiResponse.response)
+    await WhatsAppClient.sendMessage(businessPhoneNumberId, phoneNumber, outbound)
 
     // Save conversation history
     ConversationManager.addMessage(restaurant.id, phoneNumber, {
       id: `ai_${Date.now()}`,
       role: "assistant",
-      content: aiResponse.response,
+      content: outbound,
       timestamp: new Date(),
     })
 
