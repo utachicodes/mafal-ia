@@ -1,0 +1,60 @@
+// Prisma schema for Mafal-IA
+// Postgres for production. Set DATABASE_URL to your Postgres connection string.
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Restaurant {
+  id                     String      @id @default(cuid())
+  name                   String
+  description            String
+  cuisine                String
+  whatsappNumber         String
+  whatsappPhoneNumberId  String      @default("") // maps to Meta business phone number ID
+  supportedLanguages     Json
+  isActive               Boolean     @default(true)
+
+  // Flattened chatbot context
+  welcomeMessage         String      @default("")
+  businessHours          String      @default("")
+  specialInstructions    String      @default("")
+  orderingEnabled        Boolean     @default(true)
+  deliveryInfo           String      @default("")
+
+  menuItems              MenuItem[]
+  conversations         Conversation[]
+
+  createdAt              DateTime    @default(now())
+  updatedAt              DateTime    @updatedAt
+}
+
+model MenuItem {
+  id            String     @id @default(cuid())
+  restaurantId  String
+  restaurant    Restaurant @relation(fields: [restaurantId], references: [id])
+  name          String
+  description   String
+  price         Int
+  category      String?
+  isAvailable   Boolean    @default(true)
+  // Optional embeddings for RAG (store as vector-like JSON for now)
+  embedding     Json?
+}
+
+model Conversation {
+  id            String     @id @default(cuid())
+  restaurantId  String
+  restaurant    Restaurant @relation(fields: [restaurantId], references: [id])
+  phoneNumber   String
+  messages      Json       // array of ChatMessage
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  @@index([restaurantId, phoneNumber])
+}
