@@ -1,6 +1,6 @@
 import { defineFlow } from "@genkit-ai/flow"
 import { generate } from "@genkit-ai/ai"
-import { googleAI } from "@genkitx/googleai"
+import { googleAI } from "@genkit-ai/googleai"
 import type { MenuItem } from "@/lib/data"
 
 interface ProcessMenuInput {
