@@ -9,10 +9,10 @@
     "start": "next start"
   },
   "dependencies": {
-    "@genkit-ai/ai": "latest",
-    "@genkit-ai/core": "latest",
-    "@genkit-ai/flow": "latest",
-    "@genkit-ai/googleai": "latest",
+    "@genkit-ai/ai": "1.16.1",
+    "@genkit-ai/core": "1.16.1",
+    "@genkit-ai/flow": "0.5.17",
+    "@genkit-ai/googleai": "1.16.1",
     "@hookform/resolvers": "^3.10.0",
     "@radix-ui/react-accordion": "1.2.2",
     "@radix-ui/react-alert-dialog": "1.1.4",

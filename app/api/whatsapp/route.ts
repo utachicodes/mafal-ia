@@ -7,6 +7,7 @@ import type { ChatMessage } from "@/lib/data"
 import { validateEnv } from "@/src/lib/env"
 import { WebhookValidator } from "@/src/lib/webhook-validator"
 import { ConversationManager } from "@/src/lib/conversation-manager"
+import { estimateDelivery, formatEstimate } from "@/src/lib/delivery"
 
 // Validate required environment variables at module load (skip in demo mode)
 if (!env.DEMO_MODE) {
@@ -113,13 +114,24 @@ async function processIncomingMessage(message: any, contacts: any[], metadata: a
     const messageId = message.id
     const timestamp = message.timestamp
 
-    // Only process text messages for now
-    if (message.type !== "text" || !message.text?.body) {
-      console.log("[WhatsApp] Skipping non-text message")
+    // Support text and location messages
+    let messageText = ""
+    if (message.type === "text" && message.text?.body) {
+      messageText = message.text.body
+    } else if (message.type === "location" && message.location) {
+      const lat = message.location.latitude
+      const lng = message.location.longitude
+      const locString = `coords:${lat},${lng}`
+      // Save a generic estimate for coordinates (fallback zone)
+      ConversationManager.updateMetadata(restaurant.id, phoneNumber, {
+        locationText: locString,
+        delivery: { zone: "Coordinates", fee: 2000, etaMinutes: 50, notes: "Approximate from GPS" },
+      })
+      messageText = `My location is ${locString}`
+    } else {
+      console.log("[WhatsApp] Skipping unsupported message type", message.type)
       return
     }
-
-    const messageText = message.text.body
     const businessPhoneNumberId = metadata?.phone_number_id
 
     if (!businessPhoneNumberId) {
@@ -156,6 +168,21 @@ async function processIncomingMessage(message: any, contacts: any[], metadata: a
       return
     }
 
+    // Persist contact name if provided in webhook contacts
+    const contactName = Array.isArray(contacts) && contacts[0]?.profile?.name ? String(contacts[0].profile.name) : undefined
+    if (contactName) {
+      ConversationManager.updateMetadata(restaurant.id, phoneNumber, { name: contactName })
+    }
+
+    // Try to infer delivery zone/estimate from latest message text
+    const existingMeta = ConversationManager.getMetadata(restaurant.id, phoneNumber)
+    if (!existingMeta.delivery) {
+      const est = estimateDelivery(messageText)
+      if (est) {
+        ConversationManager.updateMetadata(restaurant.id, phoneNumber, { locationText: est.zone, delivery: est })
+      }
+    }
+
     // Get conversation history for this phone number
     const conversationHistory = ConversationManager.getConversation(restaurant.id, phoneNumber)
 
@@ -169,6 +196,10 @@ async function processIncomingMessage(message: any, contacts: any[], metadata: a
 
     const messages = [...conversationHistory, newMessage]
 
+    const meta = ConversationManager.getMetadata(restaurant.id, phoneNumber)
+    const deliveryLine = meta.delivery ? `Delivery: ${formatEstimate(meta.delivery)}` : "Delivery: unknown"
+    const customerLine = `Customer: ${meta.name ?? "unknown"} (${phoneNumber})${meta.locationText ? `, Location: ${meta.locationText}` : ""}`
+
     const restaurantContext = `
 Restaurant: ${restaurant.name}
 Description: ${restaurant.description}
@@ -177,6 +208,8 @@ Business Hours: ${restaurant.chatbotContext.businessHours}
 Welcome Message: ${restaurant.chatbotContext.welcomeMessage}
 Special Instructions: ${restaurant.chatbotContext.specialInstructions}
 Delivery Info: ${restaurant.chatbotContext.deliveryInfo}
+${deliveryLine}
+${customerLine}
 Ordering Enabled: ${restaurant.chatbotContext.orderingEnabled ? "Yes" : "No"}
     `.trim()
 

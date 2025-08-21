@@ -56,6 +56,16 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           )
         })}
       </nav>
+      <div className="px-4 pb-4 mt-auto text-xs text-muted-foreground">
+        <div className="rounded-md bg-muted p-3">
+          <p>
+            Built with ❤️ by <a className="underline hover:text-foreground" href="https://github.com/utachicodes" target="_blank" rel="noreferrer">utachicodes</a>
+          </p>
+          <p>
+            Support: <a className="underline" href="mailto:abdoullahaljersi@gmail.com">abdoullahaljersi@gmail.com</a>
+          </p>
+        </div>
+      </div>
     </div>
   )
 

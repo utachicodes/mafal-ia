@@ -1,7 +1,8 @@
 import { defineFlow } from "@genkit-ai/flow"
 import { generate } from "@genkit-ai/ai"
-import { googleAI } from "@genkitx/googleai"
+import { googleAI } from "@genkit-ai/googleai"
 import type { MenuItem } from "@/lib/data"
+import { z } from "zod"
 
 interface MenuRetrievalInput {
   query: string
@@ -17,25 +18,48 @@ interface MenuRetrievalOutput {
 export const getMenuItemInformationFlow = defineFlow(
   {
     name: "getMenuItemInformation",
-    inputSchema: {
-      type: "object",
-      properties: {
-        query: { type: "string" },
-        menuItems: { type: "array" },
-      },
-      required: ["query", "menuItems"],
-    },
-    outputSchema: {
-      type: "object",
-      properties: {
-        information: { type: "string" },
-        relevantItems: { type: "array" },
-      },
-      required: ["information", "relevantItems"],
-    },
+    inputSchema: z.object({
+      query: z.string(),
+      menuItems: z.array(
+        z.object({
+          id: z.string(),
+          name: z.string(),
+          description: z.string().optional().default(""),
+          price: z.number().optional().default(0),
+          category: z.string().optional(),
+          isAvailable: z.boolean().optional(),
+        }),
+      ),
+    }),
+    outputSchema: z.object({
+      information: z.string(),
+      relevantItems: z.array(
+        z.object({
+          id: z.string(),
+          name: z.string(),
+          description: z.string().optional().default(""),
+          price: z.number().optional().default(0),
+          category: z.string().optional(),
+          isAvailable: z.boolean().optional(),
+        }),
+      ),
+    }),
   },
   async (input: MenuRetrievalInput): Promise<MenuRetrievalOutput> => {
     const { query, menuItems } = input
+    const genAny: any = generate as any
+    const modelAny: any = (googleAI as any)("gemini-1.5-flash")
+    const getText = (res: any): string => {
+      try {
+        if (!res) return ""
+        if (typeof res.text === "function") return String(res.text()).trim()
+        if (typeof res.text === "string") return res.text.trim()
+        if (typeof res.output === "string") return res.output.trim()
+        return String(res).trim()
+      } catch {
+        return ""
+      }
+    }
 
     // First, find relevant menu items using semantic search
     const searchPrompt = `
@@ -48,12 +72,9 @@ Return the numbers of the most relevant items (1-3 items max), separated by comm
 If no items are relevant, return "none".
     `
 
-    const searchResult = await generate({
-      model: googleAI("gemini-1.5-flash"),
-      prompt: searchPrompt,
-    })
+    const searchResult = await genAny({ model: modelAny, prompt: searchPrompt })
 
-    const relevantIndexes = searchResult.text().trim()
+    const relevantIndexes = getText(searchResult)
     let relevantItems: MenuItem[] = []
 
     if (relevantIndexes !== "none") {
@@ -89,13 +110,10 @@ Provide helpful information about these items in response to the customer's quer
 Be concise but informative.
     `
 
-    const informationResult = await generate({
-      model: googleAI("gemini-1.5-flash"),
-      prompt: informationPrompt,
-    })
+    const informationResult = await genAny({ model: modelAny, prompt: informationPrompt })
 
     return {
-      information: informationResult.text(),
+      information: getText(informationResult),
       relevantItems,
     }
   },

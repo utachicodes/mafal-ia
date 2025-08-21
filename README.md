@@ -1,17 +1,28 @@
 # Mafal-IA - Restaurant WhatsApp Chatbot Platform
 
-A comprehensive SaaS platform that allows restaurant owners to create, manage, and deploy intelligent, multilingual WhatsApp chatbots for their business.
+Mafal-IA is a B2B, API-first platform for restaurants. You pay for the service, we provide the WhatsApp AI API and a simple dashboard. Plug it into your existing workflows to answer customers, share menus, and calculate orders automatically.
 
 ## Features
 
-- **Intelligent AI Chatbots**: Powered by Google Genkit with advanced language detection and intent recognition
-- **Multilingual Support**: Automatic language detection and response in French, English, Wolof, and Arabic
-- **Menu Management**: Easy-to-use interface for managing restaurant menus and pricing
-- **Order Processing**: AI-powered order calculation and total computation
-- **WhatsApp Integration**: Seamless integration with WhatsApp Business API
-- **Real-time Testing**: Live chat interface for testing chatbot responses
-- **Analytics Dashboard**: Comprehensive analytics and conversation insights
-- **Restaurant Management**: Multi-restaurant support with individual configurations
+- **AI that understands your customers**: Built on Google Genkit (Gemini), detects language and intent.
+- **Speaks your customers’ language**: French, English, Wolof, Arabic (auto-detected).
+- **Menu-aware**: Keep your menu in sync; the AI answers from your data.
+- **Order math included**: Extracts items/quantities and computes totals.
+- **WhatsApp-native**: Works with the WhatsApp Business API you already use.
+- **Test and monitor**: Live testing and basic analytics in the dashboard.
+- **Multi-restaurant ready**: Manage multiple brands under one account.
+
+## Noo ngi fi pour jàppal
+Your intelligent WhatsApp assistant. Get started in minutes.
+
+1. **Create Your Restaurant**
+   Add your restaurant profile: name, short description, and plan.
+
+2. **Upload Your Menu**
+   Upload a JSON file or paste items. We parse names, descriptions, and prices for the AI.
+
+3. **Get Your API Key**
+   Copy your unique API key and connect your WhatsApp Business account. Your assistant is ready to serve.
 
 ## Technology Stack
 
@@ -105,21 +116,61 @@ src/
 - `GET /api/whatsapp` - Webhook verification
 - `POST /api/whatsapp` - Message processing
 
-## How Restaurants Use This API (What We Provide vs. You Do)
+## Quick API Usage
 
-- __What this app provides__
-  - WhatsApp webhook endpoint: `GET/POST /api/whatsapp`
-  - AI conversation orchestration using Genkit (LLM, tools, menu reasoning)
-  - Restaurant/menu data storage and retrieval
-  - Conversation logging and basic analytics UI
+- **Verify webhook (Meta setup)**
 
-- __What your restaurant handles__
-  - Payment collection and refunds (outside WhatsApp API scope)
-  - Delivery/pickup logistics and order fulfillment
-  - Customer support escalation beyond the AI chat
-  - Menu accuracy, pricing, taxes, and legal compliance
+```bash
+curl -G \
+  "https://your-domain.com/api/whatsapp" \
+  --data-urlencode "hub.mode=subscribe" \
+  --data-urlencode "hub.verify_token=$WHATSAPP_VERIFY_TOKEN" \
+  --data-urlencode "hub.challenge=12345"
+```
 
-In short, this platform exposes an API that turns incoming WhatsApp messages into smart AI replies using your menu/context. You operate the business workflow.
+- **Send an inbound message (simulate WhatsApp event)**
+
+```bash
+curl -X POST "https://your-domain.com/api/whatsapp" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $WHATSAPP_ACCESS_TOKEN" \
+  -d '{
+    "entry": [{
+      "changes": [{
+        "value": {
+          "metadata": { "phone_number_id": "YOUR_META_PHONE_NUMBER_ID" },
+          "messages": [{
+            "from": "221771234567",
+            "id": "wamid.HBgNN...",
+            "timestamp": "1699999999",
+            "type": "text",
+            "text": { "body": "Bonjour, avez-vous du Thieb?" }
+          }]
+        }
+      }]
+    }]
+  }'
+```
+
+If `Restaurant.whatsappPhoneNumberId` matches the Meta `phone_number_id`, the request is routed to your restaurant. Mafal-IA generates a reply and sends it via the WhatsApp Business API.
+
+## B2B Model: What We Provide vs What You Handle
+
+We provide the API and tools. You keep control of your operations.
+
+- __What we provide__
+  - A production-ready WhatsApp webhook: `GET/POST /api/whatsapp`
+  - AI conversation engine (intent, language, menu reasoning, order extraction)
+  - Secure storage for restaurant/menu data
+  - Basic analytics and a simple dashboard
+
+- __What you handle__
+  - Payments and refunds (outside the WhatsApp API scope)
+  - Delivery/pickup logistics and fulfillment
+  - Customer support escalation beyond the AI
+  - Menu accuracy, pricing, taxes, compliance
+
+In short: you pay for Mafal-IA, we provide the WhatsApp AI API + dashboard. Incoming WhatsApp messages become smart, menu-aware replies. You keep control of fulfillment and payments.
 
 ## Production Setup Checklist
 
@@ -213,4 +264,6 @@ This project is licensed under the MIT License.
 
 ## Support
 
-For support and questions, please contact: support@mafal-ia.com
+For support and questions, please contact: abdoullahaljersi@gmail.com
+
+Built with ❤️ by utachicodes.

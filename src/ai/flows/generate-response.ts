@@ -1,7 +1,10 @@
 import { defineFlow, runFlow } from "@genkit-ai/flow"
 import { generate } from "@genkit-ai/ai"
-import { googleAI } from "@genkitx/googleai"
+import { googleAI } from "@genkit-ai/googleai"
 import type { MenuItem, ChatMessage } from "@/lib/data"
+import { getMenuItemInformationFlow } from "./smart-menu-retrieval"
+import { calculateOrderTotalFlow } from "./calculate-order-total"
+import { z } from "zod"
 
 // Define the input schema for the main conversational flow
 interface GenerateResponseInput {
@@ -21,42 +24,70 @@ interface GenerateResponseOutput {
 export const generateResponseFlow = defineFlow(
   {
     name: "generateResponse",
-    inputSchema: {
-      type: "object",
-      properties: {
-        messages: { type: "array" },
-        restaurantContext: { type: "string" },
-        menuItems: { type: "array" },
-        restaurantName: { type: "string" },
-      },
-      required: ["messages", "restaurantContext", "menuItems", "restaurantName"],
-    },
-    outputSchema: {
-      type: "object",
-      properties: {
-        response: { type: "string" },
-        detectedLanguage: { type: "string" },
-        usedTools: { type: "array", items: { type: "string" } },
-      },
-      required: ["response", "detectedLanguage", "usedTools"],
-    },
+    inputSchema: z.object({
+      messages: z.array(
+        z.object({
+          id: z.string(),
+          role: z.enum(["user", "assistant"]),
+          content: z.string(),
+          // Flow runtime may serialize Dates; accept any to match interface while staying tolerant
+          timestamp: z.any(),
+        }),
+      ),
+      restaurantContext: z.string(),
+      menuItems: z.array(
+        z.object({
+          id: z.string(),
+          name: z.string(),
+          description: z.string(),
+          price: z.number(),
+          category: z.string().optional(),
+          isAvailable: z.boolean().optional(),
+        }),
+      ),
+      restaurantName: z.string(),
+    }),
+    outputSchema: z.object({
+      response: z.string(),
+      detectedLanguage: z.string(),
+      usedTools: z.array(z.string()),
+    }),
   },
-  async (input: GenerateResponseInput): Promise<GenerateResponseOutput> => {
+  async (input: any): Promise<GenerateResponseOutput> => {
     const { messages, restaurantContext, menuItems, restaurantName } = input
-    const lastMessage = messages[messages.length - 1]?.content || ""
+    const messagesTyped = messages as ChatMessage[]
+    const menuItemsTyped = menuItems as MenuItem[]
+    const lastMessage = messagesTyped[messagesTyped.length - 1]?.content || ""
     const usedTools: string[] = []
 
+    // Helper to normalize text output across Genkit versions
+    const getText = (res: any): string => {
+      try {
+        if (!res) return ""
+        // function style
+        if (typeof res.text === "function") return String(res.text()).trim()
+        // property style
+        if (typeof res.text === "string") return res.text.trim()
+        if (typeof res.output === "string") return res.output.trim()
+        return String(res).trim()
+      } catch {
+        return ""
+      }
+    }
+
     // Detect language from the last user message
-    const languageDetection = await generate({
-      model: googleAI("gemini-1.5-flash"),
+    const genAny: any = generate as any
+    const modelAny: any = (googleAI as any)("gemini-1.5-flash")
+    const languageDetection = await genAny({
+      model: modelAny,
       prompt: `Detect the language of this message and respond with just the language code (en, fr, wo, ar, etc.): "${lastMessage}"`,
     })
 
-    const detectedLanguage = languageDetection.text().trim().toLowerCase()
+    const detectedLanguage = getText(languageDetection).toLowerCase()
 
     // Analyze intent to determine if tools are needed
-    const intentAnalysis = await generate({
-      model: googleAI("gemini-1.5-flash"),
+    const intentAnalysis = await genAny({
+      model: modelAny,
       prompt: `
         Analyze this customer message and determine the intent:
         Message: "${lastMessage}"
@@ -71,13 +102,13 @@ export const generateResponseFlow = defineFlow(
       `,
     })
 
-    const intent = intentAnalysis.text().trim().toLowerCase()
+    const intent = getText(intentAnalysis).toLowerCase()
     let toolResponse = ""
 
     // Use appropriate tools based on intent
     if (intent === "menu_question") {
       try {
-        const menuInfo = await runFlow("getMenuItemInformation", {
+        const menuInfo = await runFlow(getMenuItemInformationFlow as any, {
           query: lastMessage,
           menuItems,
         })
@@ -88,7 +119,7 @@ export const generateResponseFlow = defineFlow(
       }
     } else if (intent === "order_calculation") {
       try {
-        const orderCalc = await runFlow("calculateOrderTotal", {
+        const orderCalc = await runFlow(calculateOrderTotalFlow as any, {
           orderText: lastMessage,
           menuItems,
         })
@@ -100,27 +131,27 @@ export const generateResponseFlow = defineFlow(
     }
 
     // Generate the main response using Handlebars-style templating
-    const conversationHistory = messages
+    const conversationHistory = messagesTyped
       .slice(-5) // Keep last 5 messages for context
-      .map((msg) => `${msg.role}: ${msg.content}`)
+      .map((msg: ChatMessage) => `${msg.role}: ${msg.content}`)
       .join("\n")
 
-    const menuSummary = menuItems
+    const menuSummary = menuItemsTyped
       .slice(0, 10) // Show first 10 items as summary
-      .map((item) => `- ${item.name}: ${item.description} (${item.price} FCFA)`)
+      .map((item: MenuItem) => `- ${item.name}: ${item.description} (${item.price} FCFA)`)
       .join("\n")
 
     const fullMenu =
       intent === "full_menu"
-        ? menuItems.map((item) => `${item.name} - ${item.description} - ${item.price} FCFA`).join("\n")
+        ? menuItemsTyped.map((item: MenuItem) => `${item.name} - ${item.description} - ${item.price} FCFA`).join("\n")
         : ""
 
     const prompt = `
-You are a friendly, professional WhatsApp chatbot assistant for {{restaurantName}}, a restaurant. You must:
+You are a friendly, professional WhatsApp chatbot assistant for {{restaurantName}}, a restaurant.
 
-LANGUAGE: Respond in ${detectedLanguage === "fr" ? "French" : detectedLanguage === "wo" ? "Wolof" : detectedLanguage === "ar" ? "Arabic" : "English"} (detected from user's message).
+LANGUAGE: Respond in ${detectedLanguage === "fr" ? "French" : detectedLanguage === "wo" ? "Wolof" : detectedLanguage === "ar" ? "Arabic" : "English"}.
 
-PERSONA: Be warm, helpful, concise, and knowledgeable about the restaurant.
+PERSONA: Warm, helpful, concise, and knowledgeable.
 
 CONTEXT: {{restaurantContext}}
 
@@ -135,20 +166,21 @@ ${toolResponse ? `TOOL INFORMATION: ${toolResponse}` : ""}
 ${fullMenu ? `FULL MENU:\n${fullMenu}` : ""}
 
 INSTRUCTIONS:
-- If tool information is provided, use it in your response
-- For menu questions, be specific about ingredients and prices
-- For orders, confirm items and provide totals
-- For general questions, use the restaurant context
-- Keep responses concise but helpful
-- Always be polite and professional
+- If delivery info in context is unknown, politely ask for the customer's location/neighborhood to estimate fee and ETA.
+- If customer name is unknown, ask for their name (short and polite). Always keep their phone number as the record key.
+- If delivery info is present in context, mention the delivery fee and estimated time in your reply.
+- For orders, confirm items, quantities, subtotal, and clearly state delivery fee if known, then the total.
+- If the user seems undecided, propose 2-3 popular or complementary items with prices.
+- For menu questions, be specific about ingredients and prices.
+- Keep responses concise but helpful and professional.
 
 Current user message: "${lastMessage}"
 
 Respond naturally as the restaurant's AI assistant:
     `
 
-    const finalResponse = await generate({
-      model: googleAI("gemini-1.5-flash"),
+    const finalResponse = await genAny({
+      model: modelAny,
       prompt: prompt
         .replace("{{restaurantName}}", restaurantName)
         .replace("{{restaurantContext}}", restaurantContext)
@@ -157,7 +189,7 @@ Respond naturally as the restaurant's AI assistant:
     })
 
     return {
-      response: finalResponse.text(),
+      response: getText(finalResponse),
       detectedLanguage,
       usedTools,
     }

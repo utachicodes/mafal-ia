@@ -1,10 +1,21 @@
 import type { ChatMessage } from "@/lib/data"
+import type { DeliveryEstimate } from "./delivery"
 
 // Enhanced conversation management (in production, use a database)
 export class ConversationManager {
   private static conversations = new Map<string, ChatMessage[]>()
   private static readonly MAX_MESSAGES_PER_CONVERSATION = 50
   private static readonly CONVERSATION_TIMEOUT = 24 * 60 * 60 * 1000 // 24 hours
+
+  // Lightweight metadata store (name, location, delivery)
+  private static metadata = new Map<
+    string,
+    {
+      name?: string
+      locationText?: string
+      delivery?: DeliveryEstimate
+    }
+  >()
 
   // Get conversation key
   private static getConversationKey(restaurantId: string, phoneNumber: string): string {
@@ -37,6 +48,7 @@ export class ConversationManager {
   static clearConversation(restaurantId: string, phoneNumber: string): void {
     const key = this.getConversationKey(restaurantId, phoneNumber)
     this.conversations.delete(key)
+    this.metadata.delete(key)
   }
 
   // Get conversation summary for analytics
@@ -78,9 +90,29 @@ export class ConversationManager {
 
       if (recentMessages.length === 0) {
         this.conversations.delete(key)
+        this.metadata.delete(key)
       } else if (recentMessages.length !== messages.length) {
         this.conversations.set(key, recentMessages)
       }
     }
+  }
+
+  // Metadata helpers
+  static getMetadata(
+    restaurantId: string,
+    phoneNumber: string,
+  ): { name?: string; locationText?: string; delivery?: DeliveryEstimate } {
+    const key = this.getConversationKey(restaurantId, phoneNumber)
+    return this.metadata.get(key) || {}
+  }
+
+  static updateMetadata(
+    restaurantId: string,
+    phoneNumber: string,
+    patch: Partial<{ name: string; locationText: string; delivery: DeliveryEstimate }>,
+  ): void {
+    const key = this.getConversationKey(restaurantId, phoneNumber)
+    const current = this.metadata.get(key) || {}
+    this.metadata.set(key, { ...current, ...patch })
   }
 }
