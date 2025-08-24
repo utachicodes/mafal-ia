@@ -1,4 +1,4 @@
-import type { Restaurant } from "./data"
+import type { Restaurant } from "@/lib/data"
 
 // Local storage keys
 const STORAGE_KEYS = {

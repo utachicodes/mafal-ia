@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { DashboardLayout } from "@/src/components/dashboard-layout"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -11,12 +12,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Upload, CheckCircle2, MessageSquare, Store, QrCode } from "lucide-react"
 import { useRestaurants } from "@/src/hooks/use-restaurants"
 import { useToast } from "@/hooks/use-toast"
-import { AIClientBrowser as AIClient } from "@/src/lib/ai-client-browser"
+// Removed AIClientBrowser mock usage; parse JSON locally
 
 export default function OnboardingPage() {
   const { addRestaurant } = useRestaurants()
   const { toast } = useToast()
   const [step, setStep] = useState(1)
+  const router = useRouter()
 
   // Step 1 – Basic info
   const [name, setName] = useState("")
@@ -39,8 +41,15 @@ export default function OnboardingPage() {
   const parseMenu = async () => {
     setIsParsing(true)
     try {
-      const result = await AIClient.processMenu(menuJson)
-      const items = (result as any)?.items ?? []
+      const raw = menuJson.trim()
+      if (!raw) throw new Error("Empty JSON")
+      const parsed = JSON.parse(raw)
+      const items = Array.isArray(parsed)
+        ? parsed
+        : Array.isArray((parsed as any)?.items)
+          ? (parsed as any).items
+          : []
+      if (!Array.isArray(items)) throw new Error("Expected an array of items")
       setParsedItems(items)
       toast({ title: "Menu parsed", description: `${items.length} items detected.` })
     } catch (e) {
@@ -48,7 +57,6 @@ export default function OnboardingPage() {
     } finally {
       setIsParsing(false)
     }
-
   }
 
   const simulateGenerateQr = () => {
@@ -73,12 +81,11 @@ export default function OnboardingPage() {
     const restaurantData = {
       name: name || "My Restaurant",
       description: description || "",
-      context:
-        "Welcome! Ask me about the menu, opening hours and delivery. I can help you place orders and book tables.",
-      locale: language,
-      whatsappNumber: whatsAppNumber || undefined,
-      whatsappConnected: Boolean(qrScanned && whatsAppNumber),
-      menuItems: parsedItems.map((p: any, idx: number) => ({
+      cuisine: "",
+      whatsappNumber: whatsAppNumber || "",
+      supportedLanguages: [language],
+      isActive: true,
+      menu: parsedItems.map((p: any, idx: number) => ({
         id: String(idx + 1),
         name: String(p.name ?? `Item ${idx + 1}`),
         description: String(p.description ?? ""),
@@ -86,13 +93,28 @@ export default function OnboardingPage() {
         category: p.category ? String(p.category) : undefined,
         isAvailable: p.isAvailable ?? true,
       })),
+      chatbotContext: {
+        welcomeMessage:
+          "Welcome! Ask me about the menu, opening hours and delivery. I can help you place orders and book tables.",
+        businessHours: "",
+        specialInstructions: "",
+        orderingEnabled: true,
+        deliveryInfo: "",
+      },
+      apiCredentials: {
+        whatsappAccessToken: "",
+        whatsappPhoneNumberId: "",
+        webhookVerifyToken: "",
+      },
       createdAt: new Date(),
       updatedAt: new Date(),
     }
 
-    addRestaurant(restaurantData as any)
+    const newId = addRestaurant(restaurantData as any)
     toast({ title: "Assistant created", description: "You can now test it in the Playground." })
     setStep(4)
+    // Navigate to playground pre-selecting the new restaurant
+    router.push(`/playground?select=${encodeURIComponent(newId)}`)
   }
 
   return (

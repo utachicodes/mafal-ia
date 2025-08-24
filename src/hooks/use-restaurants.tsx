@@ -8,7 +8,7 @@ import { LocalStorage } from "@/src/lib/storage"
 
 interface RestaurantsContextType {
   restaurants: Restaurant[]
-  addRestaurant: (restaurant: Omit<Restaurant, "id" | "apiKey" | "createdAt" | "updatedAt">) => void
+  addRestaurant: (restaurant: Omit<Restaurant, "id" | "apiKey" | "createdAt" | "updatedAt">) => string
   updateRestaurant: (id: string, updates: Partial<Restaurant>) => void
   deleteRestaurant: (id: string) => void
   getRestaurantById: (id: string) => Restaurant | undefined
@@ -51,6 +51,7 @@ export function RestaurantsProvider({ children }: { children: React.ReactNode })
       updatedAt: new Date(),
     }
     setRestaurants((prev) => [...prev, newRestaurant])
+    return newRestaurant.id
   }, [])
 
   const updateRestaurant = useCallback((id: string, updates: Partial<Restaurant>) => {

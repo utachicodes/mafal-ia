@@ -1,6 +1,4 @@
 "use client"
-
-import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -8,7 +6,7 @@ import { Plus, Store, Calendar, ExternalLink, Globe, Phone } from "lucide-react"
 import Link from "next/link"
 import { useRestaurants } from "@/src/hooks/use-restaurants"
 import { DashboardLayout } from "@/src/components/dashboard-layout"
-import { AddRestaurantDialog } from "@/src/components/restaurant/add-restaurant-dialog"
+// Creation is unified via onboarding; no quick-add dialog
 
 function RestaurantCard({ restaurant }: { restaurant: any }) {
   return (
@@ -59,8 +57,6 @@ function RestaurantCard({ restaurant }: { restaurant: any }) {
 }
 
 function EmptyState() {
-  const [dialogOpen, setDialogOpen] = useState(false)
-
   return (
     <div className="text-center py-12">
       <Store className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
@@ -68,18 +64,18 @@ function EmptyState() {
       <p className="text-muted-foreground mb-6 max-w-sm mx-auto">
         Get started by creating your first restaurant profile and setting up your WhatsApp chatbot.
       </p>
-      <Button onClick={() => setDialogOpen(true)} className="bg-red-600 hover:bg-red-700">
-        <Plus className="mr-2 h-4 w-4" />
-        Add Your First Restaurant
-      </Button>
-      <AddRestaurantDialog open={dialogOpen} onOpenChange={setDialogOpen} />
+      <Link href="/onboarding">
+        <Button className="bg-red-600 hover:bg-red-700">
+          <Plus className="mr-2 h-4 w-4" />
+          Start Onboarding
+        </Button>
+      </Link>
     </div>
   )
 }
 
 export default function RestaurantsPage() {
   const { restaurants, isLoading } = useRestaurants()
-  const [dialogOpen, setDialogOpen] = useState(false)
 
   if (isLoading) {
     return (
@@ -103,10 +99,12 @@ export default function RestaurantsPage() {
             <p className="text-muted-foreground">Manage your restaurant profiles and WhatsApp chatbots</p>
           </div>
           {restaurants.length > 0 && (
-            <Button onClick={() => setDialogOpen(true)} className="bg-red-600 hover:bg-red-700">
-              <Plus className="mr-2 h-4 w-4" />
-              Add Restaurant
-            </Button>
+            <Link href="/onboarding">
+              <Button className="bg-red-600 hover:bg-red-700">
+                <Plus className="mr-2 h-4 w-4" />
+                Add Restaurant
+              </Button>
+            </Link>
           )}
         </div>
 
@@ -120,7 +118,7 @@ export default function RestaurantsPage() {
           </div>
         )}
 
-        <AddRestaurantDialog open={dialogOpen} onOpenChange={setDialogOpen} />
+        {/* All creation flows go through /onboarding */}
       </div>
     </DashboardLayout>
   )
