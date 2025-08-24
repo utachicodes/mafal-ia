@@ -42,13 +42,6 @@ export async function GET(request: NextRequest) {
 // POST endpoint for receiving WhatsApp messages
 export async function POST(request: NextRequest) {
   try {
-    // In demo mode, accept the webhook and simulate success without hitting external services
-    if (env.DEMO_MODE) {
-      const rawBody = await request.text().catch(() => "")
-      console.log("[WhatsApp Webhook][DEMO] Received payload (not processed):", rawBody?.slice(0, 500))
-      return new NextResponse("OK (demo)", { status: 200 })
-    }
-
     // Read raw body for signature verification
     const rawBody = await request.text()
     const signature = request.headers.get("x-hub-signature-256") || ""
@@ -240,6 +233,8 @@ async function processIncomingMessage(message: any, contacts: any[], metadata: a
     const deliveryLine = meta.delivery ? `Delivery: ${formatEstimate(meta.delivery)}` : "Delivery: unknown"
     const customerLine = `Customer: ${meta.name ?? "unknown"} (${phoneNumber})${meta.locationText ? `, Location: ${meta.locationText}` : ""}`
 
+    const menuStatus = restaurant.menu && restaurant.menu.length > 0 ? "" : "Menu Status: No items configured yet."
+
     const restaurantContext = `
 Restaurant: ${restaurant.name}
 Description: ${restaurant.description}
@@ -251,6 +246,7 @@ Delivery Info: ${restaurant.chatbotContext.deliveryInfo}
 ${deliveryLine}
 ${customerLine}
 Ordering Enabled: ${restaurant.chatbotContext.orderingEnabled ? "Yes" : "No"}
+ ${menuStatus}
     `.trim()
 
     // Generate AI response using Genkit flows

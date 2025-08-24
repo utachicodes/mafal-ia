@@ -8,6 +8,18 @@ export class RestaurantService {
   // In-memory store for demo mode
   private static demoStore: Restaurant[] | null = null
 
+  // Provide safe defaults so chatbot always has guidance
+  private static defaultChatbotContext(restaurantName?: string) {
+    return {
+      welcomeMessage: `Welcome to ${restaurantName || "our restaurant"}! How can I help you today?`,
+      businessHours: "10:00 - 22:00 (Mon-Sun)",
+      specialInstructions:
+        "Be friendly and concise. Detect the user's language (French, English, Wolof, Arabic). Offer help with menu, prices, delivery/pickup, or placing an order.",
+      orderingEnabled: true,
+      deliveryInfo: "Delivery available in selected zones. Fees may apply.",
+    }
+  }
+
   private static ensureDemoStore() {
     if (!this.demoStore) {
       // Deep clone mock to avoid accidental mutation of import
@@ -59,21 +71,25 @@ export class RestaurantService {
       isAvailable: m.isAvailable,
     }))
 
+    const defaults = this.defaultChatbotContext(p?.name)
+
     return {
       id: p.id,
       name: p.name,
       description: p.description,
       cuisine: p.cuisine,
       whatsappNumber: p.whatsappNumber,
-      supportedLanguages: Array.isArray(p.supportedLanguages) ? p.supportedLanguages : [],
+      supportedLanguages: Array.isArray(p.supportedLanguages) && p.supportedLanguages.length > 0
+        ? p.supportedLanguages
+        : ["French", "English", "Wolof", "Arabic"],
       isActive: p.isActive,
       menu,
       chatbotContext: {
-        welcomeMessage: p.welcomeMessage ?? "",
-        businessHours: p.businessHours ?? "",
-        specialInstructions: p.specialInstructions ?? "",
-        orderingEnabled: p.orderingEnabled ?? true,
-        deliveryInfo: p.deliveryInfo ?? "",
+        welcomeMessage: p.welcomeMessage ?? defaults.welcomeMessage,
+        businessHours: p.businessHours ?? defaults.businessHours,
+        specialInstructions: p.specialInstructions ?? defaults.specialInstructions,
+        orderingEnabled: p.orderingEnabled ?? defaults.orderingEnabled,
+        deliveryInfo: p.deliveryInfo ?? defaults.deliveryInfo,
       },
       apiCredentials: {
         whatsappAccessToken: "", // not stored in DB

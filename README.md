@@ -261,12 +261,6 @@ You can import or edit menus via the dashboard UI. The AI uses this data to answ
 - __Verify signatures:__ The webhook validates `X-Hub-Signature-256` using `WHATSAPP_APP_SECRET`.
 - __Least privilege:__ Use a dedicated Postgres user for this app.
 
-## Operational Notes
-
-- __Rate limits:__ WhatsApp and Genkit have rate/usage limits; plan capacity accordingly.
-- __Monitoring:__ Use your platform logs to monitor `/api/whatsapp` for errors.
-- __Backups:__ Enable backups on your Postgres provider.
-
 ## Testing
 
 The platform includes comprehensive integration testing:
@@ -275,9 +269,66 @@ The platform includes comprehensive integration testing:
 - Menu item structure validation
 - AI response generation testing
 - WhatsApp message processing
-- Webhook signature validation
+  - Webhook signature validation
 
 Run tests using the Integration Test Panel in the settings.
+
+## Troubleshooting & Debugging
+
+Use these targeted checks when things go wrong.
+
+### NPM install / build
+- __Peer deps (React 19 / Next 15)__: `npm install --legacy-peer-deps` (optionally `npm config set legacy-peer-deps true`).
+- __Corrupt install__: delete `node_modules` + `package-lock.json`, then reinstall.
+- __Node version__: use Node 18+ LTS. `node -v`.
+
+### Next.js runtime & bundling
+- __Edge vs Node mismatch__: API routes like `app/api/whatsapp/route.ts` should run on Node (don’t export `runtime = 'edge'`).
+- __ESM/CJS errors (ERR_REQUIRE_ESM / Unexpected token 'export')__: avoid mixing module systems; keep Next defaults. Ensure `package.json` `type` and TS config align.
+- __Client bundle pulling server deps__: don’t import `src/ai/flows/*`, `RestaurantService`, or other server libs in client components. Use `src/lib/ai-client.ts` which mocks in the browser and runs flows only on the server.
+
+### Environment / .env
+- __Missing keys__: set `GOOGLE_GENKIT_API_KEY`, `WHATSAPP_ACCESS_TOKEN`, `WHATSAPP_APP_SECRET`, `WHATSAPP_VERIFY_TOKEN`, `DATABASE_URL` (when using DB). See `src/lib/env.ts`.
+- __Wrong values__: compare with your Meta app settings and Google API key. Restart dev server after changes.
+
+### WhatsApp webhook
+- __GET verify returns 403__: `WHATSAPP_VERIFY_TOKEN` must match Meta’s configured token. Endpoint: `GET /api/whatsapp`.
+- __403 signature mismatch__: `WHATSAPP_APP_SECRET` missing/incorrect; see `src/lib/webhook-validator.ts`.
+- __400/401 from Graph API__: check `WHATSAPP_ACCESS_TOKEN`, `businessPhoneNumberId`, and message payload structure in `src/lib/whatsapp-client.ts`.
+- __405/CORS issues locally__: use the exact GET or POST method as required; ensure correct `Content-Type: application/json`.
+
+### Genkit / AI
+- __Missing API key__: set `GOOGLE_GENKIT_API_KEY`.
+- __429 rate limit / 5xx__: retry with backoff; temporarily switch model in `src/ai/config.ts` (e.g., `gemini-1.5-flash`).
+- __Flow runtime errors (dynamic import)__: confirm flows are only executed server-side via `AIClient`.
+- __Timeouts__: reduce prompt size, or increase platform timeout where applicable.
+
+### AI response quality
+- __No menu context__: ensure your restaurant has menu items; update via dashboard.
+- __Missing business info__: verify `restaurantContext` passed in `app/api/whatsapp/route.ts` (hours, delivery, location, fees).
+- __Tone/behavior__: customize `chatbotContext` in your restaurant data to guide tone and content.
+
+### Prisma / Database
+- __Migration errors__: run `npx prisma generate` then `npx prisma migrate dev --name init`. Verify `DATABASE_URL`.
+- __SQLite lock on Windows__: close other processes touching the DB; delete `prisma/dev.db` for a clean dev reset if needed.
+
+### Firebase-related "Module not found: Can't resolve 'net'" during build
+- __Symptom__: import trace shows `firebase-admin` / `firebase-functions`; bundler complains about Node built-ins like `net`.
+- __Cause__: optional Firebase providers from a transitive dep end up in a client/edge bundle or are recorded in `package-lock.json`.
+- __Fixes__:
+  - Keep API routes on Node runtime; don’t import server-only code in client components.
+  - Avoid adding `@genkit-ai/firebase` or Firebase SDKs unless used server-side only.
+  - Clean reinstall: delete `node_modules` and `package-lock.json`, then `npm install --legacy-peer-deps`.
+  - Use `AIClient` to invoke flows; do not import `src/ai/flows/*` directly in client code.
+  - As a last resort, set `DEMO_MODE=true` to validate UI and routing only.
+
+### Dev server / OS
+- __EADDRINUSE: 3000__: another app uses the port. Stop it or run with `PORT=3001 npm run dev`.
+- __CERT_HAS_EXPIRED / TLS__: ensure system time is correct; use valid HTTPS certs in production.
+
+### Quick diagnostics
+- __Find who depends on X__: `npx why <pkg>`; tree: `npm ls <pkg>`.
+- __Verbose logs__: check terminal during `npm run dev`. Add targeted `console.log` in `app/api/whatsapp/route.ts` to trace payload and routing.
 
 ## Deployment
 
@@ -303,3 +354,4 @@ This project is licensed under the MIT License.
 For support and questions, please contact: abdoullahaljersi@gmail.com
 
 Built with ❤️ by utachicodes.
+
