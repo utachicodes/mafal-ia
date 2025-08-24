@@ -42,6 +42,7 @@ export class RestaurantService {
           whatsappPhoneNumberId: r.apiCredentials.whatsappPhoneNumberId || "",
           supportedLanguages: r.supportedLanguages,
           isActive: r.isActive,
+          isConcierge: !!r.isConcierge,
           welcomeMessage: r.chatbotContext.welcomeMessage,
           businessHours: r.chatbotContext.businessHours,
           specialInstructions: r.chatbotContext.specialInstructions,
@@ -83,6 +84,7 @@ export class RestaurantService {
         ? p.supportedLanguages
         : ["French", "English", "Wolof", "Arabic"],
       isActive: p.isActive,
+      isConcierge: !!p.isConcierge,
       menu,
       chatbotContext: {
         welcomeMessage: p.welcomeMessage ?? defaults.welcomeMessage,
@@ -96,6 +98,9 @@ export class RestaurantService {
         whatsappPhoneNumberId: p.whatsappPhoneNumberId ?? "",
         webhookVerifyToken: "", // not stored in DB
       },
+      apiKey: "",
+      createdAt: new Date(),
+      updatedAt: new Date(),
     }
   }
 
@@ -161,6 +166,7 @@ export class RestaurantService {
         whatsappPhoneNumberId: updates.apiCredentials?.whatsappPhoneNumberId,
         supportedLanguages: updates.supportedLanguages,
         isActive: updates.isActive,
+        isConcierge: updates.isConcierge,
         welcomeMessage: updates.chatbotContext?.welcomeMessage,
         businessHours: updates.chatbotContext?.businessHours,
         specialInstructions: updates.chatbotContext?.specialInstructions,

@@ -14,7 +14,7 @@ export class ConversationManager {
   private static readonly MAX_MESSAGES_PER_CONVERSATION = 50
   private static readonly CONVERSATION_TIMEOUT = 24 * 60 * 60 * 1000 // 24 hours
 
-  // Lightweight metadata store (name, location, delivery)
+  // Lightweight metadata store (name, location, delivery, concierge state)
   private static metadata = new Map<
     string,
     {
@@ -22,6 +22,16 @@ export class ConversationManager {
       locationText?: string
       delivery?: DeliveryEstimate
       pendingOrder?: PendingOrder | undefined
+      // Concierge-only fields (global assistant)
+      conciergeOptions?: { id: string; name: string; sample: string; price: number }[]
+      conciergePendingOrder?: {
+        restaurantId: string
+        restaurantName: string
+        itemsSummary: string
+        total: number
+        orderItems: { itemName: string; quantity: number }[]
+      }
+      lastQuery?: string
     }
   >()
 
@@ -109,7 +119,21 @@ export class ConversationManager {
   static getMetadata(
     restaurantId: string,
     phoneNumber: string,
-  ): { name?: string; locationText?: string; delivery?: DeliveryEstimate; pendingOrder?: PendingOrder | undefined } {
+  ): {
+    name?: string
+    locationText?: string
+    delivery?: DeliveryEstimate
+    pendingOrder?: PendingOrder | undefined
+    conciergeOptions?: { id: string; name: string; sample: string; price: number }[]
+    conciergePendingOrder?: {
+      restaurantId: string
+      restaurantName: string
+      itemsSummary: string
+      total: number
+      orderItems: { itemName: string; quantity: number }[]
+    }
+    lastQuery?: string
+  } {
     const key = this.getConversationKey(restaurantId, phoneNumber)
     return this.metadata.get(key) || {}
   }
@@ -117,7 +141,21 @@ export class ConversationManager {
   static updateMetadata(
     restaurantId: string,
     phoneNumber: string,
-    patch: Partial<{ name: string; locationText: string; delivery: DeliveryEstimate; pendingOrder: PendingOrder | undefined }>,
+    patch: Partial<{
+      name: string
+      locationText: string
+      delivery: DeliveryEstimate
+      pendingOrder: PendingOrder | undefined
+      conciergeOptions: { id: string; name: string; sample: string; price: number }[]
+      conciergePendingOrder: {
+        restaurantId: string
+        restaurantName: string
+        itemsSummary: string
+        total: number
+        orderItems: { itemName: string; quantity: number }[]
+      }
+      lastQuery: string
+    }>,
   ): void {
     const key = this.getConversationKey(restaurantId, phoneNumber)
     const current = this.metadata.get(key) || {}

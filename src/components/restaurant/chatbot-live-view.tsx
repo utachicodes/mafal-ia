@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Send, Bot, User, RefreshCw, Trash2, AlertCircle, CheckCircle } from "lucide-react"
 import type { Restaurant, ChatMessage } from "@/lib/data"
-import { AIClient } from "@/src/lib/ai-client"
+import { AIClientBrowser as AIClient } from "@/src/lib/ai-client-browser"
 
 interface ChatbotLiveViewProps {
   restaurant: Restaurant

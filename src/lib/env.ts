@@ -2,6 +2,8 @@ export const env = {
   WHATSAPP_ACCESS_TOKEN: process.env.WHATSAPP_ACCESS_TOKEN || "",
   WHATSAPP_VERIFY_TOKEN: process.env.WHATSAPP_VERIFY_TOKEN || "mafal_verify_token_2024",
   WHATSAPP_APP_SECRET: process.env.WHATSAPP_APP_SECRET || "",
+  // Optional: dedicated concierge number that routes to multi-restaurant assistant
+  WHATSAPP_CONCIERGE_PHONE_NUMBER_ID: process.env.WHATSAPP_CONCIERGE_PHONE_NUMBER_ID || "",
   GOOGLE_GENKIT_API_KEY: process.env.GOOGLE_GENKIT_API_KEY || "",
   NODE_ENV: process.env.NODE_ENV || "development",
   DATABASE_URL: process.env.DATABASE_URL || "",

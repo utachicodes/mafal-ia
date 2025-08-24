@@ -5,7 +5,7 @@ import type React from "react"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { Menu, Home, Store, BarChart3, Settings } from "lucide-react"
+import { Menu, Home, Store, BarChart3, Settings, MessageSquare, Key } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
@@ -14,7 +14,9 @@ import { Logo } from "./logo"
 const navigation = [
   { name: "Home", href: "/", icon: Home },
   { name: "Restaurants", href: "/restaurants", icon: Store },
+  { name: "Playground", href: "/playground", icon: MessageSquare },
   { name: "Analytics", href: "/analytics", icon: BarChart3 },
+  { name: "Onboarding", href: "/onboarding", icon: Key },
   { name: "Settings", href: "/settings", icon: Settings },
 ]
 

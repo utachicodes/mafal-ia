@@ -85,7 +85,16 @@ export async function POST(request: NextRequest) {
         // Process incoming messages
         if (messages && Array.isArray(messages)) {
           for (const message of messages) {
-            await processIncomingMessage(message, contacts, metadata)
+            const businessPhoneNumberId = metadata?.phone_number_id
+            if (!businessPhoneNumberId) continue
+
+            // Lookup restaurant by WhatsApp business phone number id to determine concierge routing
+            const r = await RestaurantService.getRestaurantByPhoneNumber(businessPhoneNumberId)
+            if (r?.isActive && (r as any).isConcierge === true) {
+              await processConciergeIncomingMessage(message, contacts, metadata)
+            } else {
+              await processIncomingMessage(message, contacts, metadata)
+            }
           }
         }
       }
@@ -294,6 +303,167 @@ Ordering Enabled: ${restaurant.chatbotContext.orderingEnabled ? "Yes" : "No"}
       console.error("[WhatsApp] Error sending error message:", sendError)
     }
   }
+}
+
+// Simple helpers to normalize menus from different shapes
+function normalizeMenu(r: any) {
+  if (Array.isArray(r.menu) && r.menu.length) return r.menu
+  if (Array.isArray(r.menuItems) && r.menuItems.length)
+    return r.menuItems.map((m: any, idx: number) => ({
+      id: String(m.id ?? idx + 1),
+      name: String(m.name ?? "Item"),
+      description: String(m.description ?? ""),
+      price: Number(m.price ?? 0),
+      category: m.category ? String(m.category) : undefined,
+      isAvailable: m.isAvailable ?? true,
+    }))
+  return []
+}
+
+// Concierge multi-restaurant assistant
+async function processConciergeIncomingMessage(message: any, contacts: any[], metadata: any) {
+  const phoneNumber = message.from
+  const businessPhoneNumberId = metadata?.phone_number_id
+  if (!businessPhoneNumberId) return
+
+  // Support text and location messages
+  let messageText = ""
+  if (message.type === "text" && message.text?.body) {
+    messageText = message.text.body.trim()
+  } else if (message.type === "location" && message.location) {
+    const lat = message.location.latitude
+    const lng = message.location.longitude
+    messageText = `location:${lat},${lng}`
+  } else {
+    // Ignore unsupported types
+    return
+  }
+
+  const CONCIERGE_ID = "concierge_global"
+  const lower = messageText.toLowerCase()
+
+  // Meta state we manage for concierge
+  const meta = ConversationManager.getMetadata(CONCIERGE_ID, phoneNumber) || {}
+
+  // If awaiting YES/NO for a pending suggestion
+  if (meta.conciergePendingOrder && ["yes", "y", "confirm", "ok", "okay", "oui"].includes(lower)) {
+    const po = meta.conciergePendingOrder as {
+      restaurantId: string
+      restaurantName: string
+      itemsSummary: string
+      total: number
+      orderItems: { itemName: string; quantity: number }[]
+    }
+    const order = await OrderService.createOrder({
+      restaurantId: po.restaurantId,
+      phoneNumber,
+      total: po.total,
+      itemsSummary: po.itemsSummary,
+      notFoundItems: "",
+      orderItems: po.orderItems,
+    })
+    ConversationManager.updateMetadata(CONCIERGE_ID, phoneNumber, { conciergePendingOrder: undefined })
+    await WhatsAppClient.sendMessage(
+      businessPhoneNumberId,
+      phoneNumber,
+      `✅ Order sent to ${po.restaurantName}!\nOrder ID: ${order.id}\nTotal: ${order.total} FCFA`,
+    )
+    return
+  }
+  if (meta.conciergePendingOrder && ["no", "n", "cancel", "non"].includes(lower)) {
+    ConversationManager.updateMetadata(CONCIERGE_ID, phoneNumber, { conciergePendingOrder: undefined })
+    await WhatsAppClient.sendMessage(businessPhoneNumberId, phoneNumber, "❌ No problem. Tell me what you'd like instead.")
+    return
+  }
+
+  // Save basic contact name
+  if (Array.isArray(contacts) && contacts[0]?.profile?.name) {
+    ConversationManager.updateMetadata(CONCIERGE_ID, phoneNumber, { name: String(contacts[0].profile.name) })
+  }
+
+  // Ensure we have a location hint
+  let locationKnown = Boolean(meta.locationText)
+  if (lower.startsWith("location:") || lower.startsWith("coords:")) {
+    ConversationManager.updateMetadata(CONCIERGE_ID, phoneNumber, { locationText: messageText })
+    locationKnown = true
+  }
+  if (!locationKnown) {
+    await WhatsAppClient.sendMessage(
+      businessPhoneNumberId,
+      phoneNumber,
+      "Hello! Please share your location (send a location pin or type your neighborhood). Then tell me what you want, e.g. 'burgers'",
+    )
+    return
+  }
+
+  // If user just sent location without a food query, prompt for query
+  if (!messageText || lower.startsWith("location:") || lower.startsWith("coords:")) {
+    await WhatsAppClient.sendMessage(
+      businessPhoneNumberId,
+      phoneNumber,
+      "Got it! Now tell me what you're craving (e.g. 'shawarma', 'burger', 'vegan salad').",
+    )
+    return
+  }
+
+  // Run a simple RAG-like search across all restaurants' menus
+  const all = await RestaurantService.getAllRestaurants()
+  const q = lower
+  const scored = all
+    .map((r: any) => {
+      const menu = normalizeMenu(r)
+      const matches = menu.filter((m: any) => ((m.name + " " + (m.description || "") + " " + (m.category || "")).toLowerCase().includes(q)) && (m.isAvailable ?? true))
+      return { r, matches }
+    })
+    .filter((x) => x.matches.length > 0)
+    .sort((a, b) => b.matches.length - a.matches.length)
+
+  if (scored.length === 0) {
+    await WhatsAppClient.sendMessage(
+      businessPhoneNumberId,
+      phoneNumber,
+      "I couldn't find any restaurants matching that. Try another description (e.g. 'grilled chicken', 'pizza', 'sushi').",
+    )
+    return
+  }
+
+  // If the user replied with a numeric choice and we have stored options, handle selection
+  const choiceNum = Number.parseInt(lower, 10)
+  if (!Number.isNaN(choiceNum) && meta.conciergeOptions && Array.isArray(meta.conciergeOptions) && meta.conciergeOptions[choiceNum - 1]) {
+    const chosen = meta.conciergeOptions[choiceNum - 1] as { id: string; name: string; sample: string; price: number }
+    // Create a pending order with 1x top match; ask for YES to confirm
+    const po = {
+      restaurantId: chosen.id,
+      restaurantName: chosen.name,
+      itemsSummary: `1x ${chosen.sample}`,
+      total: chosen.price,
+      orderItems: [{ itemName: chosen.sample, quantity: 1 }],
+    }
+    ConversationManager.updateMetadata(CONCIERGE_ID, phoneNumber, { conciergePendingOrder: po })
+    await WhatsAppClient.sendMessage(
+      businessPhoneNumberId,
+      phoneNumber,
+      `Great choice: ${chosen.name}.\nI'll place an order for 1x ${chosen.sample} (${chosen.price} FCFA). Reply YES to confirm or NO to cancel.`,
+    )
+    return
+  }
+
+  // Propose top 4 options with one sample item each
+  const top = scored.slice(0, 4)
+  const options = top.map(({ r, matches }: any) => {
+    const sample = matches[0]
+    return { id: r.id, name: r.name, sample: sample?.name ?? "Item", price: Number(sample?.price ?? 0) }
+  })
+  ConversationManager.updateMetadata(CONCIERGE_ID, phoneNumber, { conciergeOptions: options, lastQuery: q })
+
+  const lines = options
+    .map((o: any, i: number) => `${i + 1}. ${o.name} — try: ${o.sample} (${o.price} FCFA)`) 
+    .join("\n")
+  await WhatsAppClient.sendMessage(
+    businessPhoneNumberId,
+    phoneNumber,
+    `Here are some options near you for "${messageText}":\n${lines}\n\nReply with a number (1-${options.length}) to choose.`,
+  )
 }
 
 // Removed in favor of ConversationManager

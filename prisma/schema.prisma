@@ -2,8 +2,8 @@
 // Postgres for production. Set DATABASE_URL to your Postgres connection string.
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider = "sqlite"
+  url      = "file:./dev.db"
 }
 
 generator client {
@@ -19,6 +19,8 @@ model Restaurant {
   whatsappPhoneNumberId  String      @default("") // maps to Meta business phone number ID
   supportedLanguages     Json
   isActive               Boolean     @default(true)
+  // Marks this WhatsApp number as the global concierge that can search across all restaurants
+  isConcierge            Boolean     @default(false)
 
   // Flattened chatbot context
   welcomeMessage         String      @default("")

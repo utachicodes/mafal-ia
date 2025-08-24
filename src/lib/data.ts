@@ -14,6 +14,18 @@ export interface Restaurant {
   apiKey: string
   context: string
   menuItems: MenuItem[]
+  // New fields for integrations and UX
+  locale?: string
+  whatsappNumber?: string
+  whatsappConnected?: boolean
+  calendarProvider?: "google" | "outlook" | null
+  crmWebhookUrl?: string | null
+  assistantTone?: "friendly" | "professional" | "playful"
+  templates?: {
+    greeting?: string
+    bookingConfirmation?: string
+    closing?: string
+  }
   createdAt: Date
   updatedAt: Date
 }
@@ -39,6 +51,11 @@ export const mockRestaurants: Restaurant[] = [
     apiKey: "mafal_chez_fatou_2024_abc123",
     context:
       "We are a traditional Senegalese restaurant serving authentic dishes like thieboudienne, yassa, and mafe. We are open from 11 AM to 10 PM daily. We offer both dine-in and takeaway options.",
+    locale: "fr",
+    whatsappConnected: false,
+    calendarProvider: null,
+    crmWebhookUrl: null,
+    assistantTone: "friendly",
     menuItems: [
       {
         id: "1",

@@ -24,6 +24,13 @@ Your intelligent WhatsApp assistant. Get started in minutes.
 3. **Get Your API Key**
    Copy your unique API key and connect your WhatsApp Business account. Your assistant is ready to serve.
 
+## V2 Update (Aug 2025)
+
+- **New pages & flows**: `app/onboarding`, `app/playground`, `app/concierge`, `app/whatsapp/quick-connect`, and `app/legal/dpa`.
+- **Concierge mode**: `Restaurant.isConcierge` lets one number act as a global concierge across all restaurants.
+- **Browser-safe AI client**: Use `src/lib/ai-client-browser.ts` in client components; keep `src/lib/ai-client.ts` for server code only.
+- **Local dev DB**: Default to SQLite via `prisma/dev.db` (PostgreSQL recommended for production).
+
 ## Technology Stack
 
 - **Framework**: Next.js 15 (App Router)
@@ -69,9 +76,13 @@ DEMO_MODE=false
    - `npm install --legacy-peer-deps`
    - Optionally set globally: `npm config set legacy-peer-deps true`
 3. Set up environment variables (`.env.local`)
-4. Initialize database with Prisma (PostgreSQL):
-   - Generate client: `npx prisma generate`
-   - Create schema and migrations: `npx prisma migrate dev --name init`
+4. Initialize database with Prisma
+   - Local dev (SQLite, no DATABASE_URL needed):
+     - `npx prisma migrate dev --name add-isConcierge`
+     - `npx prisma generate`
+   - Production (PostgreSQL):
+     - Ensure `DATABASE_URL` is set
+     - `npx prisma migrate deploy`
 5. Run the development server: `npm run dev`
 6. Open [http://localhost:3000](http://localhost:3000)
 
@@ -82,11 +93,17 @@ DEMO_MODE=false
 ├─ app/                             # Next.js App Router
 │  ├─ api/
 │  │  ├─ whatsapp/route.ts          # WhatsApp webhook (GET verify, POST messages)
-│  │  └─ restaurants/[id]/route.ts  # Restaurant API
+│  │  ├─ restaurants/[id]/route.ts  # Restaurant API
+│  │  └─ concierge/order/route.ts   # Concierge ordering endpoint
 │  ├─ analytics/page.tsx
+│  ├─ concierge/page.tsx
+│  ├─ onboarding/page.tsx
+│  ├─ playground/page.tsx
 │  ├─ restaurants/[id]/
 │  ├─ restaurants/page.tsx
 │  ├─ settings/page.tsx
+│  ├─ whatsapp/quick-connect/page.tsx
+│  ├─ legal/dpa/page.tsx
 │  ├─ page.tsx                      # Landing page
 │  └─ layout.tsx
 │
@@ -110,7 +127,8 @@ DEMO_MODE=false
 │  ├─ hooks/
 │  │  └─ use-restaurants.tsx
 │  ├─ lib/
-│  │  ├─ ai-client.ts               # Server runner for flows
+│  │  ├─ ai-client.ts               # Server runner for flows (server-only)
+│  │  ├─ ai-client-browser.ts       # Browser-safe client for client components
 │  │  ├─ conversation-manager.ts    # In-memory conv + metadata (name/location/delivery)
 │  │  ├─ data-utils.ts
 │  │  ├─ delivery.ts                # Delivery zone fee/ETA estimator
@@ -285,7 +303,7 @@ Use these targeted checks when things go wrong.
 ### Next.js runtime & bundling
 - __Edge vs Node mismatch__: API routes like `app/api/whatsapp/route.ts` should run on Node (don’t export `runtime = 'edge'`).
 - __ESM/CJS errors (ERR_REQUIRE_ESM / Unexpected token 'export')__: avoid mixing module systems; keep Next defaults. Ensure `package.json` `type` and TS config align.
-- __Client bundle pulling server deps__: don’t import `src/ai/flows/*`, `RestaurantService`, or other server libs in client components. Use `src/lib/ai-client.ts` which mocks in the browser and runs flows only on the server.
+- __Client bundle pulling server deps__: don’t import `src/ai/flows/*`, `RestaurantService`, or other server libs in client components. Use `src/lib/ai-client-browser.ts` in client code and keep `src/lib/ai-client.ts` on the server.
 
 ### Environment / .env
 - __Missing keys__: set `GOOGLE_GENKIT_API_KEY`, `WHATSAPP_ACCESS_TOKEN`, `WHATSAPP_APP_SECRET`, `WHATSAPP_VERIFY_TOKEN`, `DATABASE_URL` (when using DB). See `src/lib/env.ts`.

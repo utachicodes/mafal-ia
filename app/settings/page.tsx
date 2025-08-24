@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -9,9 +9,10 @@ import { Switch } from "@/components/ui/switch"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Save, Download, Upload, Trash2, Shield, Bell, Palette } from "lucide-react"
+import { Save, Download, Upload, Trash2, Shield, Bell, Palette, MessageSquare, Plug, FileText } from "lucide-react"
 import { DashboardLayout } from "@/src/components/dashboard-layout"
 import { useToast } from "@/hooks/use-toast"
+import { LocalStorage } from "@/src/lib/storage"
 
 export default function SettingsPage() {
   const { toast } = useToast()
@@ -37,11 +38,40 @@ export default function SettingsPage() {
   const [sessionTimeout, setSessionTimeout] = useState("24")
   const [ipWhitelist, setIpWhitelist] = useState("")
 
+  // Assistant Settings
+  const [assistantTone, setAssistantTone] = useState("friendly")
+  const [tplGreeting, setTplGreeting] = useState("Hello! I can help with menu, prices and orders.")
+  const [tplBooking, setTplBooking] = useState("Your booking is confirmed for {{datetime}}. See you soon!")
+  const [tplClosing, setTplClosing] = useState("Thanks for reaching out!")
+
+  // Integrations
+  const [calendarProvider, setCalendarProvider] = useState<string>("none")
+  const [crmWebhookUrl, setCrmWebhookUrl] = useState("")
+
   const handleSaveSettings = async () => {
     setIsLoading(true)
     try {
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1000))
+      const payload = {
+        companyName,
+        supportEmail,
+        emailNotifications,
+        webhookNotifications,
+        dailyReports,
+        twoFactorAuth,
+        sessionTimeout,
+        ipWhitelist,
+        assistantTone,
+        templates: {
+          greeting: tplGreeting,
+          booking: tplBooking,
+          closing: tplClosing,
+        },
+        calendarProvider,
+        crmWebhookUrl,
+      }
+      LocalStorage.saveSettings(payload)
       toast({
         title: "Settings saved",
         description: "Your settings have been updated successfully.",
@@ -56,6 +86,27 @@ export default function SettingsPage() {
       setIsLoading(false)
     }
   }
+
+  // Load settings on mount
+  useEffect(() => {
+    const s = LocalStorage.loadSettings()
+    if (!s) return
+    setCompanyName(s.companyName ?? companyName)
+    setSupportEmail(s.supportEmail ?? supportEmail)
+    setEmailNotifications(Boolean(s.emailNotifications))
+    setWebhookNotifications(Boolean(s.webhookNotifications))
+    setDailyReports(Boolean(s.dailyReports))
+    setTwoFactorAuth(Boolean(s.twoFactorAuth))
+    setSessionTimeout(String(s.sessionTimeout ?? sessionTimeout))
+    setIpWhitelist(String(s.ipWhitelist ?? ""))
+    setAssistantTone(String(s.assistantTone ?? assistantTone))
+    setTplGreeting(String(s.templates?.greeting ?? tplGreeting))
+    setTplBooking(String(s.templates?.booking ?? tplBooking))
+    setTplClosing(String(s.templates?.closing ?? tplClosing))
+    setCalendarProvider(String(s.calendarProvider ?? calendarProvider))
+    setCrmWebhookUrl(String(s.crmWebhookUrl ?? crmWebhookUrl))
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const handleExportData = () => {
     toast({
@@ -80,12 +131,15 @@ export default function SettingsPage() {
         </div>
 
         <Tabs defaultValue="general" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-8">
             <TabsTrigger value="general">General</TabsTrigger>
             <TabsTrigger value="ai">AI & Models</TabsTrigger>
             <TabsTrigger value="notifications">Notifications</TabsTrigger>
             <TabsTrigger value="security">Security</TabsTrigger>
             <TabsTrigger value="data">Data</TabsTrigger>
+            <TabsTrigger value="assistant">Assistant</TabsTrigger>
+            <TabsTrigger value="integrations">Integrations</TabsTrigger>
+            <TabsTrigger value="compliance">Compliance</TabsTrigger>
           </TabsList>
 
           <TabsContent value="general">
@@ -296,6 +350,87 @@ export default function SettingsPage() {
                 </CardContent>
               </Card>
             </div>
+          </TabsContent>
+
+          <TabsContent value="assistant">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2"><MessageSquare className="h-5 w-5"/>Assistant Settings</CardTitle>
+                <CardDescription>Control tone and default templates</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Assistant Tone</Label>
+                    <Select value={assistantTone} onValueChange={setAssistantTone}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="friendly">Friendly</SelectItem>
+                        <SelectItem value="professional">Professional</SelectItem>
+                        <SelectItem value="playful">Playful</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label>Greeting Template</Label>
+                  <Textarea value={tplGreeting} onChange={(e) => setTplGreeting(e.target.value)} rows={2} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Booking Confirmation Template</Label>
+                  <Textarea value={tplBooking} onChange={(e) => setTplBooking(e.target.value)} rows={2} />
+                  <p className="text-xs text-muted-foreground">{"You can use variables like {{datetime}}, {{name}}"}</p>
+                </div>
+                <div className="space-y-2">
+                  <Label>Closing Template</Label>
+                  <Textarea value={tplClosing} onChange={(e) => setTplClosing(e.target.value)} rows={2} />
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="integrations">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2"><Plug className="h-5 w-5"/>Integrations</CardTitle>
+                <CardDescription>Connect calendars and CRMs</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Calendar Provider</Label>
+                    <Select value={calendarProvider} onValueChange={setCalendarProvider}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">None</SelectItem>
+                        <SelectItem value="google">Google Calendar</SelectItem>
+                        <SelectItem value="outlook">Outlook</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="crm">CRM/Webhook URL</Label>
+                    <Input id="crm" value={crmWebhookUrl} onChange={(e) => setCrmWebhookUrl(e.target.value)} placeholder="https://hooks.zapier.com/..." />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="compliance">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2"><FileText className="h-5 w-5"/>Compliance</CardTitle>
+                <CardDescription>Privacy, GDPR/CCPA and DPA</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex gap-3">
+                  <a href="/legal/dpa" className="underline text-primary">View/Download DPA</a>
+                  <a href="/privacy" className="underline">Privacy Policy</a>
+                  <a href="/security" className="underline">Security Overview</a>
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
 

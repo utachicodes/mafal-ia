@@ -15,6 +15,8 @@ export interface Restaurant {
   whatsappNumber: string
   supportedLanguages: string[]
   isActive: boolean
+  // Marks this WhatsApp number as a global concierge entry point
+  isConcierge?: boolean
   menu: MenuItem[]
   chatbotContext: {
     welcomeMessage: string
