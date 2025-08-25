@@ -26,7 +26,7 @@ export function RestaurantsProvider({ children }: { children: React.ReactNode })
     const loadData = () => {
       const stored = LocalStorage.loadRestaurants()
       if (stored && stored.length > 0) {
-        setRestaurants(stored)
+        setRestaurants(stored as Restaurant[])
       } else {
         setRestaurants(mockRestaurants)
       }
@@ -45,6 +45,8 @@ export function RestaurantsProvider({ children }: { children: React.ReactNode })
   const addRestaurant = useCallback((restaurantData: Omit<Restaurant, "id" | "apiKey" | "createdAt" | "updatedAt">) => {
     const newRestaurant: Restaurant = {
       ...restaurantData,
+      // Ensure `menu` is initialized even if upstream provided `menuItems`
+      menu: (restaurantData as any).menu ?? (restaurantData as any).menuItems ?? [],
       id: `restaurant_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`,
       apiKey: generateApiKey(restaurantData.name),
       createdAt: new Date(),

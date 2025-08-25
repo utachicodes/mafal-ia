@@ -33,13 +33,14 @@ function AddMenuItemDialog({ restaurant }: { restaurant: Restaurant }) {
   const [price, setPrice] = useState("")
   const [category, setCategory] = useState("")
   const { updateRestaurant } = useRestaurants()
+  const items = (restaurant as any).menu ?? (restaurant as any).menuItems ?? []
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (name.trim() && description.trim() && price) {
       const newItem = createMenuItem(name, description, Number(price), category || undefined)
-      const updatedMenuItems = [...restaurant.menuItems, newItem]
-      updateRestaurant(restaurant.id, { menuItems: updatedMenuItems })
+      const updated = [...items, newItem]
+      updateRestaurant(restaurant.id, { menu: updated })
 
       setName("")
       setDescription("")
@@ -123,6 +124,7 @@ function UploadMenuDialog({ restaurant }: { restaurant: Restaurant }) {
   const [jsonContent, setJsonContent] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const { updateRestaurant } = useRestaurants()
+  const items = (restaurant as any).menu ?? (restaurant as any).menuItems ?? []
 
   const handleUpload = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -130,7 +132,8 @@ function UploadMenuDialog({ restaurant }: { restaurant: Restaurant }) {
 
     try {
       const newItems = processMenuFromJSON(jsonContent)
-      updateRestaurant(restaurant.id, { menuItems: newItems })
+      // Replace existing items with uploaded set
+      updateRestaurant(restaurant.id, { menu: newItems })
       setJsonContent("")
       setOpen(false)
     } catch (error) {
@@ -185,10 +188,11 @@ function UploadMenuDialog({ restaurant }: { restaurant: Restaurant }) {
 
 export function MenuManager({ restaurant }: MenuManagerProps) {
   const { updateRestaurant } = useRestaurants()
+  const items = (restaurant as any).menu ?? (restaurant as any).menuItems ?? []
 
   const handleDeleteItem = (itemId: string) => {
-    const updatedMenuItems = restaurant.menuItems.filter((item) => item.id !== itemId)
-    updateRestaurant(restaurant.id, { menuItems: updatedMenuItems })
+    const updated = items.filter((item: any) => item.id !== itemId)
+    updateRestaurant(restaurant.id, { menu: updated })
   }
 
   return (
@@ -207,7 +211,7 @@ export function MenuManager({ restaurant }: MenuManagerProps) {
           </div>
         </CardHeader>
         <CardContent>
-          {restaurant.menuItems.length === 0 ? (
+          {items.length === 0 ? (
             <div className="text-center py-8">
               <FileText className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
               <h3 className="text-lg font-semibold mb-2">No menu items yet</h3>
@@ -226,7 +230,7 @@ export function MenuManager({ restaurant }: MenuManagerProps) {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {restaurant.menuItems.map((item) => (
+                {items.map((item: any) => (
                   <TableRow key={item.id}>
                     <TableCell className="font-medium">{item.name}</TableCell>
                     <TableCell className="max-w-xs truncate">{item.description}</TableCell>

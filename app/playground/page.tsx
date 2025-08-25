@@ -303,58 +303,6 @@ export default function PlaygroundPage() {
           </div>
         </div>
 
-        {/* Selected restaurant details */}
-        {restaurant ? (
-          <Card>
-            <CardHeader>
-              <CardTitle>Restaurant Details</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <div className="text-sm"><span className="font-medium">Name:</span> {restaurant.name}</div>
-                  {restaurant.description ? (
-                    <div className="text-sm"><span className="font-medium">Description:</span> {restaurant.description}</div>
-                  ) : null}
-                  {restaurant.supportedLanguages?.length ? (
-                    <div className="text-sm"><span className="font-medium">Languages:</span> {restaurant.supportedLanguages.join(", ")}</div>
-                  ) : null}
-                  {restaurant.chatbotContext?.businessHours ? (
-                    <div className="text-sm"><span className="font-medium">Hours:</span> {restaurant.chatbotContext.businessHours}</div>
-                  ) : null}
-                  {restaurant.chatbotContext?.deliveryInfo ? (
-                    <div className="text-sm"><span className="font-medium">Delivery:</span> {restaurant.chatbotContext.deliveryInfo}</div>
-                  ) : null}
-                  {restaurant.chatbotContext?.specialInstructions ? (
-                    <div className="text-sm"><span className="font-medium">Notes:</span> {restaurant.chatbotContext.specialInstructions}</div>
-                  ) : null}
-                  {restaurant.chatbotContext?.welcomeMessage ? (
-                    <div className="text-sm"><span className="font-medium">Welcome:</span> {restaurant.chatbotContext.welcomeMessage}</div>
-                  ) : null}
-                </div>
-                <div>
-                  <div className="font-medium mb-2">Menu ({restaurant.menu?.length || 0})</div>
-                  <div className="max-h-60 overflow-y-auto pr-1 space-y-2">
-                    {(restaurant.menu || []).map((it: any) => (
-                      <div key={it.id} className="text-sm flex justify-between gap-3">
-                        <div>
-                          <div className="font-medium">{it.name}</div>
-                          {it.description ? <div className="text-muted-foreground text-xs">{it.description}</div> : null}
-                        </div>
-                        <div className="text-right whitespace-nowrap text-xs">
-                          {typeof it.price === "number" ? it.price : "-"}
-                          {it.isAvailable === false ? <div className="text-[10px] text-red-600">unavailable</div> : null}
-                        </div>
-                      </div>
-                    ))}
-                    {!restaurant.menu?.length ? <div className="text-xs text-muted-foreground">No menu items</div> : null}
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ) : null}
-
         {globalError ? (
           <div className="text-sm text-red-600">{globalError}</div>
         ) : null}
