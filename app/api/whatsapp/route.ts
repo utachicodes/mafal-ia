@@ -10,6 +10,9 @@ import { ConversationManager } from "@/src/lib/conversation-manager"
 import { estimateDelivery, formatEstimate } from "@/src/lib/delivery"
 import { OrderService } from "@/src/lib/order-service"
 
+// Helper to strip Markdown bold markers while keeping bullets
+const stripBold = (s: string) => s.replace(/\*\*(.*?)\*\*/g, "$1").replace(/__(.*?)__/g, "$1")
+
 // Validate required environment variables at module load (skip in demo mode)
 if (!env.DEMO_MODE) {
   validateEnv()
@@ -268,7 +271,7 @@ Ordering Enabled: ${restaurant.chatbotContext.orderingEnabled ? "Yes" : "No"}
     })
 
     // If an order quote is present, store it as pending and append confirmation prompt
-    let outbound = aiResponse.response
+    let outbound = stripBold(aiResponse.response)
     if (aiResponse.orderQuote && aiResponse.orderQuote.orderItems?.length) {
       ConversationManager.updateMetadata(restaurant.id, phoneNumber, { pendingOrder: aiResponse.orderQuote })
       outbound = `${outbound}\n\nReply YES to confirm this order or NO to cancel.`

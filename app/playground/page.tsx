@@ -12,6 +12,33 @@ import type { ChatMessage } from "@/lib/data"
 import { useRestaurants } from "@/src/hooks/use-restaurants"
 import { cn } from "@/lib/utils"
 
+// Helper to remove markdown bold while preserving bullets
+const stripBold = (s: string) => s.replace(/\*\*(.*?)\*\*/g, "$1").replace(/__(.*?)__/g, "$1")
+
+// Build a rich restaurant context string for the model
+function buildRestaurantContext(r?: any): string {
+  if (!r) return ""
+  const lines: string[] = []
+  lines.push(`Restaurant: ${r.name}`)
+  if (r.description) lines.push(`Description: ${r.description}`)
+  if (Array.isArray(r.supportedLanguages) && r.supportedLanguages.length)
+    lines.push(`Supported languages: ${r.supportedLanguages.join(", ")}`)
+  const c = r.chatbotContext || {}
+  if (c.welcomeMessage) lines.push(`Welcome message: ${c.welcomeMessage}`)
+  if (c.businessHours) lines.push(`Business hours: ${c.businessHours}`)
+  if (c.deliveryInfo) lines.push(`Delivery info: ${c.deliveryInfo}`)
+  if (c.specialInstructions) lines.push(`Special instructions: ${c.specialInstructions}`)
+  const items = Array.isArray(r.menu) ? r.menu : []
+  if (items.length) {
+    lines.push("Menu (name - price - availability):")
+    for (const it of items.slice(0, 50)) {
+      const avail = it.isAvailable === false ? "(unavailable)" : ""
+      lines.push(`- ${it.name}${it.price != null ? ` - ${it.price}` : ""} ${avail}`.trim())
+    }
+  }
+  return lines.join("\n")
+}
+
 // Child initializer that reads search params and sets selection.
 function SearchSelectInitializer({
   restaurants,
@@ -63,11 +90,12 @@ export default function PlaygroundPage() {
 
   useEffect(() => {
     if (restaurant) {
+      const welcome = restaurant.chatbotContext?.welcomeMessage || `Welcome to ${restaurant.name}! Ask me about the menu, prices, or make an order.`
       setMessages([
         {
           id: "sys_" + Date.now(),
           role: "assistant",
-          content: `Welcome to ${restaurant.name}! Ask me about the menu, prices, or make an order.`,
+          content: stripBold(welcome),
           timestamp: new Date(),
         },
       ])
@@ -151,17 +179,21 @@ export default function PlaygroundPage() {
           ...(apiKey?.trim() ? { apiKey } : {}),
           model: "models/gemini-1.5-flash",
           messages: [...messages, userMsg].map((m) => ({ role: m.role, content: m.content })),
-          restaurantContext: restaurant.chatbotContext?.welcomeMessage || `Restaurant: ${restaurant.name}`,
+          restaurantContext: buildRestaurantContext(restaurant),
         }),
       })
       const data = await res.json()
-      if (!data?.ok) throw new Error(data?.error || "Generation failed")
+      if (!data?.ok) {
+        const errMsg = String(data?.error || "Generation failed")
+        setGlobalError(errMsg)
+        throw new Error(errMsg)
+      }
       const responseText = String(data?.response || "")
 
       const botMsg: ChatMessage = {
         id: "a_" + Date.now(),
         role: "assistant",
-        content: responseText,
+        content: stripBold(responseText),
         timestamp: new Date(),
       }
       setMessages((prev) => [...prev, botMsg])
@@ -271,6 +303,58 @@ export default function PlaygroundPage() {
           </div>
         </div>
 
+        {/* Selected restaurant details */}
+        {restaurant ? (
+          <Card>
+            <CardHeader>
+              <CardTitle>Restaurant Details</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <div className="text-sm"><span className="font-medium">Name:</span> {restaurant.name}</div>
+                  {restaurant.description ? (
+                    <div className="text-sm"><span className="font-medium">Description:</span> {restaurant.description}</div>
+                  ) : null}
+                  {restaurant.supportedLanguages?.length ? (
+                    <div className="text-sm"><span className="font-medium">Languages:</span> {restaurant.supportedLanguages.join(", ")}</div>
+                  ) : null}
+                  {restaurant.chatbotContext?.businessHours ? (
+                    <div className="text-sm"><span className="font-medium">Hours:</span> {restaurant.chatbotContext.businessHours}</div>
+                  ) : null}
+                  {restaurant.chatbotContext?.deliveryInfo ? (
+                    <div className="text-sm"><span className="font-medium">Delivery:</span> {restaurant.chatbotContext.deliveryInfo}</div>
+                  ) : null}
+                  {restaurant.chatbotContext?.specialInstructions ? (
+                    <div className="text-sm"><span className="font-medium">Notes:</span> {restaurant.chatbotContext.specialInstructions}</div>
+                  ) : null}
+                  {restaurant.chatbotContext?.welcomeMessage ? (
+                    <div className="text-sm"><span className="font-medium">Welcome:</span> {restaurant.chatbotContext.welcomeMessage}</div>
+                  ) : null}
+                </div>
+                <div>
+                  <div className="font-medium mb-2">Menu ({restaurant.menu?.length || 0})</div>
+                  <div className="max-h-60 overflow-y-auto pr-1 space-y-2">
+                    {(restaurant.menu || []).map((it: any) => (
+                      <div key={it.id} className="text-sm flex justify-between gap-3">
+                        <div>
+                          <div className="font-medium">{it.name}</div>
+                          {it.description ? <div className="text-muted-foreground text-xs">{it.description}</div> : null}
+                        </div>
+                        <div className="text-right whitespace-nowrap text-xs">
+                          {typeof it.price === "number" ? it.price : "-"}
+                          {it.isAvailable === false ? <div className="text-[10px] text-red-600">unavailable</div> : null}
+                        </div>
+                      </div>
+                    ))}
+                    {!restaurant.menu?.length ? <div className="text-xs text-muted-foreground">No menu items</div> : null}
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ) : null}
+
         {globalError ? (
           <div className="text-sm text-red-600">{globalError}</div>
         ) : null}
@@ -290,8 +374,11 @@ export default function PlaygroundPage() {
                         m.role === "user" ? "bg-primary text-primary-foreground" : "bg-muted"
                       )}
                     >
-                      <div className="whitespace-pre-wrap">{m.content}</div>
-                      <div className="text-[10px] opacity-70 mt-1">{m.timestamp.toLocaleTimeString()}</div>
+                      <div className="whitespace-pre-wrap">{stripBold(m.content)}</div>
+                      <div className="text-[10px] opacity-70 mt-1">{(() => {
+                        const d = m.timestamp instanceof Date ? m.timestamp : new Date(m.timestamp as any)
+                        return isNaN(d.getTime()) ? "" : d.toLocaleTimeString()
+                      })()}</div>
                     </div>
                   </div>
                 ))}

@@ -50,7 +50,12 @@ export function RestaurantsProvider({ children }: { children: React.ReactNode })
       createdAt: new Date(),
       updatedAt: new Date(),
     }
-    setRestaurants((prev) => [...prev, newRestaurant])
+    setRestaurants((prev) => {
+      const next = [...prev, newRestaurant]
+      // Persist immediately to avoid race when navigating to Playground
+      LocalStorage.saveRestaurants(next)
+      return next
+    })
     return newRestaurant.id
   }, [])
 
