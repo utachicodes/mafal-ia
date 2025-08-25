@@ -6,7 +6,8 @@
     "build": "next build",
     "dev": "next dev",
     "lint": "next lint",
-    "start": "next start"
+    "start": "next start",
+    "postinstall": "prisma generate || true"
   },
   "dependencies": {
     "@genkit-ai/ai": "1.16.1",

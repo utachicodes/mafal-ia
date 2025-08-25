@@ -1,4 +1,4 @@
-import { prisma } from "@/src/lib/db"
+import { getPrisma } from "@/src/lib/db"
 import type { Restaurant, MenuItem } from "@/lib/data"
 import { mockRestaurants } from "@/lib/data"
 import { env } from "@/src/lib/env"
@@ -29,10 +29,12 @@ export class RestaurantService {
 
   private static async ensureSeeded() {
     if (env.DEMO_MODE) return
+    const prisma = await getPrisma()
     const count = await prisma.restaurant.count()
     if (count > 0) return
 
     for (const r of mockRestaurants) {
+      const prisma = await getPrisma()
       await prisma.restaurant.create({
         data: {
           name: r.name,
@@ -111,6 +113,7 @@ export class RestaurantService {
       return found || null
     }
     await this.ensureSeeded()
+    const prisma = await getPrisma()
     const p = await prisma.restaurant.findFirst({
       where: { whatsappPhoneNumberId: phoneNumberId },
       include: { menuItems: true },
@@ -127,6 +130,7 @@ export class RestaurantService {
       return this.demoStore!.find((r) => r.id === id) || null
     }
     await this.ensureSeeded()
+    const prisma = await getPrisma()
     const p = await prisma.restaurant.findUnique({ where: { id }, include: { menuItems: true } })
     return p ? this.mapPrismaToRestaurant(p) : null
   }
@@ -137,6 +141,7 @@ export class RestaurantService {
       return this.demoStore as Restaurant[]
     }
     await this.ensureSeeded()
+    const prisma = await getPrisma()
     const list = await prisma.restaurant.findMany({ include: { menuItems: true } })
     return list.map((p: any) => this.mapPrismaToRestaurant(p))
   }
@@ -156,6 +161,7 @@ export class RestaurantService {
       return false
     }
     await this.ensureSeeded()
+    const prisma = await getPrisma()
     await prisma.restaurant.update({
       where: { id },
       data: {
