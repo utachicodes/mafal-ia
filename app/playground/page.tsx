@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useRef, useState } from "react"
+import { Suspense, useEffect, useMemo, useRef, useState } from "react"
 import { useSearchParams } from "next/navigation"
 import { DashboardLayout } from "@/src/components/dashboard-layout"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -12,10 +12,34 @@ import type { ChatMessage } from "@/lib/data"
 import { useRestaurants } from "@/src/hooks/use-restaurants"
 import { cn } from "@/lib/utils"
 
+// Child initializer that reads search params and sets selection.
+function SearchSelectInitializer({
+  restaurants,
+  selectedRestaurantId,
+  setSelectedRestaurantId,
+}: {
+  restaurants: { id: string }[]
+  selectedRestaurantId: string
+  setSelectedRestaurantId: (id: string) => void
+}) {
+  const searchParams = useSearchParams()
+  useEffect(() => {
+    if (!restaurants.length) return
+    const q = searchParams?.get("select")
+    if (q) {
+      const exists = restaurants.some((r) => r.id === q)
+      setSelectedRestaurantId(exists ? q : restaurants[0].id)
+    } else if (!selectedRestaurantId) {
+      setSelectedRestaurantId(restaurants[0].id)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [restaurants.length])
+  return null
+}
+
 export default function PlaygroundPage() {
   const { restaurants, isLoading } = useRestaurants()
   const [selectedRestaurantId, setSelectedRestaurantId] = useState<string>("")
-  const searchParams = useSearchParams()
   const [input, setInput] = useState("")
   const [isSending, setIsSending] = useState(false)
   const [messages, setMessages] = useState<ChatMessage[]>([])
@@ -36,19 +60,6 @@ export default function PlaygroundPage() {
     if (!restaurants.length) return undefined
     return restaurants.find((r) => r.id === selectedRestaurantId) || restaurants[0]
   }, [restaurants, selectedRestaurantId])
-
-  // Pick selection from URL (?select=) once restaurants are loaded
-  useEffect(() => {
-    if (!restaurants.length) return
-    const q = searchParams?.get("select")
-    if (q) {
-      const exists = restaurants.some((r) => r.id === q)
-      setSelectedRestaurantId(exists ? q : restaurants[0].id)
-    } else if (!selectedRestaurantId) {
-      setSelectedRestaurantId(restaurants[0].id)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [restaurants.length])
 
   useEffect(() => {
     if (restaurant) {
@@ -230,6 +241,14 @@ export default function PlaygroundPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
+        {/* Initialize selection from URL under Suspense to satisfy Next.js 15 */}
+        <Suspense fallback={null}>
+          <SearchSelectInitializer
+            restaurants={restaurants as any}
+            selectedRestaurantId={selectedRestaurantId}
+            setSelectedRestaurantId={setSelectedRestaurantId}
+          />
+        </Suspense>
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold">Assistant Playground</h1>
