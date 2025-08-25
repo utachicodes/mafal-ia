@@ -78,7 +78,7 @@ export default function HomePage() {
           <Card className="rounded-xl border-border/50 bg-card/50 backdrop-blur">
             <CardHeader className="space-y-1">
               <Globe className="h-7 w-7 text-primary" />
-              <CardDescription>French, English, Wolof, Arabic — auto-detected</CardDescription>
+              <CardDescription>French, English, Wolof, Arabic auto-detected</CardDescription>
             </CardHeader>
           </Card>
 
