@@ -10,6 +10,16 @@ generator client {
   provider = "prisma-client-js"
 }
 
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String?
+  image        String?
+  passwordHash String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
 model Restaurant {
   id                     String      @id @default(cuid())
   name                   String
@@ -31,6 +41,7 @@ model Restaurant {
 
   menuItems              MenuItem[]
   conversations         Conversation[]
+  orders                Order[]
 
   createdAt              DateTime    @default(now())
   updatedAt              DateTime    @updatedAt
@@ -59,4 +70,30 @@ model Conversation {
   updatedAt     DateTime   @updatedAt
 
   @@index([restaurantId, phoneNumber])
+}
+
+enum OrderStatus {
+  pending
+  confirmed
+  preparing
+  delivered
+  cancelled
+}
+
+model Order {
+  id            String       @id @default(cuid())
+  restaurantId  String
+  restaurant    Restaurant   @relation(fields: [restaurantId], references: [id])
+  customerName  String
+  phoneNumber   String
+  // items: array of { itemName, quantity, price, specs } with arbitrary specs object
+  items         Json
+  // total in smallest currency unit (e.g., CFA)
+  total         Int
+  notes         String?
+  status        OrderStatus  @default(pending)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  @@index([restaurantId, createdAt])
 }

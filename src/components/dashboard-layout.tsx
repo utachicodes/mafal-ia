@@ -10,11 +10,22 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { Logo } from "./logo"
+import { useSession, signOut } from "next-auth/react"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 const navigation = [
-  { name: "Home", href: "/", icon: Home },
+  { name: "Dashboard", href: "/dashboard", icon: Home },
   { name: "Restaurants", href: "/restaurants", icon: Store },
   { name: "Playground", href: "/playground", icon: MessageSquare },
+  { name: "Orders", href: "/orders", icon: BarChart3 },
   { name: "Analytics", href: "/analytics", icon: BarChart3 },
   { name: "Onboarding", href: "/onboarding", icon: Key },
   { name: "Settings", href: "/settings", icon: Settings },
@@ -27,6 +38,7 @@ interface DashboardLayoutProps {
 export function DashboardLayout({ children }: DashboardLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const pathname = usePathname()
+  const { data: session } = useSession()
 
   const SidebarContent = () => (
     <div className="flex flex-col h-full">
@@ -94,6 +106,36 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 
       {/* Main Content */}
       <div className="flex flex-col flex-1 md:pl-64">
+        {/* Top bar */}
+        <div className="h-16 border-b bg-card/50 backdrop-blur flex items-center justify-between px-4">
+          <div />
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="flex items-center gap-2">
+                <Avatar className="h-8 w-8">
+                  <AvatarFallback>
+                    {session?.user?.name?.[0]?.toUpperCase() || session?.user?.email?.[0]?.toUpperCase() || "U"}
+                  </AvatarFallback>
+                </Avatar>
+                <span className="hidden sm:inline text-muted-foreground">
+                  {session?.user?.name || session?.user?.email || "Invité"}
+                </span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>
+                {session?.user?.name || session?.user?.email || "Invité"}
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => location.assign('/settings')}>Paramètres</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => alert('Bientôt: changement d\'organisation')}>Changer d'organisation</DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => signOut({ callbackUrl: "/auth/signin" })}>
+                Se déconnecter
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
         <main className="flex-1 overflow-y-auto p-6">{children}</main>
       </div>
     </div>

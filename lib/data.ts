@@ -13,6 +13,8 @@ export interface Restaurant {
   description: string
   cuisine: string
   whatsappNumber: string
+  // Optional connection status used by WhatsApp Quick Connect simulator
+  whatsappConnected?: boolean
   supportedLanguages: string[]
   isActive: boolean
   // Marks this WhatsApp number as a global concierge entry point

@@ -4,6 +4,7 @@ import { GeistSans } from "geist/font/sans"
 import { GeistMono } from "geist/font/mono"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
+import { SessionProvider } from "next-auth/react"
 import { Toaster } from "@/components/ui/toaster"
 import { RestaurantsProvider } from "@/src/hooks/use-restaurants"
 import { ErrorBoundary } from "@/src/components/error-boundary"
@@ -32,10 +33,12 @@ html {
       </head>
       <body>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
-          <ErrorBoundary>
-            <RestaurantsProvider>{children}</RestaurantsProvider>
-          </ErrorBoundary>
-          <Toaster />
+          <SessionProvider>
+            <ErrorBoundary>
+              <RestaurantsProvider>{children}</RestaurantsProvider>
+            </ErrorBoundary>
+            <Toaster />
+          </SessionProvider>
         </ThemeProvider>
       </body>
     </html>
