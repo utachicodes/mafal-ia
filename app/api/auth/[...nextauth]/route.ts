@@ -63,6 +63,6 @@ const config: AuthOptions = {
   },
 }
 
-export const { handlers, auth, signIn, signOut } = NextAuth(config)
-export const GET = handlers.GET
-export const POST = handlers.POST
+// NextAuth v4 App Router style: create a single handler and export for both methods
+const handler = NextAuth(config)
+export { handler as GET, handler as POST }
