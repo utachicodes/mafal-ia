@@ -103,19 +103,53 @@ const config: AuthOptions = {
       }
     }),
     Credentials({
-      name: "Email et mot de passe",
+      name: "Credentials",
       credentials: {
         email: { label: "Email", type: "email" },
-        password: { label: "Mot de passe", type: "password" },
+        password: { label: "Password", type: "password" },
       },
       async authorize(credentials: { email?: string; password?: string } | undefined) {
-        if (!credentials?.email || !credentials?.password) return null
-        const prisma = await getPrisma()
-        const user = await prisma.user.findUnique({ where: { email: credentials.email } })
-        if (!user?.passwordHash) return null
-        const ok = await bcrypt.compare(credentials.password, user.passwordHash)
-        if (!ok) return null
-        return { id: user.id, name: user.name || user.email, email: user.email, image: user.image || undefined }
+        try {
+          if (!credentials?.email || !credentials?.password) {
+            console.log('Missing credentials')
+            return null
+          }
+          
+          console.log('Authorizing user:', credentials.email)
+          const prisma = await getPrisma()
+          const user = await prisma.user.findUnique({ 
+            where: { email: credentials.email } 
+          })
+          
+          if (!user) {
+            console.log('No user found with email:', credentials.email)
+            return null
+          }
+          
+          if (!user.passwordHash) {
+            console.log('User has no password set (OAuth user?)')
+            return null
+          }
+          
+          console.log('Comparing passwords...')
+          const isPasswordValid = await bcrypt.compare(credentials.password, user.passwordHash)
+          
+          if (!isPasswordValid) {
+            console.log('Invalid password')
+            return null
+          }
+          
+          console.log('User authorized successfully:', user.id)
+          return { 
+            id: user.id, 
+            name: user.name || user.email, 
+            email: user.email, 
+            image: user.image || undefined 
+          }
+        } catch (error) {
+          console.error('Authorization error:', error)
+          return null
+        }
       },
     }),
   ],

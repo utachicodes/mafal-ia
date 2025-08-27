@@ -23,26 +23,41 @@ export default function SignUpPage() {
     e.preventDefault()
     setError(null)
     
+    // Basic validation
+    if (!email || !name || !password || !confirmPassword) {
+      setError("All fields are required")
+      return
+    }
+    
     if (password !== confirmPassword) {
       setError("Passwords do not match")
+      return
+    }
+
+    if (password.length < 8) {
+      setError("Password must be at least 8 characters")
       return
     }
 
     setIsLoading(true)
     
     try {
+      console.log('Sending signup request...')
       const response = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, name, password })
       })
+      
+      const data = await response.json()
+      console.log('Signup response:', data)
 
       if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.message || 'Something went wrong')
+        throw new Error(data.message || 'Failed to create account')
       }
 
       // Sign in the user after successful signup
+      console.log('Attempting to sign in...')
       const result = await signIn('credentials', {
         redirect: false,
         email,
@@ -50,12 +65,24 @@ export default function SignUpPage() {
         callbackUrl: '/profile'
       })
 
+      console.log('Sign in result:', result)
+      
       if (result?.error) {
+        // If sign in fails but account was created, redirect to login
+        if (data.success) {
+          router.push('/auth/signin?registered=true')
+          return
+        }
         throw new Error(result.error)
       }
 
-      router.push('/profile')
+      // Redirect to profile or callback URL
+      const redirectUrl = result?.url || '/profile'
+      console.log('Redirecting to:', redirectUrl)
+      router.push(redirectUrl)
+      
     } catch (err) {
+      console.error('Signup error:', err)
       setError(err instanceof Error ? err.message : 'Failed to create account')
     } finally {
       setIsLoading(false)
