@@ -52,8 +52,17 @@ export default function SignInPage() {
             </Button>
           </form>
 
+          <div className="text-sm text-center text-muted-foreground">
+            Don't have an account?{' '}
+            <Link href="/auth/signup" className="underline hover:text-primary">
+              Sign up
+            </Link>
+          </div>
+
           <div className="text-xs text-muted-foreground text-center">
-            En continuant, vous acceptez nos <Link href="/legal/dpa" className="underline">Conditions</Link>.
+            En continuant, vous acceptez nos{' '}
+            <Link href="/legal/terms" className="underline">Conditions</Link> et{' '}
+            <Link href="/legal/privacy" className="underline">Politique de confidentialité</Link>.
           </div>
         </CardContent>
       </Card>
