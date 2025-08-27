@@ -42,12 +42,25 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 
   const SidebarContent = () => (
     <div className="flex flex-col h-full">
-      <div className="p-6">
+      <div className="p-6 pb-2">
         <div className="h-6 text-foreground">
           <Logo />
         </div>
       </div>
-      <nav className="flex-1 px-4 space-y-2">
+      <div className="px-6 py-4 border-b">
+        <div className="flex items-center space-x-3">
+          <Avatar className="h-10 w-10">
+            <AvatarFallback>
+              {session?.user?.name?.split(' ').map(n => n[0]).join('').toUpperCase() || 'U'}
+            </AvatarFallback>
+          </Avatar>
+          <div className="truncate">
+            <p className="text-sm font-medium">{session?.user?.name || 'Utilisateur'}</p>
+            <p className="text-xs text-muted-foreground truncate">{session?.user?.email}</p>
+          </div>
+        </div>
+      </div>
+      <nav className="flex-1 px-4 space-y-2 mt-4">
         {navigation.map((item) => {
           const Icon = item.icon
           const isActive = pathname === item.href || pathname.startsWith(item.href + "/")
@@ -94,11 +107,44 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 
       {/* Mobile Sidebar */}
       <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
-        <SheetTrigger asChild>
-          <Button variant="ghost" size="icon" className="md:hidden fixed top-4 left-4 z-40">
-            <Menu className="h-6 w-6" />
+        <div className="flex items-center justify-between h-16 px-4 border-b">
+          <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setSidebarOpen(true)}>
+            <Menu className="h-5 w-5" />
           </Button>
-        </SheetTrigger>
+          <div className="ml-auto flex items-center space-x-4">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                  <Avatar className="h-8 w-8">
+                    <AvatarFallback>
+                      {session?.user?.name?.split(' ').map(n => n[0]).join('').toUpperCase() || 'U'}
+                    </AvatarFallback>
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56" align="end" forceMount>
+                <DropdownMenuLabel className="font-normal">
+                  <div className="flex flex-col space-y-1">
+                    <p className="text-sm font-medium leading-none">{session?.user?.name || 'Utilisateur'}</p>
+                    <p className="text-xs leading-none text-muted-foreground">
+                      {session?.user?.email}
+                    </p>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link href="/profile">
+                    Profil
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => signOut({ callbackUrl: '/' })}>
+                  Se déconnecter
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </div>
         <SheetContent side="left" className="p-0 w-64">
           <SidebarContent />
         </SheetContent>

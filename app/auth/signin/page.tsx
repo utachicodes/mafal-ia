@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Github, Mail, Apple, Chrome } from "lucide-react"
+import { Github, Mail, Chrome } from "lucide-react"
 import { signIn } from "next-auth/react"
 import { useState } from "react"
 
@@ -21,13 +21,10 @@ export default function SignInPage() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid gap-3">
-            <Button variant="outline" className="w-full justify-start" onClick={() => signIn("apple", { callbackUrl: "/dashboard" })}>
-              <Apple className="h-4 w-4 mr-2" /> Continuer avec Apple
-            </Button>
-            <Button variant="outline" className="w-full justify-start" onClick={() => signIn("google", { callbackUrl: "/dashboard" })}>
+<Button variant="outline" className="w-full justify-start" onClick={() => signIn("google", { callbackUrl: "/profile" })}>
               <Chrome className="h-4 w-4 mr-2" /> Continuer avec Google
             </Button>
-            <Button variant="outline" className="w-full justify-start" onClick={() => signIn("github", { callbackUrl: "/dashboard" })}>
+            <Button variant="outline" className="w-full justify-start" onClick={() => signIn("github", { callbackUrl: "/profile" })}>
               <Github className="h-4 w-4 mr-2" /> Continuer avec GitHub
             </Button>
           </div>
@@ -41,7 +38,7 @@ export default function SignInPage() {
             </div>
           </div>
 
-          <form className="space-y-3" onSubmit={(e) => { e.preventDefault(); signIn("credentials", { email, password, callbackUrl: "/dashboard" }) }}>
+          <form className="space-y-3" onSubmit={(e) => { e.preventDefault(); signIn("credentials", { email, password, callbackUrl: "/profile" }) }}>
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input id="email" type="email" placeholder="vous@exemple.com" value={email} onChange={(e) => setEmail(e.target.value)} />
