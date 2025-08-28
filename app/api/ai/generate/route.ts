@@ -2,7 +2,7 @@ import { NextResponse } from "next/server"
 import { env } from "@/src/lib/env"
 
 // Maps our chat roles to Gemini API roles
-function mapRole(role: string): "user" | "model" {
+function mapRole(role: string): "user" | "model" {1
   return role === "assistant" ? "model" : "user"
 }
 

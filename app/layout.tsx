@@ -3,7 +3,11 @@ import type { Metadata } from "next"
 import { GeistSans } from "geist/font/sans"
 import { GeistMono } from "geist/font/mono"
 import "./globals.css"
-import { Providers } from "@/src/components/providers"
+import { ThemeProvider } from "@/components/theme-provider"
+import { SessionProvider } from "next-auth/react"
+import { Toaster } from "@/components/ui/toaster"
+import { RestaurantsProvider } from "@/src/hooks/use-restaurants"
+import { ErrorBoundary } from "@/src/components/error-boundary"
 
 export const metadata: Metadata = {
   title: "Mafal-IA | Restaurant WhatsApp Chatbot Platform",
@@ -28,7 +32,14 @@ html {
         `}</style>
       </head>
       <body>
-        <Providers>{children}</Providers>
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
+          <SessionProvider>
+            <ErrorBoundary>
+              <RestaurantsProvider>{children}</RestaurantsProvider>
+            </ErrorBoundary>
+            <Toaster />
+          </SessionProvider>
+        </ThemeProvider>
       </body>
     </html>
   )

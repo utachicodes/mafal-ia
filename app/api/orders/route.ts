@@ -1,28 +1,10 @@
 import { NextResponse } from "next/server"
 import { getPrisma } from "@/src/lib/db"
 
-export async function GET(req: Request) {
+export async function GET() {
   try {
-    const url = new URL(req.url)
-    const restaurantId = url.searchParams.get("restaurantId") || undefined
-    const dateFromStr = url.searchParams.get("dateFrom") || undefined
-    const dateToStr = url.searchParams.get("dateTo") || undefined
-    const dateFrom = dateFromStr ? new Date(dateFromStr) : undefined
-    const dateTo = dateToStr ? new Date(dateToStr) : undefined
-
     const prisma = await getPrisma()
     const orders = await prisma.order.findMany({
-      where: {
-        ...(restaurantId ? { restaurantId } : {}),
-        ...(dateFrom || dateTo
-          ? {
-              createdAt: {
-                ...(dateFrom ? { gte: dateFrom } : {}),
-                ...(dateTo ? { lte: dateTo } : {}),
-              },
-            }
-          : {}),
-      },
       orderBy: { createdAt: "desc" },
       include: { restaurant: { select: { id: true, name: true } } },
     })

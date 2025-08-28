@@ -1,155 +1,37 @@
 import NextAuth from "next-auth"
-import type { AuthOptions, User, Account, Profile } from "next-auth"
-import type { JWT } from "next-auth/jwt"
+import type { AuthOptions } from "next-auth"
 import GitHub from "next-auth/providers/github"
 import Google from "next-auth/providers/google"
 import Credentials from "next-auth/providers/credentials"
 import { getPrisma } from "@/src/lib/db"
 import bcrypt from "bcryptjs"
 
-// Extend the User type to include our custom fields
-import type { DefaultSession, DefaultUser } from "next-auth"
-
-declare module "next-auth" {
-  interface User extends DefaultUser {
-    id: string
-    name?: string | null
-    email?: string | null
-    image?: string | null
-  }
-
-  interface Session extends DefaultSession {
-    user: {
-      id: string
-      name?: string | null
-      email?: string | null
-      image?: string | null
-    } & DefaultSession["user"]
-    accessToken?: string
-    error?: string
-  }
-}
-
-declare module "next-auth/jwt" {
-  interface JWT {
-    accessToken?: string
-    refreshToken?: string
-    accessTokenExpires?: number
-    error?: string
-    user?: {
-      id: string
-      name?: string | null
-      email?: string | null
-      image?: string | null
-    }
-  }
-}
-
 const config: AuthOptions = {
-  debug: process.env.NODE_ENV === 'development',
-  logger: {
-    error(code, metadata) {
-      console.error('NextAuth Error:', { code, metadata });
-    },
-    warn(code) {
-      console.warn('NextAuth Warning:', code);
-    },
-    debug(code, metadata) {
-      console.log('NextAuth Debug:', { code, metadata });
-    }
-  },
   providers: [
     GitHub({
       clientId: process.env.GITHUB_ID || "",
       clientSecret: process.env.GITHUB_SECRET || "",
       allowDangerousEmailAccountLinking: true,
-      authorization: {
-        params: {
-          prompt: 'consent',
-          access_type: 'offline',
-          response_type: 'code'
-        }
-      },
-      profile(profile) {
-        console.log('GitHub Profile:', profile);
-        return {
-          id: profile.id.toString(),
-          name: profile.name || profile.login,
-          email: profile.email,
-          image: profile.avatar_url
-        };
-      }
     }),
     Google({
       clientId: process.env.GOOGLE_CLIENT_ID || "",
       clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
       allowDangerousEmailAccountLinking: true,
-      authorization: {
-        params: {
-          prompt: 'consent',
-          access_type: 'offline',
-          response_type: 'code',
-          scope: 'openid email profile'
-        }
-      },
-      profile(profile) {
-        console.log('Google Profile:', profile);
-        return {
-          id: profile.sub,
-          name: profile.name,
-          email: profile.email,
-          image: profile.picture
-        };
-      }
     }),
     Credentials({
-      name: "Credentials",
+      name: "Email et mot de passe",
       credentials: {
         email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" },
+        password: { label: "Mot de passe", type: "password" },
       },
       async authorize(credentials: { email?: string; password?: string } | undefined) {
-        try {
-          if (!credentials?.email || !credentials?.password) {
-            console.log('Missing credentials')
-            return null
-          }
-          
-          console.log('Authorizing user:', credentials.email)
-          const prisma = await getPrisma()
-          const user = await prisma.user.findUnique({ 
-            where: { email: credentials.email } 
-          })
-          
-          if (!user) {
-            console.log('No user found with email:', credentials.email)
-            return null
-          }
-          
-          if (!user.passwordHash) {
-            console.log('User has no password set (OAuth user?)')
-            return null
-          }
-          
-          console.log('Comparing passwords...')
-          const isPasswordValid = await bcrypt.compare(credentials.password, user.passwordHash)
-          
-          if (!isPasswordValid) {
-            console.log('Invalid password')
-            return null
-          }
-          
-          console.log('User authorized successfully:', user.id)
-          return { 
-            id: user.id, 
-            name: user.name || user.email, 
-            email: user.email, 
-            image: user.image || undefined 
-          }
-        } catch (error) {
-          console.error('Authorization error:', error)
-          return null
-        }
+        if (!credentials?.email || !credentials?.password) return null
+        const prisma = await getPrisma()
+        const user = await prisma.user.findUnique({ where: { email: credentials.email } })
+        if (!user?.passwordHash) return null
+        const ok = await bcrypt.compare(credentials.password, user.passwordHash)
+        if (!ok) return null
+        return { id: user.id, name: user.name || user.email, email: user.email, image: user.image || undefined }
       },
     }),
   ],
@@ -158,97 +40,29 @@ const config: AuthOptions = {
     signIn: "/auth/signin",
   },
   callbacks: {
-    async signIn({ user, account, profile, email, credentials }) {
-      console.log('SignIn Callback:', { user, account, profile, email, credentials });
-      
+    async signIn({ user, account }: any) {
+      // For OAuth providers, ensure a User record exists
       try {
         if (account && account.provider !== "credentials" && user?.email) {
           const prisma = await getPrisma()
-          console.log('Upserting user in database:', user.email);
-          
-          const dbUser = await prisma.user.upsert({
+          await prisma.user.upsert({
             where: { email: user.email },
-            update: { 
-              name: user.name || undefined, 
-              image: user.image || undefined,
-              emailVerified: new Date()
-            },
-            create: { 
-              email: user.email, 
-              name: user.name || null, 
-              image: user.image || null,
-              emailVerified: new Date()
-            },
-          });
-          console.log('Database user updated/created:', dbUser);
+            update: { name: user.name || undefined, image: (user as any).image || undefined },
+            create: { email: user.email, name: user.name || null, image: (user as any).image || null },
+          })
         }
-        return true;
-      } catch (error) {
-        console.error('Error in signIn callback:', error);
-        return false;
-      }
-    },
-    jwt({ token, user, account, profile }: { token: JWT; user?: User; account?: Account | null; profile?: Profile }): JWT {
-      // Initial sign in
-      if (account && user) {
-        console.log('JWT Callback - Initial Sign In:', { token, user, account, profile });
-        
-        // Create a new token object with the required properties
-        return {
-          ...token,
-          accessToken: account.access_token,
-          refreshToken: account.refresh_token,
-          accessTokenExpires: account.expires_at ? account.expires_at * 1000 : undefined,
-          user: {
-            id: user.id,
-            name: user.name || null,
-            email: user.email || null,
-            image: user.image || null
-          }
-        };
-      }
-      
-      // Return previous token if this isn't the initial sign-in
-      return token;
-    },
-    async session({ session, token }) {
-      console.log('Session Callback:', { session, token });
-      
-      // Create a new session object with the required properties
-      const newSession = {
-        ...session,
-        user: {
-          ...session.user,
-          id: token.user?.id || '',
-          name: token.user?.name || session.user.name,
-          email: token.user?.email || session.user.email,
-          image: token.user?.image || session.user.image
-        },
-        accessToken: token.accessToken,
-        error: token.error
-      };
-      
-      return newSession;
-    },
-    async redirect({ url, baseUrl }) {
-      console.log('Redirect Callback:', { url, baseUrl });
-      
-      // Check if the URL is relative
-      if (url.startsWith("/")) return `${baseUrl}${url}`
-      
-      // Check if the URL is on the same origin
-      try {
-        const urlObj = new URL(url);
-        if (urlObj.origin === baseUrl) return url;
+        return true
       } catch (e) {
-        console.error('Invalid URL in redirect callback:', e);
+        return false
       }
-      
-      return baseUrl;
+    },
+    async redirect({ url, baseUrl }: { url: string; baseUrl: string }) {
+      if (url.startsWith("/")) return `${baseUrl}${url}`
+      return baseUrl
     },
   },
 }
 
-// NextAuth v4 App Router style: create a single handler and export for both methods
-const handler = NextAuth(config)
-export { handler as GET, handler as POST }
+export const { handlers, auth, signIn, signOut } = NextAuth(config)
+export const GET = handlers.GET
+export const POST = handlers.POST
