@@ -1,6 +1,7 @@
-export { default as middleware } from "next-auth/middleware"
+// No authentication required
+// All routes are public by default
+export default function middleware() {}
 
-// Protect dashboard and related routes
 export const config = {
-  matcher: ["/dashboard", "/settings/:path*", "/restaurants/:path*"],
+  matcher: [], // No protected routes
 }

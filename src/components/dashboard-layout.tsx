@@ -9,6 +9,19 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { Logo } from "./logo"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { useSession } from "next-auth/react"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { signOut } from "next-auth/react"
+import { useSession } from "next-auth/react"
+import { SessionProvider } from "next-auth/react"
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: Home },
@@ -27,6 +40,8 @@ interface DashboardLayoutProps {
 export function DashboardLayout({ children }: DashboardLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const pathname = usePathname()
+  const { data: session } = useSession()
+  const { data: session } = useSession()
 
   const SidebarContent = () => (
     <div className="flex flex-col h-full">
