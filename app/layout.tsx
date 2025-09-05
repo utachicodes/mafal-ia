@@ -1,16 +1,10 @@
-import type React from "react"
-import type { Metadata } from "next"
 import { GeistSans } from "geist/font/sans"
 import { GeistMono } from "geist/font/mono"
 import "./globals.css"
-import { Toaster } from "@/components/ui/toaster"
-import { Providers } from "@/src/components/providers"
+import { Providers } from "./providers"
+import { metadata } from "./metadata"
 
-export const metadata: Metadata = {
-  title: "Mafal-IA | Restaurant WhatsApp Chatbot Platform",
-  description: "Create and manage intelligent, multilingual WhatsApp chatbots for your restaurant",
-  generator: "mafal-ia",
-}
+export { metadata }
 
 export default function RootLayout({
   children,
@@ -28,10 +22,9 @@ html {
 }
         `}</style>
       </head>
-      <body>
+      <body className={`${GeistSans.variable} ${GeistMono.variable}`}>
         <Providers>
           {children}
-          <Toaster />
         </Providers>
       </body>
     </html>
