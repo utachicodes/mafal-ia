@@ -1,8 +1,8 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { DashboardLayout } from "@/src/components/dashboard-layout"
+import DashboardLayout from "@/src/components/dashboard-layout"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -10,13 +10,47 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Upload, CheckCircle2, MessageSquare, Store, QrCode } from "lucide-react"
-import { useRestaurants } from "@/src/hooks/use-restaurants"
+import { type Restaurant, mockRestaurants } from "@/lib/data"
+import { LocalStorage } from "@/src/lib/storage"
+import { generateApiKey } from "@/src/lib/data-utils"
 import { useToast } from "@/hooks/use-toast"
 // Removed AIClientBrowser mock usage; parse JSON locally
 
 export default function OnboardingPage() {
-  const { addRestaurant } = useRestaurants()
+  const [restaurants, setRestaurants] = useState<Restaurant[]>([])
   const { toast } = useToast()
+  
+  useEffect(() => {
+    const loadData = () => {
+      const stored = LocalStorage.loadRestaurants()
+      if (stored && stored.length > 0) {
+        setRestaurants(stored as Restaurant[])
+      } else {
+        setRestaurants(mockRestaurants)
+      }
+    }
+
+    loadData()
+  }, [])
+  
+  const addRestaurant = (restaurantData: Omit<Restaurant, "id" | "apiKey" | "createdAt" | "updatedAt">) => {
+    const newRestaurant: Restaurant = {
+      ...restaurantData,
+      // Ensure `menu` is initialized even if upstream provided `menuItems`
+      menu: (restaurantData as any).menu ?? (restaurantData as any).menuItems ?? [],
+      id: `restaurant_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`,
+      apiKey: generateApiKey(restaurantData.name),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    }
+    setRestaurants((prev) => {
+      const next = [...prev, newRestaurant]
+      // Persist immediately to avoid race when navigating to Playground
+      LocalStorage.saveRestaurants(next)
+      return next
+    })
+    return newRestaurant.id
+  }
   const [step, setStep] = useState(1)
   const router = useRouter()
 

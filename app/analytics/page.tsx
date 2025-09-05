@@ -1,10 +1,11 @@
 "use client"
 
-import { DashboardLayout } from "@/src/components/dashboard-layout"
+import DashboardLayout from "@/src/components/dashboard-layout"
 import dynamic from "next/dynamic"
-import { useRestaurants } from "@/src/hooks/use-restaurants"
+import { useState, useEffect } from "react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { useState } from "react"
+import { type Restaurant, mockRestaurants } from "@/lib/data"
+import { LocalStorage } from "@/src/lib/storage"
 
 const ChatAnalytics = dynamic(
   () => import("@/src/components/restaurant/chat-analytics").then((m) => m.ChatAnalytics),
@@ -12,8 +13,23 @@ const ChatAnalytics = dynamic(
 )
 
 export default function AnalyticsPage() {
-  const { restaurants, isLoading } = useRestaurants()
+  const [restaurants, setRestaurants] = useState<Restaurant[]>([])
+  const [isLoading, setIsLoading] = useState(true)
   const [selectedRestaurantId, setSelectedRestaurantId] = useState<string>("")
+  
+  useEffect(() => {
+    const loadData = () => {
+      const stored = LocalStorage.loadRestaurants()
+      if (stored && stored.length > 0) {
+        setRestaurants(stored as Restaurant[])
+      } else {
+        setRestaurants(mockRestaurants)
+      }
+      setIsLoading(false)
+    }
+
+    loadData()
+  }, [])
 
   const selectedRestaurant = restaurants.find((r) => r.id === selectedRestaurantId) || restaurants[0]
 

@@ -4,8 +4,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Plus, Store, Calendar, ExternalLink, Globe, Phone } from "lucide-react"
 import Link from "next/link"
-import { useRestaurants } from "@/src/hooks/use-restaurants"
-import { DashboardLayout } from "@/src/components/dashboard-layout"
+// Using local state instead of useRestaurants
+import { useState, useEffect } from "react"
+import DashboardLayout from "@/src/components/dashboard-layout"
 // Creation is unified via onboarding; no quick-add dialog
 
 function RestaurantCard({ restaurant }: { restaurant: any }) {
@@ -75,7 +76,16 @@ function EmptyState() {
 }
 
 export default function RestaurantsPage() {
-  const { restaurants, isLoading } = useRestaurants()
+  // Using local state instead of useRestaurants hook
+  const [restaurants, setRestaurants] = useState([])
+  const [isLoading, setIsLoading] = useState(false)
+
+  // Initialize with sample data or empty array
+  useEffect(() => {
+    // You could fetch from local storage or API here
+    setRestaurants([])
+    setIsLoading(false)
+  }, [])
 
   if (isLoading) {
     return (

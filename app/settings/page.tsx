@@ -9,8 +9,8 @@ import { Switch } from "@/components/ui/switch"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Save, Download, Upload, Trash2, Shield, Bell, Palette, MessageSquare, Plug, FileText } from "lucide-react"
-import { DashboardLayout } from "@/src/components/dashboard-layout"
+import { Save, Download, Upload, Trash2, Bell, Palette, MessageSquare, Plug, FileText } from "lucide-react"
+import DashboardLayout from "@/src/components/dashboard-layout"
 import { useToast } from "@/hooks/use-toast"
 import { LocalStorage } from "@/src/lib/storage"
 
@@ -33,9 +33,7 @@ export default function SettingsPage() {
   const [webhookNotifications, setWebhookNotifications] = useState(false)
   const [dailyReports, setDailyReports] = useState(true)
 
-  // Security Settings
-  const [twoFactorAuth, setTwoFactorAuth] = useState(false)
-  const [sessionTimeout, setSessionTimeout] = useState("24")
+  // System Settings
   const [ipWhitelist, setIpWhitelist] = useState("")
 
   // Assistant Settings
@@ -131,11 +129,10 @@ export default function SettingsPage() {
         </div>
 
         <Tabs defaultValue="general" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-8">
+          <TabsList className="grid w-full grid-cols-7">
             <TabsTrigger value="general">General</TabsTrigger>
             <TabsTrigger value="ai">AI & Models</TabsTrigger>
             <TabsTrigger value="notifications">Notifications</TabsTrigger>
-            <TabsTrigger value="security">Security</TabsTrigger>
             <TabsTrigger value="data">Data</TabsTrigger>
             <TabsTrigger value="assistant">Assistant</TabsTrigger>
             <TabsTrigger value="integrations">Integrations</TabsTrigger>
@@ -274,47 +271,7 @@ export default function SettingsPage() {
             </Card>
           </TabsContent>
 
-          <TabsContent value="security">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Shield className="h-5 w-5" />
-                  Security Settings
-                </CardTitle>
-                <CardDescription>Configure security and access control settings</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>Two-Factor Authentication</Label>
-                    <p className="text-sm text-muted-foreground">Add an extra layer of security to your account</p>
-                  </div>
-                  <Switch checked={twoFactorAuth} onCheckedChange={setTwoFactorAuth} />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="session-timeout">Session Timeout (hours)</Label>
-                  <Input
-                    id="session-timeout"
-                    type="number"
-                    value={sessionTimeout}
-                    onChange={(e) => setSessionTimeout(e.target.value)}
-                    min="1"
-                    max="168"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="ip-whitelist">IP Whitelist</Label>
-                  <Textarea
-                    id="ip-whitelist"
-                    value={ipWhitelist}
-                    onChange={(e) => setIpWhitelist(e.target.value)}
-                    placeholder="Enter IP addresses, one per line"
-                    rows={3}
-                  />
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
+
 
           <TabsContent value="data">
             <div className="space-y-6">

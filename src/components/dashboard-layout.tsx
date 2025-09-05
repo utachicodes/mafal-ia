@@ -1,21 +1,30 @@
 "use client"
 
-import type React from "react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { Sheet, SheetContent } from "@/components/ui/sheet"
 import { Menu, Home, Store, BarChart3, Settings, MessageSquare, Key } from "lucide-react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { Logo } from "./logo"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Skeleton } from "@/components/ui/skeleton"
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: Home },
-  { name: "Restaurants", href: "/restaurants", icon: Store },
-  { name: "Playground", href: "/playground", icon: MessageSquare },
   { name: "Orders", href: "/orders", icon: BarChart3 },
   { name: "Analytics", href: "/analytics", icon: BarChart3 },
+  { name: "Restaurants", href: "/restaurants", icon: Store },
+  { name: "Playground", href: "/playground", icon: MessageSquare },
   { name: "Onboarding", href: "/onboarding", icon: Key },
   { name: "Settings", href: "/settings", icon: Settings },
 ]
@@ -24,9 +33,20 @@ interface DashboardLayoutProps {
   children: React.ReactNode
 }
 
-export function DashboardLayout({ children }: DashboardLayoutProps) {
+const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [isMounted, setIsMounted] = useState(false)
   const pathname = usePathname()
+  
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
+  
+  if (!isMounted) {
+    return <div className="flex items-center justify-center min-h-screen">
+      <Skeleton className="h-12 w-12 rounded-full" />
+    </div>
+  }
 
   const SidebarContent = () => (
     <div className="flex flex-col h-full">
@@ -35,19 +55,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           <Logo />
         </div>
       </div>
-      <div className="px-6 py-4 border-b">
-        <div className="flex items-center space-x-3">
-          <Avatar className="h-10 w-10">
-            <AvatarFallback>
-              {session?.user?.name?.split(' ').map(n => n[0]).join('').toUpperCase() || 'U'}
-            </AvatarFallback>
-          </Avatar>
-          <div className="truncate">
-            <p className="text-sm font-medium">{session?.user?.name || 'Utilisateur'}</p>
-            <p className="text-xs text-muted-foreground truncate">{session?.user?.email}</p>
-          </div>
-        </div>
-      </div>
+
       <nav className="flex-1 px-4 space-y-2 mt-4">
         {navigation.map((item) => {
           const Icon = item.icon
@@ -112,16 +120,12 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                   <Avatar className="h-8 w-8">
-                    <AvatarFallback>
-                      {session?.user?.name?.split(' ').map(n => n[0]).join('').toUpperCase() || 'U'}
-                    </AvatarFallback>
+                    <AvatarFallback>U</AvatarFallback>
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuLabel>
-                  {session?.user?.name || session?.user?.email || "Invité"}
-                </DropdownMenuLabel>
+                <DropdownMenuLabel>Utilisateur</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => location.assign('/settings')}>
                   Paramètres
@@ -135,3 +139,5 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
     </div>
   )
 }
+
+export default DashboardLayout

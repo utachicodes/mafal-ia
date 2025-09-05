@@ -2,14 +2,15 @@
 
 import { Suspense, useEffect, useMemo, useRef, useState } from "react"
 import { useSearchParams } from "next/navigation"
-import { DashboardLayout } from "@/src/components/dashboard-layout"
+import DashboardLayout from "@/src/components/dashboard-layout"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 // No mock client; we require a valid API key and always call server-backed Gemini
-import type { ChatMessage } from "@/lib/data"
-import { useRestaurants } from "@/src/hooks/use-restaurants"
+import type { ChatMessage, Restaurant } from "@/lib/data"
+import { mockRestaurants } from "@/lib/data"
+import { LocalStorage } from "@/src/lib/storage"
 import { cn } from "@/lib/utils"
 
 // Helper to remove markdown bold while preserving bullets
@@ -65,12 +66,27 @@ function SearchSelectInitializer({
 }
 
 export default function PlaygroundPage() {
-  const { restaurants, isLoading } = useRestaurants()
+  const [restaurants, setRestaurants] = useState<Restaurant[]>([])
+  const [isLoading, setIsLoading] = useState(true)
   const [selectedRestaurantId, setSelectedRestaurantId] = useState<string>("")
   const [input, setInput] = useState("")
   const [isSending, setIsSending] = useState(false)
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const bottomRef = useRef<HTMLDivElement | null>(null)
+  
+  useEffect(() => {
+    const loadData = () => {
+      const stored = LocalStorage.loadRestaurants()
+      if (stored && stored.length > 0) {
+        setRestaurants(stored as Restaurant[])
+      } else {
+        setRestaurants(mockRestaurants)
+      }
+      setIsLoading(false)
+    }
+
+    loadData()
+  }, [])
 
   // API key gate state
   const [apiKey, setApiKey] = useState("")

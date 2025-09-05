@@ -1,13 +1,14 @@
 "use client"
 
-import { useMemo, useState } from "react"
-import { DashboardLayout } from "@/src/components/dashboard-layout"
+import { useMemo, useState, useEffect } from "react"
+import DashboardLayout from "@/src/components/dashboard-layout"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { useRestaurants } from "@/src/hooks/use-restaurants"
 import type { Restaurant, MenuItem } from "@/lib/data"
+import { mockRestaurants } from "@/lib/data"
+import { LocalStorage } from "@/src/lib/storage"
 import { useToast } from "@/hooks/use-toast"
 
 function normalizeMenu(r: any): MenuItem[] {
@@ -27,8 +28,23 @@ function normalizeMenu(r: any): MenuItem[] {
 }
 
 export default function ConciergePage() {
-  const { restaurants, isLoading } = useRestaurants()
+  const [restaurants, setRestaurants] = useState<Restaurant[]>([])
+  const [isLoading, setIsLoading] = useState(true)
   const { toast } = useToast()
+  
+  useEffect(() => {
+    const loadData = () => {
+      const stored = LocalStorage.loadRestaurants()
+      if (stored && stored.length > 0) {
+        setRestaurants(stored as Restaurant[])
+      } else {
+        setRestaurants(mockRestaurants)
+      }
+      setIsLoading(false)
+    }
+
+    loadData()
+  }, [])
 
   const [query, setQuery] = useState("")
   const [locationText, setLocationText] = useState("")

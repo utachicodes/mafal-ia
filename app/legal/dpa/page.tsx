@@ -1,6 +1,6 @@
 "use client"
 
-import { DashboardLayout } from "@/src/components/dashboard-layout"
+import DashboardLayout from "@/src/components/dashboard-layout"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { FileDown } from "lucide-react"

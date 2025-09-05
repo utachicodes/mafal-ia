@@ -6,8 +6,10 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { ArrowLeft, Store } from "lucide-react"
 import Link from "next/link"
-import { useRestaurants } from "@/src/hooks/use-restaurants"
-import { DashboardLayout } from "@/src/components/dashboard-layout"
+import { useState, useEffect } from "react"
+import { type Restaurant, mockRestaurants } from "@/lib/data"
+import { LocalStorage } from "@/src/lib/storage"
+import DashboardLayout from "@/src/components/dashboard-layout"
 import { GeneralSettings } from "@/src/components/restaurant/general-settings"
 import { MenuManager } from "@/src/components/restaurant/menu-manager"
 import { ChatbotContext } from "@/src/components/restaurant/chatbot-context"
@@ -17,8 +19,27 @@ import { ApiCredentials } from "@/src/components/restaurant/api-credentials"
 export default function RestaurantDetailPage() {
   const params = useParams()
   const restaurantId = params.id as string
-  const { getRestaurantById, isLoading } = useRestaurants()
+  const [restaurants, setRestaurants] = useState<Restaurant[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  
+  useEffect(() => {
+    const loadData = () => {
+      const stored = LocalStorage.loadRestaurants()
+      if (stored && stored.length > 0) {
+        setRestaurants(stored as Restaurant[])
+      } else {
+        setRestaurants(mockRestaurants)
+      }
+      setIsLoading(false)
+    }
 
+    loadData()
+  }, [])
+  
+  const getRestaurantById = (id: string) => {
+    return restaurants.find((restaurant) => restaurant.id === id)
+  }
+  
   const restaurant = getRestaurantById(restaurantId)
 
   if (isLoading) {

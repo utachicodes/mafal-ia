@@ -1,8 +1,7 @@
 "use client"
 
-import { useState } from "react"
-import { DashboardLayout } from "@/src/components/dashboard-layout"
-import { useRestaurants } from "@/src/hooks/use-restaurants"
+import { useState, useEffect } from "react"
+import DashboardLayout from "@/src/components/dashboard-layout"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
@@ -10,14 +9,51 @@ import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { QrCode, CheckCircle2, Phone } from "lucide-react"
+import { type Restaurant, mockRestaurants } from "@/lib/data"
+import { LocalStorage } from "@/src/lib/storage"
 import { useToast } from "@/hooks/use-toast"
 
 export default function WhatsAppQuickConnectPage() {
-  const { restaurants, updateRestaurant, isLoading } = useRestaurants()
+  const [restaurants, setRestaurants] = useState<Restaurant[]>([])
+  const [isLoading, setIsLoading] = useState(true)
   const { toast } = useToast()
+  
+  useEffect(() => {
+    const loadData = () => {
+      const stored = LocalStorage.loadRestaurants()
+      if (stored && stored.length > 0) {
+        setRestaurants(stored as Restaurant[])
+      } else {
+        setRestaurants(mockRestaurants)
+      }
+      setIsLoading(false)
+    }
 
-  const [selectedId, setSelectedId] = useState<string | undefined>(restaurants[0]?.id)
+    loadData()
+  }, [])
+  
+  const updateRestaurant = (id: string, updates: Partial<Restaurant>) => {
+    setRestaurants((prev) =>
+      prev.map((restaurant) =>
+        restaurant.id === id ? { ...restaurant, ...updates, updatedAt: new Date() } : restaurant,
+      ),
+    )
+    // Save to local storage
+    const updatedRestaurants = restaurants.map((restaurant) =>
+      restaurant.id === id ? { ...restaurant, ...updates, updatedAt: new Date() } : restaurant
+    )
+    LocalStorage.saveRestaurants(updatedRestaurants)
+  }
+
+  const [selectedId, setSelectedId] = useState<string | undefined>("")
   const [phone, setPhone] = useState("")
+  
+  useEffect(() => {
+    if (restaurants.length > 0 && !selectedId) {
+      setSelectedId(restaurants[0]?.id)
+    }
+  }, [restaurants, selectedId])
+  
   const restaurant = restaurants.find((r) => r.id === selectedId)
 
   const simulateGenerateQr = () => {
