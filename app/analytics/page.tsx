@@ -4,7 +4,7 @@ import DashboardLayout from "@/src/components/dashboard-layout"
 import dynamic from "next/dynamic"
 import { useState, useEffect } from "react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { type Restaurant, mockRestaurants } from "@/lib/data"
+import { type Restaurant } from "@/lib/data"
 import { LocalStorage } from "@/src/lib/storage"
 
 const ChatAnalytics = dynamic(
@@ -23,7 +23,7 @@ export default function AnalyticsPage() {
       if (stored && stored.length > 0) {
         setRestaurants(stored as Restaurant[])
       } else {
-        setRestaurants(mockRestaurants)
+        // setRestaurants(mockRestaurants) // Removed mock data usage
       }
       setIsLoading(false)
     }

@@ -2,7 +2,7 @@
 
 import type React from "react"
 import { createContext, useContext, useState, useCallback, useEffect } from "react"
-import { type Restaurant, mockRestaurants } from "@/lib/data"
+import { type Restaurant } from "@/lib/data"
 import { generateApiKey } from "@/src/lib/data-utils"
 import { LocalStorage } from "@/src/lib/storage"
 
@@ -23,42 +23,62 @@ export function RestaurantsProvider({ children }: { children: React.ReactNode })
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    const loadData = () => {
-      const stored = LocalStorage.loadRestaurants()
-      if (stored && stored.length > 0) {
-        setRestaurants(stored as Restaurant[])
-      } else {
-        setRestaurants(mockRestaurants)
+    const loadData = async () => {
+      try {
+        const response = await fetch("/api/restaurants")
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`)
+        }
+        const data = await response.json()
+        setRestaurants(data as Restaurant[])
+      } catch (error) {
+        console.error("Failed to fetch restaurants:", error)
+        // Optionally, handle error state or load from local storage as a fallback
+        const stored = LocalStorage.loadRestaurants()
+        if (stored && stored.length > 0) {
+          setRestaurants(stored as Restaurant[])
+        }
+      } finally {
+        setIsLoading(false)
       }
-      setIsLoading(false)
     }
 
     loadData()
   }, [])
 
-  useEffect(() => {
-    if (!isLoading && restaurants.length > 0) {
-      LocalStorage.saveRestaurants(restaurants)
-    }
-  }, [restaurants, isLoading])
 
-  const addRestaurant = useCallback((restaurantData: Omit<Restaurant, "id" | "apiKey" | "createdAt" | "updatedAt">) => {
+
+  const addRestaurant = useCallback(async (restaurantData: Omit<Restaurant, "id" | "apiKey" | "createdAt" | "updatedAt">) => {
     const newRestaurant: Restaurant = {
       ...restaurantData,
       // Ensure `menu` is initialized even if upstream provided `menuItems`
       menu: (restaurantData as any).menu ?? (restaurantData as any).menuItems ?? [],
-      id: `restaurant_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`,
+      id: `restaurant_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`, // Temporary ID
       apiKey: generateApiKey(restaurantData.name),
       createdAt: new Date(),
       updatedAt: new Date(),
     }
-    setRestaurants((prev) => {
-      const next = [...prev, newRestaurant]
-      // Persist immediately to avoid race when navigating to Playground
-      LocalStorage.saveRestaurants(next)
-      return next
-    })
-    return newRestaurant.id
+
+    try {
+      const response = await fetch("/api/restaurants", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newRestaurant),
+      })
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
+      const savedRestaurant = await response.json()
+      setRestaurants((prev) => [...prev, savedRestaurant])
+      return savedRestaurant.id
+    } catch (error) {
+      console.error("Failed to add restaurant:", error)
+      throw error
+    }
   }, [])
 
   const updateRestaurant = useCallback((id: string, updates: Partial<Restaurant>) => {

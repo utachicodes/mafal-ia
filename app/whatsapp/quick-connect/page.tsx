@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { QrCode, CheckCircle2, Phone } from "lucide-react"
-import { type Restaurant, mockRestaurants } from "@/lib/data"
+import { type Restaurant } from "@/lib/data"
 import { LocalStorage } from "@/src/lib/storage"
 import { useToast } from "@/hooks/use-toast"
 
@@ -24,7 +24,7 @@ export default function WhatsAppQuickConnectPage() {
       if (stored && stored.length > 0) {
         setRestaurants(stored as Restaurant[])
       } else {
-        setRestaurants(mockRestaurants)
+        // setRestaurants(mockRestaurants) // Removed mock data usage
       }
       setIsLoading(false)
     }

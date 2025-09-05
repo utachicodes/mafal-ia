@@ -1,51 +1,67 @@
 "use client"
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts"
 import { MessageSquare, Bot, Globe, Zap, TrendingUp } from "lucide-react"
 import type { Restaurant } from "@/lib/data"
 
+import { useEffect, useState } from "react"
+
 interface ChatAnalyticsProps {
   restaurant: Restaurant
 }
 
-// Mock analytics data (in production, this would come from a database)
-const mockAnalytics = {
-  totalConversations: 156,
-  totalMessages: 1247,
-  averageResponseTime: 1.2,
-  customerSatisfaction: 4.6,
-  languageDistribution: [
-    { language: "French", count: 89, percentage: 57 },
-    { language: "English", count: 45, percentage: 29 },
-    { language: "Wolof", count: 22, percentage: 14 },
-  ],
-  dailyMessages: [
-    { day: "Mon", messages: 45 },
-    { day: "Tue", messages: 52 },
-    { day: "Wed", messages: 38 },
-    { day: "Thu", messages: 61 },
-    { day: "Fri", messages: 73 },
-    { day: "Sat", messages: 89 },
-    { day: "Sun", messages: 67 },
-  ],
-  topQueries: [
-    { query: "Menu information", count: 234 },
-    { query: "Order placement", count: 189 },
-    { query: "Opening hours", count: 156 },
-    { query: "Pricing", count: 134 },
-    { query: "Location", count: 98 },
-  ],
-  toolUsage: [
-    { tool: "Menu Information", uses: 345, color: "#8884d8" },
-    { tool: "Order Calculator", uses: 234, color: "#82ca9d" },
-    { tool: "General Response", uses: 456, color: "#ffc658" },
-  ],
+interface AnalyticsData {
+  totalConversations: number
+  totalMessages: number
+  averageResponseTime: number
+  customerSatisfaction: number
+  languageDistribution: { language: string; count: number; percentage: number }[]
+  dailyMessages: { day: string; messages: number }[]
+  topQueries: { query: string; count: number }[]
+  toolUsage: { tool: string; uses: number; color: string }[]
 }
 
 export function ChatAnalytics({ restaurant }: ChatAnalyticsProps) {
+  const [analytics, setAnalytics] = useState<AnalyticsData | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const fetchAnalytics = async () => {
+      try {
+        setLoading(true)
+        const response = await fetch(`/api/analytics/summary?restaurantId=${restaurant.id}`)
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`)
+        }
+        const data: AnalyticsData = await response.json()
+        setAnalytics(data)
+      } catch (e: any) {
+        setError(e.message)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchAnalytics()
+  }, [restaurant.id])
+
+  if (loading) {
+    return <div>Loading analytics...</div>
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>
+  }
+
+  if (!analytics) {
+    return <div>No analytics data available.</div>
+  }
+
   return (
     <div className="space-y-6">
       {/* Overview Cards */}
@@ -56,7 +72,7 @@ export function ChatAnalytics({ restaurant }: ChatAnalyticsProps) {
             <MessageSquare className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{mockAnalytics.totalConversations}</div>
+            <div className="text-2xl font-bold">{analytics.totalConversations}</div>
             <p className="text-xs text-muted-foreground">
               <TrendingUp className="inline h-3 w-3 mr-1" />
               +12% from last month
@@ -70,7 +86,7 @@ export function ChatAnalytics({ restaurant }: ChatAnalyticsProps) {
             <Bot className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{mockAnalytics.totalMessages}</div>
+            <div className="text-2xl font-bold">{analytics.totalMessages}</div>
             <p className="text-xs text-muted-foreground">
               <TrendingUp className="inline h-3 w-3 mr-1" />
               +8% from last month
@@ -84,7 +100,7 @@ export function ChatAnalytics({ restaurant }: ChatAnalyticsProps) {
             <Zap className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{mockAnalytics.averageResponseTime}s</div>
+            <div className="text-2xl font-bold">{analytics.averageResponseTime}s</div>
             <p className="text-xs text-muted-foreground">
               <TrendingUp className="inline h-3 w-3 mr-1" />
               15% faster than last month
@@ -98,8 +114,8 @@ export function ChatAnalytics({ restaurant }: ChatAnalyticsProps) {
             <Globe className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{mockAnalytics.customerSatisfaction}/5</div>
-            <Progress value={mockAnalytics.customerSatisfaction * 20} className="mt-2" />
+            <div className="text-2xl font-bold">{analytics.customerSatisfaction}/5</div>
+            <Progress value={analytics.customerSatisfaction * 20} className="mt-2" />
           </CardContent>
         </Card>
       </div>
@@ -114,7 +130,7 @@ export function ChatAnalytics({ restaurant }: ChatAnalyticsProps) {
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={mockAnalytics.dailyMessages}>
+              <BarChart data={analytics.dailyMessages || []}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="day" />
                 <YAxis />
@@ -135,7 +151,7 @@ export function ChatAnalytics({ restaurant }: ChatAnalyticsProps) {
             <ResponsiveContainer width="100%" height={300}>
               <PieChart>
                 <Pie
-                  data={mockAnalytics.toolUsage}
+                  data={analytics.toolUsage}
                   cx="50%"
                   cy="50%"
                   labelLine={false}
@@ -144,7 +160,7 @@ export function ChatAnalytics({ restaurant }: ChatAnalyticsProps) {
                   fill="#8884d8"
                   dataKey="uses"
                 >
-                  {mockAnalytics.toolUsage.map((entry, index) => (
+                  {(analytics.toolUsage || []).map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.color} />
                   ))}
                 </Pie>
@@ -163,7 +179,7 @@ export function ChatAnalytics({ restaurant }: ChatAnalyticsProps) {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {mockAnalytics.languageDistribution.map((lang) => (
+            {(analytics.languageDistribution || []).map((lang) => (
               <div key={lang.language} className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Badge variant="outline">{lang.language}</Badge>
@@ -187,7 +203,7 @@ export function ChatAnalytics({ restaurant }: ChatAnalyticsProps) {
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            {mockAnalytics.topQueries.map((query, index) => (
+            {(analytics.topQueries || []).map((query, index) => (
               <div key={query.query} className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-xs font-medium">

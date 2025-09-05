@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import type { Restaurant, MenuItem } from "@/lib/data"
-import { mockRestaurants } from "@/lib/data"
+// import { mockRestaurants } from "@/lib/data" // Removed mock data usage
 import { LocalStorage } from "@/src/lib/storage"
 import { useToast } from "@/hooks/use-toast"
 
@@ -38,7 +38,7 @@ export default function ConciergePage() {
       if (stored && stored.length > 0) {
         setRestaurants(stored as Restaurant[])
       } else {
-        setRestaurants(mockRestaurants)
+        // setRestaurants(mockRestaurants) // Removed mock data usage
       }
       setIsLoading(false)
     }

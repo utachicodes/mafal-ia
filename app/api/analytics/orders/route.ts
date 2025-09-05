@@ -11,30 +11,54 @@ export async function GET() {
     const today = startOfDay(new Date())
     const sevenDaysAgo = subDays(today, 6) // inclusive 7 days window
     
-    // In a production environment, we would use Prisma to query the database
-    // Since OrderService uses an in-memory store for demo purposes, we'll create some sample data
-    
-    // Sample data for order analytics
-    const ordersByDay = [
-      { date: format(subDays(today, 6), 'yyyy-MM-dd'), count: 4, revenue: 12500 },
-      { date: format(subDays(today, 5), 'yyyy-MM-dd'), count: 3, revenue: 9800 },
-      { date: format(subDays(today, 4), 'yyyy-MM-dd'), count: 5, revenue: 15200 },
-      { date: format(subDays(today, 3), 'yyyy-MM-dd'), count: 7, revenue: 21000 },
-      { date: format(subDays(today, 2), 'yyyy-MM-dd'), count: 9, revenue: 28500 },
-      { date: format(subDays(today, 1), 'yyyy-MM-dd'), count: 11, revenue: 32000 },
-      { date: format(today, 'yyyy-MM-dd'), count: 8, revenue: 24500 },
-    ]
-    
-    const totalOrders = ordersByDay.reduce((sum, day) => sum + day.count, 0)
-    const todayOrders = ordersByDay[6].count
-    const totalRevenue = ordersByDay.reduce((sum, day) => sum + day.revenue, 0)
-    
-    // Category distribution for pie chart
-    const categoryDistribution = [
-      { name: "Plats", value: 45 },
-      { name: "Boissons", value: 30 },
-      { name: "Desserts", value: 25 },
-    ]
+    const orders = await prisma.order.findMany({
+      where: {
+        createdAt: {
+          gte: sevenDaysAgo,
+          lte: today,
+        },
+      },
+      select: {
+        createdAt: true,
+        total: true,
+        items: true,
+      },
+    })
+
+    const ordersByDayMap = new Map<string, { count: number; revenue: number }>()
+    for (let i = 0; i < 7; i++) {
+      const date = format(subDays(today, 6 - i), 'yyyy-MM-dd')
+      ordersByDayMap.set(date, { count: 0, revenue: 0 })
+    }
+
+    orders.forEach((order) => {
+      const date = format(order.createdAt, 'yyyy-MM-dd')
+      const current = ordersByDayMap.get(date) || { count: 0, revenue: 0 }
+      ordersByDayMap.set(date, { count: current.count + 1, revenue: current.revenue + order.total })
+    })
+
+    const ordersByDay = Array.from(ordersByDayMap.entries()).map(([date, data]) => ({
+      date,
+      count: data.count,
+      revenue: data.revenue,
+    }))
+
+    const totalOrders = orders.length
+    const todayOrders = ordersByDay[6]?.count || 0
+    const totalRevenue = orders.reduce((sum, order) => sum + order.total, 0)
+
+    const categoryDistributionMap = new Map<string, number>()
+    orders.forEach((order) => {
+      order.items.forEach((item: any) => {
+        const category = item.category || "Other" // Assuming items have a category field
+        categoryDistributionMap.set(category, (categoryDistributionMap.get(category) || 0) + item.quantity)
+      })
+    })
+
+    const categoryDistribution = Array.from(categoryDistributionMap.entries()).map(([name, value]) => ({
+      name,
+      value,
+    }))
     
     return NextResponse.json({
       totalOrders,

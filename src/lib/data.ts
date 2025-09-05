@@ -43,7 +43,7 @@ export interface ChatMessage {
 }
 
 // Mock data for Senegalese restaurants
-export const mockRestaurants: Restaurant[] = [
+// export const mockRestaurants: Restaurant[] = [ // Removed mock data
   {
     id: "1",
     name: "Chez Fatou",
