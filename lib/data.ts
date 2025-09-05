@@ -50,7 +50,7 @@ export interface ChatMessage {
   timestamp: Date
 }
 
-export const mockRestaurants: Restaurant[] = [
+// export const mockRestaurants: Restaurant[] = [ // Removed mock data
   {
     id: "1",
     name: "Chez Fatou",

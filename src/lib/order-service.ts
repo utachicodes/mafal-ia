@@ -1,37 +1,29 @@
-export type OrderRecord = {
-  id: string
-  restaurantId: string
-  phoneNumber: string
-  total: number
-  itemsSummary: string
-  notFoundItems: string
-  orderItems: { itemName: string; quantity: number }[]
-  status: "pending" | "confirmed" | "cancelled"
-  createdAt: Date
-}
+import { getPrisma } from "@/src/lib/db"
+import { Order, Prisma } from "@prisma/client"
 
-// Simple in-memory order store for demo and default usage.
-// In production, replace with Prisma models.
+export type OrderRecord = Order
+
 export class OrderService {
-  private static store = new Map<string, OrderRecord>()
-
-  static async createOrder(params: Omit<OrderRecord, "id" | "status" | "createdAt">): Promise<OrderRecord> {
-    const id = `ord_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
-    const rec: OrderRecord = {
-      id,
-      status: "confirmed",
-      createdAt: new Date(),
-      ...params,
-    }
-    this.store.set(id, rec)
-    return rec
+  static async createOrder(params: Prisma.OrderCreateInput): Promise<OrderRecord> {
+    const prisma = await getPrisma()
+    const createdOrder = await prisma.order.create({
+      data: params,
+    })
+    return createdOrder
   }
 
   static async getOrder(id: string): Promise<OrderRecord | null> {
-    return this.store.get(id) ?? null
+    const prisma = await getPrisma()
+    return prisma.order.findUnique({
+      where: { id },
+    })
   }
 
   static async listByPhone(restaurantId: string, phoneNumber: string): Promise<OrderRecord[]> {
-    return [...this.store.values()].filter((o) => o.restaurantId === restaurantId && o.phoneNumber === phoneNumber)
+    const prisma = await getPrisma()
+    return prisma.order.findMany({
+      where: { restaurantId, phoneNumber },
+      orderBy: { createdAt: "desc" },
+    })
   }
 }

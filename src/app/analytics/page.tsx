@@ -16,9 +16,7 @@ export default function AnalyticsPage() {
           <CardDescription>Key metrics and performance indicators</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="h-64 flex items-center justify-center bg-muted/50 rounded-lg">
-            <p className="text-muted-foreground">Analytics dashboard coming soon</p>
-          </div>
+
         </CardContent>
       </Card>
     </div>

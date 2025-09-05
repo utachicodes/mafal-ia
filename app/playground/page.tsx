@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 // No mock client; we require a valid API key and always call server-backed Gemini
 import type { ChatMessage, Restaurant } from "@/lib/data"
-import { mockRestaurants } from "@/lib/data"
+// import { mockRestaurants } from "@/lib/data" // Removed mock data usage
 import { LocalStorage } from "@/src/lib/storage"
 import { cn } from "@/lib/utils"
 
@@ -80,7 +80,7 @@ export default function PlaygroundPage() {
       if (stored && stored.length > 0) {
         setRestaurants(stored as Restaurant[])
       } else {
-        setRestaurants(mockRestaurants)
+        // setRestaurants(mockRestaurants) // Removed mock data usage
       }
       setIsLoading(false)
     }

@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Upload, CheckCircle2, MessageSquare, Store, QrCode } from "lucide-react"
-import { type Restaurant, mockRestaurants } from "@/lib/data"
+import { type Restaurant } from "@/lib/data"
 import { LocalStorage } from "@/src/lib/storage"
 import { generateApiKey } from "@/src/lib/data-utils"
 import { useToast } from "@/hooks/use-toast"
@@ -26,7 +26,7 @@ export default function OnboardingPage() {
       if (stored && stored.length > 0) {
         setRestaurants(stored as Restaurant[])
       } else {
-        setRestaurants(mockRestaurants)
+        // setRestaurants(mockRestaurants) // Removed mock data usage
       }
     }
 

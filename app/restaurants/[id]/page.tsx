@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge"
 import { ArrowLeft, Store } from "lucide-react"
 import Link from "next/link"
 import { useState, useEffect } from "react"
-import { type Restaurant, mockRestaurants } from "@/lib/data"
+import { type Restaurant } from "@/lib/data"
 import { LocalStorage } from "@/src/lib/storage"
 import DashboardLayout from "@/src/components/dashboard-layout"
 import { GeneralSettings } from "@/src/components/restaurant/general-settings"
@@ -28,7 +28,7 @@ export default function RestaurantDetailPage() {
       if (stored && stored.length > 0) {
         setRestaurants(stored as Restaurant[])
       } else {
-        setRestaurants(mockRestaurants)
+        // setRestaurants(mockRestaurants) // Removed mock data usage
       }
       setIsLoading(false)
     }

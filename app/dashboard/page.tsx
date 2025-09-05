@@ -94,7 +94,7 @@ export default function DashboardPage() {
   }, [])
 
   // Format order data for charts
-  const orderData = orderSummary?.ordersByDay.map(day => ({
+  const orderData = orderSummary?.ordersByDay?.map(day => ({
     name: new Date(day.date).toLocaleDateString('fr-FR', { weekday: 'short' }).substring(0, 3),
     orders: day.count,
     revenue: day.revenue

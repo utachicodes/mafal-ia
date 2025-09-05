@@ -1,6 +1,17 @@
 import { NextResponse } from "next/server"
 import { RestaurantService } from "@/src/lib/restaurant-service"
 
+export async function GET(req: Request, { params }: { params: { id: string } }) {
+  try {
+    const id = params.id
+    const restaurant = await RestaurantService.getRestaurantById(id)
+    if (!restaurant) return NextResponse.json({ error: "Restaurant not found" }, { status: 404 })
+    return NextResponse.json(restaurant)
+  } catch (err: any) {
+    return NextResponse.json({ error: err?.message || "Failed to fetch restaurant" }, { status: 500 })
+  }
+}
+
 export async function PATCH(req: Request, { params }: { params: { id: string } }) {
   try {
     const id = params.id
