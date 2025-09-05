@@ -24,43 +24,13 @@ export class RestaurantService {
     if (!this.demoStore) {
       // this.demoStore = JSON.parse(JSON.stringify(mockRestaurants)) // Removed mock data usage
     }
-  }
+}
 
   private static async ensureSeeded() {
     if (env.DEMO_MODE) return
     const prisma = await getPrisma()
     const count = await prisma.restaurant.count()
     if (count > 0) return
-
-    // for (const r of mockRestaurants) { // Removed mock data usage
-      const prisma = await getPrisma()
-      await prisma.restaurant.create({
-        data: {
-          name: r.name,
-          description: r.description,
-          cuisine: r.cuisine,
-          whatsappNumber: r.whatsappNumber,
-          whatsappPhoneNumberId: r.apiCredentials.whatsappPhoneNumberId || "",
-          supportedLanguages: r.supportedLanguages,
-          isActive: r.isActive,
-          isConcierge: !!r.isConcierge,
-          welcomeMessage: r.chatbotContext.welcomeMessage,
-          businessHours: r.chatbotContext.businessHours,
-          specialInstructions: r.chatbotContext.specialInstructions,
-          orderingEnabled: r.chatbotContext.orderingEnabled,
-          deliveryInfo: r.chatbotContext.deliveryInfo,
-          menuItems: {
-            create: r.menu.map((m) => ({
-              name: m.name,
-              description: m.description,
-              price: m.price,
-              category: m.category || null,
-              isAvailable: m.isAvailable ?? true,
-            })),
-          },
-        },
-      })
-    }
   }
 
   private static mapPrismaToRestaurant(p: any): Restaurant {
