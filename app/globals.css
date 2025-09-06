@@ -132,3 +132,29 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer components {
+  .card {
+    @apply transition-all duration-300 ease-in-out hover:shadow-lg hover:scale-[1.02] hover:border-primary/50;
+  }
+
+  .hover-effect {
+    @apply transition-transform duration-200 ease-in-out hover:scale-105;
+  }
+
+  .fade-in {
+    @apply animate-in fade-in duration-500;
+  }
+
+  .slide-in {
+    @apply animate-in slide-in-from-bottom duration-500;
+  }
+
+  .button-hover {
+    @apply hover:shadow-md active:scale-95 transition-all duration-200;
+  }
+
+  .menu-item {
+    @apply transition-colors duration-200 hover:bg-accent/10 hover:text-accent-foreground;
+  }
+}
