@@ -3,8 +3,8 @@ import { GeistMono } from "geist/font/mono"
 import "./globals.css"
 import { Providers } from "./providers"
 import { metadata } from "./metadata"
-
-export { metadata }
+import { LanguageProvider } from "@/src/context/language-context"
+import { LanguageWrapper } from "./language-wrapper"
 
 export default function RootLayout({
   children,
@@ -12,21 +12,23 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className="dark" suppressHydrationWarning>
-      <head>
-        <style>{`
+    <LanguageProvider>
+      <LanguageWrapper>
+        <head>
+          <style>{`
 html {
   font-family: ${GeistSans.style.fontFamily};
   --font-sans: ${GeistSans.variable};
   --font-mono: ${GeistMono.variable};
 }
-        `}</style>
-      </head>
-      <body className={`${GeistSans.variable} ${GeistMono.variable}`}>
-        <Providers>
-          {children}
-        </Providers>
-      </body>
-    </html>
+          `}</style>
+        </head>
+        <body className={`${GeistSans.variable} ${GeistMono.variable}`}>
+          <Providers>
+            {children}
+          </Providers>
+        </body>
+      </LanguageWrapper>
+    </LanguageProvider>
   )
 }
