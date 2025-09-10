@@ -89,7 +89,16 @@ export const generateResponseFlow = defineFlow(
       prompt: `Detect the language of this message and respond with just the language code (en, fr, wo, ar, etc.): "${lastMessage}"`,
     })
 
-    const detectedLanguage = getText(languageDetection).toLowerCase()
+    // Normalize language detection to robustly handle variants like "fr-FR", "Français", etc.
+    const normalizeLang = (s: string): "en" | "fr" | "wo" | "ar" => {
+      const x = (s || "").toLowerCase().trim()
+      if (x.startsWith("fr") || x.includes("fran") || x.includes("french")) return "fr"
+      if (x.startsWith("wo") || x.includes("wolof")) return "wo"
+      if (x.startsWith("ar") || x.includes("arab") || x.includes("الع")) return "ar"
+      return "en"
+    }
+
+    const detectedLanguage = normalizeLang(getText(languageDetection))
 
     // Analyze intent to determine if tools are needed
     const intentAnalysis = await genAny({

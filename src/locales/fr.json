@@ -1,0 +1,42 @@
+{
+  "app": {
+    "name": "Mafal-IA"
+  },
+  "header": {
+    "login": "Se connecter",
+    "dashboard": "Tableau de bord"
+  },
+  "hero": {
+    "badge": "Chatbots WhatsApp B2B pour restaurants",
+    "title": "Assistant WhatsApp pour votre restaurant",
+    "subtitle": "Renseignez votre compte, connectez votre numéro WhatsApp Business et laissez Mafal-IA répondre, recommander et prendre des commandes — menu à l’appui, multilingue.",
+    "ctaPrimary": "Créer mon restaurant",
+    "ctaSecondary": "Voir comment ça marche"
+  },
+  "features": {
+    "heading": "Pensé pour l’échelle, conçu pour la clarté",
+    "menu": "IA consciente du menu",
+    "menuDesc": "Comprend vos plats, prix et disponibilités par restaurant.",
+    "multi": "Multilingue",
+    "multiDesc": "Français et anglais pris en charge, avec un ton concis.",
+    "wa": "Natif WhatsApp",
+    "waDesc": "Vérification du webhook, signatures sécurisées et réponses rapides.",
+    "fast": "Rapide & fiable",
+    "fastDesc": "Runtime Node, Prisma ORM, SQLite en dev / Postgres en prod."
+  },
+  "steps": {
+    "heading": "Trois étapes pour être en ligne",
+    "s1": {"title": "Créer le restaurant", "desc": "Ajoutez votre profil et importez le menu en JSON."},
+    "s2": {"title": "Connecter WhatsApp", "desc": "Définissez phone_number_id et l’access token. Vérifiez le webhook."},
+    "s3": {"title": "Lancer & suivre", "desc": "Testez les chats et suivez commandes et analytics."}
+  },
+  "cta": {
+    "heading": "Prêt pour le lancement ?",
+    "desc": "Mafal-IA est pensé pour la production, dédié aux restaurants B2B.",
+    "button": "Commencer"
+  },
+  "footer": {
+    "copyright": "Tous droits réservés."
+  }
+}
+
