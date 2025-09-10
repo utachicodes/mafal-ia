@@ -7,9 +7,9 @@ export const env = {
   GOOGLE_GENKIT_API_KEY: process.env.GOOGLE_GENKIT_API_KEY || "",
   NODE_ENV: process.env.NODE_ENV || "development",
   DATABASE_URL: process.env.DATABASE_URL || "",
-  // Demo mode defaults to ON unless explicitly disabled (DEMO_MODE=false or 0)
+  // Demo mode defaults to OFF unless explicitly enabled (DEMO_MODE=true or 1)
   DEMO_MODE:
-    ((process.env.DEMO_MODE ?? "true") !== "false" && (process.env.DEMO_MODE ?? "true") !== "0") as boolean,
+    ((process.env.DEMO_MODE ?? "false") === "true" || (process.env.DEMO_MODE ?? "false") === "1") as boolean,
 } as const
 
 // Validation function to ensure required environment variables are set

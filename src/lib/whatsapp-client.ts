@@ -4,7 +4,12 @@ export class WhatsAppClient {
   private static readonly BASE_URL = "https://graph.facebook.com/v18.0"
 
   // Send a text message via WhatsApp Business API
-  static async sendMessage(businessPhoneNumberId: string, to: string, message: string): Promise<boolean> {
+  static async sendMessage(
+    businessPhoneNumberId: string,
+    to: string,
+    message: string,
+    accessTokenOverride?: string,
+  ): Promise<boolean> {
     try {
       const url = `${this.BASE_URL}/${businessPhoneNumberId}/messages`
 
@@ -22,10 +27,11 @@ export class WhatsAppClient {
         message: message.substring(0, 100) + (message.length > 100 ? "..." : ""),
       })
 
+      const token = accessTokenOverride || env.WHATSAPP_ACCESS_TOKEN
       const response = await fetch(url, {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${env.WHATSAPP_ACCESS_TOKEN}`,
+          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify(payload),
@@ -57,6 +63,7 @@ export class WhatsAppClient {
     templateName: string,
     languageCode = "en",
     parameters: string[] = [],
+    accessTokenOverride?: string,
   ): Promise<boolean> {
     try {
       const url = `${this.BASE_URL}/${businessPhoneNumberId}/messages`
@@ -90,10 +97,11 @@ export class WhatsAppClient {
         language: languageCode,
       })
 
+      const token = accessTokenOverride || env.WHATSAPP_ACCESS_TOKEN
       const response = await fetch(url, {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${env.WHATSAPP_ACCESS_TOKEN}`,
+          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify(payload),
@@ -119,7 +127,11 @@ export class WhatsAppClient {
   }
 
   // Mark a message as read
-  static async markMessageAsRead(businessPhoneNumberId: string, messageId: string): Promise<boolean> {
+  static async markMessageAsRead(
+    businessPhoneNumberId: string,
+    messageId: string,
+    accessTokenOverride?: string,
+  ): Promise<boolean> {
     try {
       const url = `${this.BASE_URL}/${businessPhoneNumberId}/messages`
 
@@ -129,10 +141,11 @@ export class WhatsAppClient {
         message_id: messageId,
       }
 
+      const token = accessTokenOverride || env.WHATSAPP_ACCESS_TOKEN
       const response = await fetch(url, {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${env.WHATSAPP_ACCESS_TOKEN}`,
+          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify(payload),
@@ -151,14 +164,15 @@ export class WhatsAppClient {
   }
 
   // Get business profile information
-  static async getBusinessProfile(businessPhoneNumberId: string): Promise<any> {
+  static async getBusinessProfile(businessPhoneNumberId: string, accessTokenOverride?: string): Promise<any> {
     try {
       const url = `${this.BASE_URL}/${businessPhoneNumberId}`
 
+      const token = accessTokenOverride || env.WHATSAPP_ACCESS_TOKEN
       const response = await fetch(url, {
         method: "GET",
         headers: {
-          Authorization: `Bearer ${env.WHATSAPP_ACCESS_TOKEN}`,
+          Authorization: `Bearer ${token}`,
         },
       })
 

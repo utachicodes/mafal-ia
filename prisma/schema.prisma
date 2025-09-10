@@ -72,6 +72,9 @@ model Restaurant {
   cuisine                String
   whatsappNumber         String
   whatsappPhoneNumberId  String      @default("") // maps to Meta business phone number ID
+  // Optional per-tenant credentials (fallback to env vars when empty)
+  whatsappAccessToken    String?     @default("")
+  whatsappAppSecret      String?     @default("")
   supportedLanguages     Json
   isActive               Boolean     @default(true)
   // Marks this WhatsApp number as the global concierge that can search across all restaurants
@@ -85,8 +88,8 @@ model Restaurant {
   deliveryInfo           String      @default("")
 
   menuItems              MenuItem[]
-  conversations         Conversation[]
-  orders                Order[]
+  conversations          Conversation[]
+  orders                 Order[]
 
   createdAt              DateTime    @default(now())
   updatedAt              DateTime    @updatedAt
