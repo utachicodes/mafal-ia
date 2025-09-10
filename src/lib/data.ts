@@ -7,29 +7,6 @@ export interface MenuItem {
   isAvailable?: boolean
 }
 
-export interface Restaurant {
-  id: string
-  name: string
-  description: string
-  apiKey: string
-  context: string
-  menuItems: MenuItem[]
-  // New fields for integrations and UX
-  locale?: string
-  whatsappNumber?: string
-  whatsappConnected?: boolean
-  calendarProvider?: "google" | "outlook" | null
-  crmWebhookUrl?: string | null
-  assistantTone?: "friendly" | "professional" | "playful"
-  templates?: {
-    greeting?: string
-    bookingConfirmation?: string
-    closing?: string
-  }
-  createdAt: Date
-  updatedAt: Date
-}
-
 export interface OrderItem {
   itemName: string
   quantity: number
@@ -42,47 +19,33 @@ export interface ChatMessage {
   timestamp: Date
 }
 
-// Mock data for Senegalese restaurants
-// export const mockRestaurants: Restaurant[] = [ // Removed mock data
-  {
-    id: "1",
-    name: "Chez Fatou",
-    description: "Authentic Senegalese cuisine in the heart of Dakar",
-    apiKey: "mafal_chez_fatou_2024_abc123",
-    context:
-      "We are a traditional Senegalese restaurant serving authentic dishes like thieboudienne, yassa, and mafe. We are open from 11 AM to 10 PM daily. We offer both dine-in and takeaway options.",
-    locale: "fr",
-    whatsappConnected: false,
-    calendarProvider: null,
-    crmWebhookUrl: null,
-    assistantTone: "friendly",
-    menuItems: [
-      {
-        id: "1",
-        name: "Thieboudienne",
-        description: "Traditional Senegalese rice and fish dish with vegetables",
-        price: 3500,
-        category: "Main Course",
-        isAvailable: true,
-      },
-      {
-        id: "2",
-        name: "Yassa Poulet",
-        description: "Grilled chicken with onion sauce and rice",
-        price: 2800,
-        category: "Main Course",
-        isAvailable: true,
-      },
-      {
-        id: "3",
-        name: "Mafe",
-        description: "Peanut stew with meat and vegetables",
-        price: 3000,
-        category: "Main Course",
-        isAvailable: true,
-      },
-    ],
-    createdAt: new Date("2024-01-15"),
-    updatedAt: new Date("2024-01-15"),
-  },
-]
+export interface ChatbotContext {
+  welcomeMessage: string
+  businessHours: string
+  specialInstructions: string
+  orderingEnabled: boolean
+  deliveryInfo: string
+}
+
+export interface ApiCredentials {
+  whatsappAccessToken?: string
+  whatsappPhoneNumberId: string
+  webhookVerifyToken?: string
+}
+
+export interface Restaurant {
+  id: string
+  name: string
+  description: string
+  cuisine: string
+  whatsappNumber: string
+  supportedLanguages: string[]
+  isActive: boolean
+  isConcierge: boolean
+  menu: MenuItem[]
+  chatbotContext: ChatbotContext
+  apiCredentials: ApiCredentials
+  apiKey: string
+  createdAt: Date
+  updatedAt: Date
+}
