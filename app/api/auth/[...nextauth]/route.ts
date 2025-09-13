@@ -1,15 +1,6 @@
-// Authentication removed
+import NextAuth from "next-auth"
+import { authOptions } from "@/lib/auth"
 
-export async function GET() {
-  return new Response(JSON.stringify({ message: "Authentication disabled" }), {
-    status: 200,
-    headers: { "Content-Type": "application/json" }
-  })
-}
+const handler = NextAuth(authOptions)
 
-export async function POST() {
-  return new Response(JSON.stringify({ message: "Authentication disabled" }), {
-    status: 200,
-    headers: { "Content-Type": "application/json" }
-  })
-}
+export { handler as GET, handler as POST }
