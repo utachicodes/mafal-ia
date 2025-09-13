@@ -75,6 +75,8 @@ model Restaurant {
   // Optional per-tenant credentials (fallback to env vars when empty)
   whatsappAccessToken    String?     @default("")
   whatsappAppSecret      String?     @default("")
+  // Per-restaurant webhook verification token (used by Meta webhook verification GET)
+  webhookVerifyToken     String      @default("")
   supportedLanguages     Json
   isActive               Boolean     @default(true)
   // Marks this WhatsApp number as the global concierge that can search across all restaurants
