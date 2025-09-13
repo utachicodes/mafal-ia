@@ -208,6 +208,86 @@ curl -X POST "https://your-domain.com/api/whatsapp" \
 
 If `Restaurant.whatsappPhoneNumberId` matches the Meta `phone_number_id`, the request is routed to your restaurant. Mafal-IA generates a reply and sends it via the WhatsApp Business API.
 
+### WhatsApp Integration - Step by Step
+
+Follow these steps to connect a restaurant to WhatsApp Business API and validate the webhook end to end.
+
+1) Prepare credentials
+- **From Meta**: WhatsApp Business `phone_number_id`, a long‑lived **Access Token**, and your app’s **App Secret**.
+- **Choose** a **Verify Token** (any string you control) to use during webhook verification.
+
+2) Configure the restaurant in the dashboard
+- Go to `Settings → API Credentials` for the restaurant.
+- Set the fields:
+  - `phone_number_id`: your Meta WhatsApp Business phone number ID
+  - `Access Token` (optional per restaurant): overrides the global token when sending messages
+  - `App Secret` (optional per restaurant): used to validate incoming webhook signatures
+  - `Webhook Verify Token`: exact token you’ll also supply in Meta for verification
+
+3) Configure the webhook in Meta
+- Webhook URL: `https://YOUR_DOMAIN/api/whatsapp`
+- Verify Token: the exact value set above
+- Subscribe to the “messages” webhook event
+
+4) Verify the webhook (GET)
+
+```bash
+curl -i -G "https://YOUR_DOMAIN/api/whatsapp" \
+  --data-urlencode "hub.mode=subscribe" \
+  --data-urlencode "hub.verify_token=YOUR_VERIFY_TOKEN" \
+  --data-urlencode "hub.challenge=123456"
+```
+
+Expected: `HTTP/1.1 200` with body `123456`.
+
+5) Test a signed POST delivery locally (optional but recommended)
+
+- Save a minimal WhatsApp payload as `wa.json` (set `phone_number_id` to your restaurant’s `phone_number_id`):
+
+```json
+{
+  "entry": [
+    {
+      "changes": [
+        {
+          "field": "messages",
+          "value": {
+            "metadata": { "phone_number_id": "123456789012345" },
+            "contacts": [{ "profile": { "name": "Test User" }, "wa_id": "15551234567" }],
+            "messages": [
+              { "from": "15551234567", "id": "wamid.TEST", "timestamp": "1736800000", "type": "text", "text": { "body": "Hi there" } }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "object": "whatsapp_business_account"
+}
+```
+
+- Compute the signature with your App Secret and send the request:
+
+```bash
+APP_SECRET="YOUR_APP_SECRET"
+SIG="sha256=$(cat wa.json | openssl sha256 -hmac "$APP_SECRET" -binary | xxd -p -c 256)"
+curl -i -X POST "https://YOUR_DOMAIN/api/whatsapp" \
+  -H "Content-Type: application/json" \
+  -H "X-Hub-Signature-256: $SIG" \
+  --data-binary @wa.json
+```
+
+Expected: `HTTP/1.1 200` and server logs showing payload processing. If a per‑restaurant App Secret is set, unsigned POSTs will be rejected (`403`).
+
+6) Live test
+- Send a real WhatsApp message to your WABA number. The platform will route by `metadata.phone_number_id`, generate an AI response with your restaurant’s context/menu, and reply using your Access Token (per‑restaurant if set, otherwise global).
+
+7) Troubleshooting
+- 403 on GET: verify the exact Verify Token value.
+- 403 on POST: invalid/missing `X-Hub-Signature-256` for the configured App Secret.
+- No reply sent: check `phone_number_id` mapping, Access Token permissions, and logs.
+
+
 ## B2B Model: What We Provide vs What You Handle
 
 We provide the API and tools. You keep control of your operations.
