@@ -20,7 +20,7 @@ import {
 import { Plus, Upload, Edit, Trash2, FileText } from "lucide-react"
 import { useRestaurants } from "@/src/hooks/use-restaurants"
 import type { Restaurant } from "@/lib/data"
-import { createMenuItem, processMenuFromJSON, formatPrice } from "@/src/lib/data-utils"
+import { createMenuItem, processMenuFromJSON, processMenuFromCSV, processMenuFromText, autoDetectMenuFromString, formatPrice } from "@/src/lib/data-utils"
 
 interface MenuManagerProps {
   restaurant: Restaurant
@@ -121,7 +121,7 @@ function AddMenuItemDialog({ restaurant }: { restaurant: Restaurant }) {
 
 function UploadMenuDialog({ restaurant }: { restaurant: Restaurant }) {
   const [open, setOpen] = useState(false)
-  const [jsonContent, setJsonContent] = useState("")
+  const [rawContent, setRawContent] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const { updateRestaurant } = useRestaurants()
   const items = (restaurant as any).menu ?? (restaurant as any).menuItems ?? []
@@ -131,10 +131,10 @@ function UploadMenuDialog({ restaurant }: { restaurant: Restaurant }) {
     setIsLoading(true)
 
     try {
-      const newItems = processMenuFromJSON(jsonContent)
+      const newItems = autoDetectMenuFromString(rawContent)
       // Replace existing items with uploaded set
       updateRestaurant(restaurant.id, { menu: newItems })
-      setJsonContent("")
+      setRawContent("")
       setOpen(false)
     } catch (error) {
       alert("Error processing menu: " + (error as Error).message)
@@ -148,25 +148,24 @@ function UploadMenuDialog({ restaurant }: { restaurant: Restaurant }) {
       <DialogTrigger asChild>
         <Button variant="outline">
           <Upload className="mr-2 h-4 w-4" />
-          Upload JSON
+          Upload Menu
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle>Upload Menu from JSON</DialogTitle>
+          <DialogTitle>Upload Menu (JSON / CSV / Text)</DialogTitle>
           <DialogDescription>
-            Upload your menu items from a JSON file. The format should be an array of objects with id, name,
-            description, and price.
+            Paste your menu in JSON, CSV, or simple one-item-per-line text. We auto-detect the format.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleUpload} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="json-content">JSON Content</Label>
+            <Label htmlFor="menu-content">Menu Content</Label>
             <Textarea
-              id="json-content"
-              value={jsonContent}
-              onChange={(e) => setJsonContent(e.target.value)}
-              placeholder='[{"id": "1", "name": "Dish Name", "description": "Description", "price": 3500}]'
+              id="menu-content"
+              value={rawContent}
+              onChange={(e) => setRawContent(e.target.value)}
+              placeholder='JSON: [{"name":"Thieboudienne","price":3500}]\nCSV: name,description,price\nThieboudienne,Rice & fish,3500\nText: Thieboudienne - Rice & fish - 3500'
               rows={10}
               className="font-mono text-sm"
               required

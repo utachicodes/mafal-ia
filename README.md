@@ -18,8 +18,8 @@ Your intelligent WhatsApp assistant. Get started in minutes.
 1. **Create Your Restaurant**
    Add your restaurant profile: name, short description, and plan.
 
-2. **Upload Your Menu**
-   Upload a JSON file or paste items. We parse names, descriptions, and prices for the AI.
+2. **Add Your Menu (No JSON required)**
+   Paste JSON, CSV, or simple text lines. We auto-detect the format and structure it for AI.
 
 3. **Get Your API Key**
    Copy your unique API key and connect your WhatsApp Business account. Your assistant is ready to serve.
@@ -296,7 +296,7 @@ Share the following so we can set you up fast. You can send it by email or via t
   - Business hours, delivery zones/fees, languages spoken
   - Optional: welcome message, any special instructions or tone
 
-- **Menu (JSON or CSV)**
+- **Menu (JSON / CSV / Text)**
   - Preferred: JSON array of items with fields `name`, `description`, `price`, optional `category`, `isAvailable`
   - Example JSON:
 
@@ -308,6 +308,7 @@ Share the following so we can set you up fast. You can send it by email or via t
 ```
 
   - If sending CSV, include columns: `name,description,price,category,isAvailable`
+  - If sending simple text, one item per line works: `Thieboudienne - Rice & fish - 3500`
 
 - **WhatsApp info**
   - Your business WhatsApp phone number (E.164, e.g. +221771234567)

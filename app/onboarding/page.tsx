@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Upload, CheckCircle2, MessageSquare, Store, QrCode } from "lucide-react"
 import { type Restaurant } from "@/lib/data"
 import { LocalStorage } from "@/src/lib/storage"
-import { generateApiKey } from "@/src/lib/data-utils"
+import { generateApiKey, autoDetectMenuFromString } from "@/src/lib/data-utils"
 import { useToast } from "@/hooks/use-toast"
 // Removed AIClientBrowser mock usage; parse JSON locally
 
@@ -60,7 +60,7 @@ export default function OnboardingPage() {
   const [language, setLanguage] = useState("en")
 
   // Step 2 – Menu upload
-  const [menuJson, setMenuJson] = useState("")
+  const [menuRaw, setMenuRaw] = useState("")
   const [parsedItems, setParsedItems] = useState<any[]>([])
   const [isParsing, setIsParsing] = useState(false)
 
@@ -75,19 +75,13 @@ export default function OnboardingPage() {
   const parseMenu = async () => {
     setIsParsing(true)
     try {
-      const raw = menuJson.trim()
+      const raw = menuRaw.trim()
       if (!raw) throw new Error("Empty JSON")
-      const parsed = JSON.parse(raw)
-      const items = Array.isArray(parsed)
-        ? parsed
-        : Array.isArray((parsed as any)?.items)
-          ? (parsed as any).items
-          : []
-      if (!Array.isArray(items)) throw new Error("Expected an array of items")
+      const items = autoDetectMenuFromString(raw)
       setParsedItems(items)
       toast({ title: "Menu parsed", description: `${items.length} items detected.` })
     } catch (e) {
-      toast({ title: "Invalid JSON", description: "Please provide a valid JSON menu.", variant: "destructive" })
+      toast({ title: "Invalid menu", description: "Paste JSON, CSV, or simple text lines.", variant: "destructive" })
     } finally {
       setIsParsing(false)
     }
@@ -224,7 +218,7 @@ export default function OnboardingPage() {
               <CardDescription>Paste JSON array or object with an "items" array.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <Textarea rows={8} value={menuJson} onChange={(e) => setMenuJson(e.target.value)} placeholder='[{"name":"Thieboudienne","price":3500}]' />
+              <Textarea rows={8} value={menuRaw} onChange={(e) => setMenuRaw(e.target.value)} placeholder='JSON: [{"name":"Thieboudienne","price":3500}]\nCSV: name,description,price\nThieboudienne,Rice & fish,3500\nText: Thieboudienne - Rice & fish - 3500' />
               <div className="flex gap-2">
                 <Button variant="outline" onClick={prev}>Back</Button>
                 <Button onClick={parseMenu} disabled={!menuJson.trim() || isParsing}>{isParsing ? "Parsing..." : "Parse Menu"}</Button>
