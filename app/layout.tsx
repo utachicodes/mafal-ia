@@ -5,6 +5,7 @@ import { Providers } from "./providers"
 import { metadata } from "./metadata"
 import { LanguageProvider } from "@/src/context/language-context"
 import { LanguageWrapper } from "./language-wrapper"
+import { I18nProvider } from "@/src/context/i18n"
 
 export default function RootLayout({
   children,
@@ -24,9 +25,11 @@ html {
           `}</style>
         </head>
         <body className={`${GeistSans.variable} ${GeistMono.variable}`}>
-          <Providers>
-            {children}
-          </Providers>
+          <I18nProvider>
+            <Providers>
+              {children}
+            </Providers>
+          </I18nProvider>
         </body>
       </LanguageWrapper>
     </LanguageProvider>
