@@ -10,6 +10,8 @@ import Link from "next/link"
 import { cn } from "@/lib/utils"
 import { Logo } from "./logo"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { LanguageToggle } from "@/src/components/language-toggle"
+import { ThemeToggle } from "@/src/components/theme-toggle"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -127,15 +129,8 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
             <Menu className="h-5 w-5" />
           </Button>
           <div className="ml-auto flex items-center gap-3">
-            <Select defaultValue={language} onValueChange={(value) => setLanguage(value)}>
-              <SelectTrigger className="w-[120px]">
-                <SelectValue placeholder="Language" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="en">English</SelectItem>
-                <SelectItem value="fr">French</SelectItem>
-              </SelectContent>
-            </Select>
+            <LanguageToggle />
+            <ThemeToggle />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-8 w-8 rounded-full">
