@@ -10,7 +10,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge"
 import { QrCode, CheckCircle2, Phone } from "lucide-react"
 import { type Restaurant } from "@/lib/data"
-import { LocalStorage } from "@/src/lib/storage"
 import { useToast } from "@/hooks/use-toast"
 
 export default function WhatsAppQuickConnectPage() {
@@ -19,30 +18,27 @@ export default function WhatsAppQuickConnectPage() {
   const { toast } = useToast()
   
   useEffect(() => {
-    const loadData = () => {
-      const stored = LocalStorage.loadRestaurants()
-      if (stored && stored.length > 0) {
-        setRestaurants(stored as Restaurant[])
-      } else {
-        // setRestaurants(mockRestaurants) // Removed mock data usage
+    const loadData = async () => {
+      try {
+        const res = await fetch('/api/restaurants')
+        const data = await res.json()
+        setRestaurants(data as Restaurant[])
+      } finally {
+        setIsLoading(false)
       }
-      setIsLoading(false)
     }
-
     loadData()
   }, [])
   
-  const updateRestaurant = (id: string, updates: Partial<Restaurant>) => {
-    setRestaurants((prev) =>
-      prev.map((restaurant) =>
-        restaurant.id === id ? { ...restaurant, ...updates, updatedAt: new Date() } : restaurant,
-      ),
-    )
-    // Save to local storage
-    const updatedRestaurants = restaurants.map((restaurant) =>
-      restaurant.id === id ? { ...restaurant, ...updates, updatedAt: new Date() } : restaurant
-    )
-    LocalStorage.saveRestaurants(updatedRestaurants)
+  const updateRestaurant = async (id: string, updates: Partial<Restaurant>) => {
+    setRestaurants((prev) => prev.map((r) => (r.id === id ? { ...r, ...updates, updatedAt: new Date() } : r)))
+    try {
+      await fetch(`/api/restaurants/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ whatsappNumber: updates.whatsappNumber }),
+      })
+    } catch {}
   }
 
   const [selectedId, setSelectedId] = useState<string | undefined>("")
