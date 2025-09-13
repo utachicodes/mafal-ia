@@ -24,7 +24,7 @@ Mafal-IA is a B2B, API-first platform for restaurants. You pay for the service, 
 - **Test and monitor**: Live testing and basic analytics in the dashboard.
 - **Multi-restaurant ready**: Manage multiple brands under one account.
 
-## Noo ngi fi pour jàppal
+## Noo ngi fi pour jàppal !!
 Your intelligent WhatsApp assistant. Get started in minutes.
 
 1. **Create Your Restaurant**
