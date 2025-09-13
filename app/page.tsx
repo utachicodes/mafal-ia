@@ -9,9 +9,10 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/40 relative overflow-hidden">
-      {/* Subtle animated background accents */}
-      <div className="pointer-events-none absolute -top-24 -right-24 h-72 w-72 rounded-full bg-primary/10 blur-3xl animate-in fade-in-50" />
-      <div className="pointer-events-none absolute -bottom-24 -left-24 h-72 w-72 rounded-full bg-emerald-500/10 blur-3xl animate-in fade-in-50" />
+      {/* Animated background blobs (non-placeholder, pure CSS) */}
+      <div className="blob-base blob-float blob-pulse top-[-8rem] right-[-8rem] h-[22rem] w-[22rem] bg-primary/20" />
+      <div className="blob-base blob-float-slow top-[20%] left-[-6rem] h-[18rem] w-[18rem] bg-emerald-500/15" />
+      <div className="blob-base blob-float bottom-[-10rem] right-[10%] h-[20rem] w-[20rem] bg-fuchsia-500/10" />
       <nav className="container mx-auto px-4 py-4 flex justify-between items-center">
         <div className="flex items-center gap-2">
           <Logo className="h-8" />
