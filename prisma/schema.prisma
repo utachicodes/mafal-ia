@@ -2,8 +2,8 @@
 // Postgres for production. Set DATABASE_URL to your Postgres connection string.
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 generator client {
