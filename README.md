@@ -1,5 +1,15 @@
 # Mafal-IA - Restaurant WhatsApp Chatbot Platform
 
+[![Next.js](https://img.shields.io/badge/Next.js-15-black?logo=next.js)](https://nextjs.org/)  
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript)](https://www.typescriptlang.org/)  
+[![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3-06B6D4?logo=tailwindcss)](https://tailwindcss.com/)  
+[![ShadCN/UI](https://img.shields.io/badge/ShadCN-UI-000000?logo=react)](https://ui.shadcn.com/)  
+[![Google Genkit](https://img.shields.io/badge/AI-Genkit-4285F4?logo=google)](https://github.com/genkit-ai)  
+[![Prisma](https://img.shields.io/badge/ORM-Prisma-2D3748?logo=prisma)](https://www.prisma.io/)  
+[![PostgreSQL](https://img.shields.io/badge/DB-PostgreSQL-4169E1?logo=postgresql)](https://www.postgresql.org/)  
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)  
+[![Contributions welcome](https://img.shields.io/badge/Contributions-Welcome-brightgreen.svg?logo=github)](../../issues)  
+
 Mafal-IA is a B2B, API-first platform for restaurants. You pay for the service, we provide the WhatsApp AI API and a simple dashboard. Plug it into your existing workflows to answer customers, share menus, and calculate orders automatically.
 
 ## Features
