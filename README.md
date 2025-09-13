@@ -287,6 +287,44 @@ Expected: `HTTP/1.1 200` and server logs showing payload processing. If a per‑
 - 403 on POST: invalid/missing `X-Hub-Signature-256` for the configured App Secret.
 - No reply sent: check `phone_number_id` mapping, Access Token permissions, and logs.
 
+## Quick Start for Restaurants (what to send us)
+
+Share the following so we can set you up fast. You can send it by email or via the dashboard form.
+
+- **Restaurant basics**
+  - Name, short description, cuisine
+  - Business hours, delivery zones/fees, languages spoken
+  - Optional: welcome message, any special instructions or tone
+
+- **Menu (JSON or CSV)**
+  - Preferred: JSON array of items with fields `name`, `description`, `price`, optional `category`, `isAvailable`
+  - Example JSON:
+
+```json
+[
+  { "name": "Thieboudienne", "description": "Rice & fish", "price": 3500, "category": "Main", "isAvailable": true },
+  { "name": "Yassa Poulet", "description": "Lemon onion chicken", "price": 3000 }
+]
+```
+
+  - If sending CSV, include columns: `name,description,price,category,isAvailable`
+
+- **WhatsApp info**
+  - Your business WhatsApp phone number (E.164, e.g. +221771234567)
+  - If you already use WhatsApp Business API: your `phone_number_id` (optional; we can help retrieve it)
+  - If you manage your own Meta app/BSP: your preferred Verify Token (or we generate one)
+
+What you’ll get back
+- Webhook URL: `https://YOUR_DOMAIN/api/whatsapp`
+- Verify Token (if we generated it) and instructions to paste it in Meta
+- Guidance to set or confirm your `phone_number_id`
+- A quick test plan (GET verify and signed POST sample)
+
+Typical timeline
+- Day 0: You send info → we configure in dashboard and provision webhook
+- Day 0–1: You confirm Meta settings (URL + Verify Token) and we test live inbound
+- Day 1+: Go live; we monitor and adjust menu/answers as needed
+
 
 ## B2B Model: What We Provide vs What You Handle
 
