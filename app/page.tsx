@@ -8,7 +8,10 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted/40">
+    <div className="min-h-screen bg-gradient-to-b from-background to-muted/40 relative overflow-hidden">
+      {/* Subtle animated background accents */}
+      <div className="pointer-events-none absolute -top-24 -right-24 h-72 w-72 rounded-full bg-primary/10 blur-3xl animate-in fade-in-50" />
+      <div className="pointer-events-none absolute -bottom-24 -left-24 h-72 w-72 rounded-full bg-emerald-500/10 blur-3xl animate-in fade-in-50" />
       <nav className="container mx-auto px-4 py-4 flex justify-between items-center">
         <div className="flex items-center gap-2">
           <Logo className="h-8" />
@@ -22,9 +25,12 @@ export default function HomePage() {
         </div>
       </nav>
 
-      <header className="container mx-auto px-4 pt-10 pb-16 text-center">
-        <div className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs text-muted-foreground mb-4">
+      <header className="container mx-auto px-4 pt-10 pb-16 text-center animate-in fade-in-50">
+        <div className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs text-muted-foreground mb-3 animate-in fade-in-50">
           <CheckCircle2 className="h-3 w-3" /> Multi‑restaurant WhatsApp agents in minutes
+        </div>
+        <div className="text-sm md:text-base text-primary/80 font-medium mb-2 animate-in slide-in-from-bottom-2">
+          Noo ngi fi pour jàppal
         </div>
         <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-4">
           Build WhatsApp agents for your restaurants
@@ -32,36 +38,36 @@ export default function HomePage() {
         <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
           Paste your menu, add your WhatsApp credentials, verify the webhook, and go live. AI answers in French, English, Wolof, or Arabic.
         </p>
-        <div className="flex flex-col sm:flex-row gap-3 justify-center">
-          <Link href="/onboarding"><Button size="lg" className="px-8">Create an agent</Button></Link>
-          <Link href="/playground"><Button size="lg" variant="outline" className="px-8">Try the playground</Button></Link>
+        <div className="flex flex-col sm:flex-row gap-3 justify-center animate-in zoom-in-50">
+          <Link href="/onboarding"><Button size="lg" className="px-8 hover:scale-[1.02] transition-transform">Create an agent</Button></Link>
+          <Link href="/playground"><Button size="lg" variant="outline" className="px-8 hover:scale-[1.02] transition-transform">Try the playground</Button></Link>
         </div>
       </header>
 
       <section id="features" className="container mx-auto px-4 pb-10">
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <Card className="rounded-xl border-border/50 bg-card/60 backdrop-blur">
+          <Card className="rounded-xl border-border/50 bg-card/60 backdrop-blur transition-transform duration-300 hover:scale-[1.02] animate-in fade-in-50">
             <CardHeader className="space-y-2">
               <Bot className="h-6 w-6 text-primary" />
               <CardTitle className="text-base">Menu‑aware AI</CardTitle>
               <CardDescription>Understands intent and your menu to answer and take orders.</CardDescription>
             </CardHeader>
           </Card>
-          <Card className="rounded-xl border-border/50 bg-card/60 backdrop-blur">
+          <Card className="rounded-xl border-border/50 bg-card/60 backdrop-blur transition-transform duration-300 hover:scale-[1.02] animate-in fade-in-50 delay-100">
             <CardHeader className="space-y-2">
               <Globe className="h-6 w-6 text-primary" />
               <CardTitle className="text-base">Multilingual</CardTitle>
               <CardDescription>French, English, Wolof, Arabic auto‑detected.</CardDescription>
             </CardHeader>
           </Card>
-          <Card className="rounded-xl border-border/50 bg-card/60 backdrop-blur">
+          <Card className="rounded-xl border-border/50 bg-card/60 backdrop-blur transition-transform duration-300 hover:scale-[1.02] animate-in fade-in-50 delay-150">
             <CardHeader className="space-y-2">
               <MessageSquare className="h-6 w-6 text-primary" />
               <CardTitle className="text-base">WhatsApp‑native</CardTitle>
               <CardDescription>Works with your WhatsApp Business API and phone_number_id.</CardDescription>
             </CardHeader>
           </Card>
-          <Card className="rounded-xl border-border/50 bg-card/60 backdrop-blur">
+          <Card className="rounded-xl border-border/50 bg-card/60 backdrop-blur transition-transform duration-300 hover:scale-[1.02] animate-in fade-in-50 delay-200">
             <CardHeader className="space-y-2">
               <Zap className="h-6 w-6 text-primary" />
               <CardTitle className="text-base">Fast setup</CardTitle>
@@ -109,15 +115,15 @@ export default function HomePage() {
       </section>
 
       <section className="container mx-auto px-4 py-12 text-center">
-        <Card className="max-w-3xl mx-auto">
+        <Card className="max-w-3xl mx-auto animate-in fade-in-50">
           <CardHeader>
             <CardTitle className="text-2xl">Ready to launch your WhatsApp agent?</CardTitle>
             <CardDescription>Create your first restaurant and go live today.</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Link href="/onboarding"><Button size="lg" className="px-8">Get started</Button></Link>
-              <Link href="/settings"><Button size="lg" variant="outline" className="px-8">View docs</Button></Link>
+              <Link href="/onboarding"><Button size="lg" className="px-8 hover:scale-[1.02] transition-transform">Get started</Button></Link>
+              <Link href="/settings"><Button size="lg" variant="outline" className="px-8 hover:scale-[1.02] transition-transform">View docs</Button></Link>
             </div>
           </CardContent>
         </Card>
