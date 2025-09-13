@@ -5,8 +5,27 @@ import { MessageSquare, Bot, Globe, Zap, CheckCircle2, Shield, Phone, Layers, Ro
 import Link from "next/link"
 import { Logo } from "@/src/components/logo"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card"
+import { useSession } from "next-auth/react"
+import { useRouter } from "next/navigation"
+import { useEffect } from "react"
 
 export default function HomePage() {
+  const { data: session, status } = useSession()
+  const router = useRouter()
+
+  useEffect(() => {
+    if (status === "authenticated" && session) {
+      router.push("/dashboard")
+    }
+  }, [session, status, router])
+
+  if (status === "loading") {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    )
+  }
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/40 relative overflow-hidden">
       {/* Animated background blobs (non-placeholder, pure CSS) */}
@@ -21,7 +40,8 @@ export default function HomePage() {
           <a href="#features" className="text-muted-foreground hover:text-foreground">Features</a>
           <a href="#how" className="text-muted-foreground hover:text-foreground">How it works</a>
           <a href="#whatsapp" className="text-muted-foreground hover:text-foreground">WhatsApp</a>
-          <Link href="/onboarding"><Button size="sm">Get started</Button></Link>
+          <Link href="/auth/signin"><Button variant="ghost" size="sm">Sign in</Button></Link>
+          <Link href="/auth/signup"><Button size="sm">Get started</Button></Link>
         </div>
       </nav>
 
@@ -39,8 +59,8 @@ export default function HomePage() {
           Paste your menu, add your WhatsApp credentials, verify the webhook, and go live. AI answers in French, English, Wolof, or Arabic.
         </p>
         <div className="flex flex-col sm:flex-row gap-3 justify-center animate-in zoom-in-50">
-          <Link href="/onboarding"><Button size="lg" className="px-8 hover:scale-[1.02] transition-transform">Create an agent</Button></Link>
-          <Link href="/playground"><Button size="lg" variant="outline" className="px-8 hover:scale-[1.02] transition-transform">Try the playground</Button></Link>
+          <Link href="/auth/signup"><Button size="lg" className="px-8 hover:scale-[1.02] transition-transform">Create an agent</Button></Link>
+          <Link href="/auth/signin"><Button size="lg" variant="outline" className="px-8 hover:scale-[1.02] transition-transform">Sign in</Button></Link>
         </div>
       </header>
 
@@ -122,8 +142,8 @@ export default function HomePage() {
           </CardHeader>
           <CardContent>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Link href="/onboarding"><Button size="lg" className="px-8 hover:scale-[1.02] transition-transform">Get started</Button></Link>
-              <Link href="/settings"><Button size="lg" variant="outline" className="px-8 hover:scale-[1.02] transition-transform">View docs</Button></Link>
+              <Link href="/auth/signup"><Button size="lg" className="px-8 hover:scale-[1.02] transition-transform">Get started</Button></Link>
+              <Link href="/auth/signin"><Button size="lg" variant="outline" className="px-8 hover:scale-[1.02] transition-transform">Sign in</Button></Link>
             </div>
           </CardContent>
         </Card>
