@@ -59,13 +59,14 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
 
   const SidebarContent = () => (
     <div className="flex flex-col h-full">
-      <div className="p-6 pb-2">
-        <div className="h-6 text-foreground">
+      <div className="px-6 pt-6 pb-3">
+        <div className="h-7 text-foreground flex items-center">
           <Logo />
         </div>
       </div>
+      <div className="px-6"><div className="h-px w-full bg-border" /></div>
 
-      <nav className="flex-1 px-4 space-y-2 mt-4">
+      <nav className="flex-1 px-3 mt-4 space-y-1">
         {navigation.map((item) => {
           const Icon = item.icon
           const isActive = pathname === item.href || pathname.startsWith(item.href + "/")
@@ -74,22 +75,23 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
             <Link
               key={item.name}
               href={item.href}
+              aria-current={isActive ? "page" : undefined}
               className={cn(
-                "flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors",
+                "group flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all duration-200",
                 isActive
-                  ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:text-foreground hover:bg-muted",
+                  ? "bg-primary text-primary-foreground ring-1 ring-primary/60"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted"
               )}
               onClick={() => setSidebarOpen(false)}
             >
-              <Icon className="mr-3 h-4 w-4" />
-              {item.name}
+              <Icon className={cn("h-4 w-4 transition-transform duration-200", isActive ? "scale-105" : "group-hover:scale-105")} />
+              <span className="truncate">{item.name}</span>
             </Link>
           )
         })}
       </nav>
       <div className="px-4 pb-4 mt-auto text-xs text-muted-foreground">
-        <div className="rounded-md bg-muted p-3">
+        <div className="rounded-md bg-muted/70 p-3">
           <p>
             Built with ❤️ by <a className="underline hover:text-foreground" href="https://github.com/utachicodes" target="_blank" rel="noreferrer">utachicodes</a>
           </p>
@@ -105,7 +107,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
     <div className="flex h-screen bg-background">
       {/* Desktop Sidebar */}
       <div className="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0">
-        <div className="flex flex-col flex-grow border-r bg-card">
+        <div className="flex flex-col flex-grow border-r bg-card/80 backdrop-blur supports-[backdrop-filter]:bg-card/70">
           <SidebarContent />
         </div>
       </div>
@@ -120,13 +122,13 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
       {/* Main content */}
       <div className="flex-1 flex flex-col overflow-hidden md:pl-64">
         {/* Top bar */}
-        <div className="h-16 border-b bg-card/50 backdrop-blur flex items-center px-4">
+        <div className="h-16 border-b bg-card/60 backdrop-blur flex items-center px-4 sticky top-0 z-10">
           <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setSidebarOpen(true)}>
             <Menu className="h-5 w-5" />
           </Button>
-          <div className="ml-auto flex items-center space-x-4">
+          <div className="ml-auto flex items-center gap-3">
             <Select defaultValue={language} onValueChange={(value) => setLanguage(value)}>
-              <SelectTrigger className="w-[100px]">
+              <SelectTrigger className="w-[120px]">
                 <SelectValue placeholder="Language" />
               </SelectTrigger>
               <SelectContent>
@@ -152,7 +154,11 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
             </DropdownMenu>
           </div>
         </div>
-        <main className="flex-1 overflow-y-auto p-6">{children}</main>
+        <main className="flex-1 overflow-y-auto p-6">
+          <div className="max-w-7xl mx-auto animate-in fade-in-50">
+            {children}
+          </div>
+        </main>
       </div>
     </div>
   )
