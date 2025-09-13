@@ -111,6 +111,15 @@ export default function OnboardingPage() {
   }
 
   const finish = () => {
+    // Require WhatsApp number and credentials to generate a usable webhook/agent
+    if (!whatsAppNumber.trim() || !waPhoneId.trim() || !waAccessToken.trim() || !waAppSecret.trim() || !waVerifyToken.trim()) {
+      toast({
+        title: "Missing WhatsApp credentials",
+        description: "Please fill WhatsApp number, phone_number_id, access token, app secret, and verify token.",
+        variant: "destructive",
+      })
+      return
+    }
     const restaurantData = {
       name: name || "My Restaurant",
       description: description || "",
@@ -245,7 +254,7 @@ export default function OnboardingPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="wa">WhatsApp Number (optional)</Label>
+                <Label htmlFor="wa">WhatsApp Number</Label>
                 <Input id="wa" value={whatsAppNumber} onChange={(e) => setWhatsAppNumber(e.target.value)} placeholder="e.g. +221771234567" />
               </div>
               <div className="grid md:grid-cols-2 gap-6">
@@ -298,7 +307,7 @@ export default function OnboardingPage() {
               </div>
               <div className="flex justify-between">
                 <Button variant="outline" onClick={prev}>Back</Button>
-                <Button onClick={finish} disabled={!name.trim() || parsedItems.length === 0}>Finish Setup</Button>
+                <Button onClick={finish} disabled={!name.trim() || parsedItems.length === 0 || !whatsAppNumber.trim() || !waPhoneId.trim() || !waAccessToken.trim() || !waAppSecret.trim() || !waVerifyToken.trim()}>Finish Setup</Button>
               </div>
             </CardContent>
           </Card>
