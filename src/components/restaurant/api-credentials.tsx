@@ -1,5 +1,6 @@
 "use client"
 
+import type React from "react"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -17,6 +18,9 @@ export function ApiCredentials({ restaurant }: ApiCredentialsProps) {
   const [showApiKey, setShowApiKey] = useState(false)
   const [isRegenerating, setIsRegenerating] = useState(false)
   const [phoneId, setPhoneId] = useState(restaurant.apiCredentials.whatsappPhoneNumberId || "")
+  const [accessToken, setAccessToken] = useState(restaurant.apiCredentials.whatsappAccessToken || "")
+  const [appSecret, setAppSecret] = useState("")
+  const [verifyToken, setVerifyToken] = useState(restaurant.apiCredentials.webhookVerifyToken || "")
   const [savingPhoneId, setSavingPhoneId] = useState(false)
   const { regenerateApiKey, updateRestaurant } = useRestaurants()
 
@@ -81,7 +85,7 @@ export function ApiCredentials({ restaurant }: ApiCredentialsProps) {
                 id="wa-phone-id"
                 placeholder="e.g. 123456789012345"
                 value={phoneId}
-                onChange={(e) => setPhoneId(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPhoneId(e.target.value)}
               />
               <Button
                 variant="default"
@@ -112,6 +116,72 @@ export function ApiCredentials({ restaurant }: ApiCredentialsProps) {
             </p>
           </div>
 
+          <div className="space-y-2">
+            <Label htmlFor="wa-access-token">Per-restaurant Access Token (optional)</Label>
+            <div className="flex gap-2">
+              <Input id="wa-access-token" type="password" value={accessToken} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setAccessToken(e.target.value)} />
+              <Button
+                variant="default"
+                onClick={async () => {
+                  const res = await fetch(`/api/restaurants/${restaurant.id}`, {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ apiCredentials: { whatsappAccessToken: accessToken } }),
+                  })
+                  if (!res.ok) throw new Error("Failed to save access token")
+                }}
+              >
+                Save
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground">Overrides global token for sending messages for this restaurant.</p>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="wa-app-secret">Per-restaurant App Secret (optional)</Label>
+            <div className="flex gap-2">
+              <Input id="wa-app-secret" type="password" value={appSecret} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setAppSecret(e.target.value)} />
+              <Button
+                variant="default"
+                onClick={async () => {
+                  const res = await fetch(`/api/restaurants/${restaurant.id}`, {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ apiCredentials: { whatsappAppSecret: appSecret } }),
+                  })
+                  if (!res.ok) throw new Error("Failed to save app secret")
+                }}
+              >
+                Save
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground">Used to validate webhook signatures for this restaurant.</p>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="verify-token">Webhook Verify Token (optional)</Label>
+            <div className="flex gap-2">
+              <Input id="verify-token" value={verifyToken} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setVerifyToken(e.target.value)} />
+              <Button
+                variant="default"
+                onClick={async () => {
+                  const res = await fetch(`/api/restaurants/${restaurant.id}`, {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ apiCredentials: { webhookVerifyToken: verifyToken } }),
+                  })
+                  if (!res.ok) throw new Error("Failed to save verify token")
+                  updateRestaurant(restaurant.id, {
+                    apiCredentials: { ...restaurant.apiCredentials, webhookVerifyToken: verifyToken },
+                  })
+                }}
+              >
+                Save
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground">Used during Meta webhook verification GET request.</p>
+          </div>
+
           <div className="pt-4 border-t">
             <Button variant="destructive" onClick={handleRegenerateApiKey} disabled={isRegenerating}>
               {isRegenerating ? (
@@ -136,14 +206,12 @@ export function ApiCredentials({ restaurant }: ApiCredentialsProps) {
         <CardContent className="space-y-4">
           <div className="space-y-2">
             <h4 className="font-medium">Webhook URL</h4>
-            <code className="block p-3 bg-muted rounded-md text-sm">https://your-domain.com/api/whatsapp</code>
+            <code className="block p-3 bg-muted rounded-md text-sm">/api/whatsapp</code>
           </div>
 
           <div className="space-y-2">
-            <h4 className="font-medium">Required Headers</h4>
-            <code className="block p-3 bg-muted rounded-md text-sm">
-              Authorization: Bearer {showApiKey ? restaurant.apiKey : maskedApiKey}
-            </code>
+            <h4 className="font-medium">Meta Verify Token</h4>
+            <code className="block p-3 bg-muted rounded-md text-sm">{verifyToken || "<set a token above>"}</code>
           </div>
 
           <div className="space-y-2">
