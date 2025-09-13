@@ -26,6 +26,27 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
       }
     }
 
+    if (body?.apiCredentials?.whatsappAccessToken !== undefined) {
+      updates.apiCredentials = {
+        ...(updates.apiCredentials || {}),
+        whatsappAccessToken: String(body.apiCredentials.whatsappAccessToken || ""),
+      }
+    }
+
+    if (body?.apiCredentials?.whatsappAppSecret !== undefined) {
+      updates.apiCredentials = {
+        ...(updates.apiCredentials || {}),
+        whatsappAppSecret: String(body.apiCredentials.whatsappAppSecret || ""),
+      }
+    }
+
+    if (body?.apiCredentials?.webhookVerifyToken !== undefined) {
+      updates.apiCredentials = {
+        ...(updates.apiCredentials || {}),
+        webhookVerifyToken: String(body.apiCredentials.webhookVerifyToken || ""),
+      }
+    }
+
     if (body?.name !== undefined) updates.name = String(body.name)
     if (body?.description !== undefined) updates.description = String(body.description)
     if (body?.cuisine !== undefined) updates.cuisine = String(body.cuisine)
@@ -51,3 +72,4 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
     return NextResponse.json({ error: err?.message || "Failed to update restaurant" }, { status: 500 })
   }
 }
+
