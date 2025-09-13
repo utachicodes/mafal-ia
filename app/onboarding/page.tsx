@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Upload, CheckCircle2, MessageSquare, Store, QrCode } from "lucide-react"
 import { type Restaurant } from "@/lib/data"
 import { LocalStorage } from "@/src/lib/storage"
-import { generateApiKey } from "@/src/lib/data-utils"
+import { generateApiKey, autoDetectMenuFromString } from "@/src/lib/data-utils"
 import { useToast } from "@/hooks/use-toast"
 // Removed AIClientBrowser mock usage; parse JSON locally
 
@@ -60,7 +60,7 @@ export default function OnboardingPage() {
   const [language, setLanguage] = useState("en")
 
   // Step 2 – Menu upload
-  const [menuJson, setMenuJson] = useState("")
+  const [menuRaw, setMenuRaw] = useState("")
   const [parsedItems, setParsedItems] = useState<any[]>([])
   const [isParsing, setIsParsing] = useState(false)
 
@@ -68,6 +68,11 @@ export default function OnboardingPage() {
   const [whatsAppNumber, setWhatsAppNumber] = useState("")
   const [qrGenerated, setQrGenerated] = useState(false)
   const [qrScanned, setQrScanned] = useState(false)
+  // Per-restaurant WhatsApp credentials (multi-tenant)
+  const [waPhoneId, setWaPhoneId] = useState("")
+  const [waAccessToken, setWaAccessToken] = useState("")
+  const [waAppSecret, setWaAppSecret] = useState("")
+  const [waVerifyToken, setWaVerifyToken] = useState("")
 
   const next = () => setStep((s) => Math.min(4, s + 1))
   const prev = () => setStep((s) => Math.max(1, s - 1))
@@ -75,19 +80,13 @@ export default function OnboardingPage() {
   const parseMenu = async () => {
     setIsParsing(true)
     try {
-      const raw = menuJson.trim()
+      const raw = menuRaw.trim()
       if (!raw) throw new Error("Empty JSON")
-      const parsed = JSON.parse(raw)
-      const items = Array.isArray(parsed)
-        ? parsed
-        : Array.isArray((parsed as any)?.items)
-          ? (parsed as any).items
-          : []
-      if (!Array.isArray(items)) throw new Error("Expected an array of items")
+      const items = autoDetectMenuFromString(raw)
       setParsedItems(items)
       toast({ title: "Menu parsed", description: `${items.length} items detected.` })
     } catch (e) {
-      toast({ title: "Invalid JSON", description: "Please provide a valid JSON menu.", variant: "destructive" })
+      toast({ title: "Invalid menu", description: "Paste JSON, CSV, or simple text lines.", variant: "destructive" })
     } finally {
       setIsParsing(false)
     }
@@ -112,6 +111,15 @@ export default function OnboardingPage() {
   }
 
   const finish = () => {
+    // Require WhatsApp number and credentials to generate a usable webhook/agent
+    if (!whatsAppNumber.trim() || !waPhoneId.trim() || !waAccessToken.trim() || !waAppSecret.trim() || !waVerifyToken.trim()) {
+      toast({
+        title: "Missing WhatsApp credentials",
+        description: "Please fill WhatsApp number, phone_number_id, access token, app secret, and verify token.",
+        variant: "destructive",
+      })
+      return
+    }
     const restaurantData = {
       name: name || "My Restaurant",
       description: description || "",
@@ -136,9 +144,10 @@ export default function OnboardingPage() {
         deliveryInfo: "",
       },
       apiCredentials: {
-        whatsappAccessToken: "",
-        whatsappPhoneNumberId: "",
-        webhookVerifyToken: "",
+        whatsappAccessToken: waAccessToken,
+        whatsappPhoneNumberId: waPhoneId,
+        webhookVerifyToken: waVerifyToken,
+        whatsappAppSecret: waAppSecret,
       },
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -224,7 +233,7 @@ export default function OnboardingPage() {
               <CardDescription>Paste JSON array or object with an "items" array.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <Textarea rows={8} value={menuJson} onChange={(e) => setMenuJson(e.target.value)} placeholder='[{"name":"Thieboudienne","price":3500}]' />
+              <Textarea rows={8} value={menuRaw} onChange={(e) => setMenuRaw(e.target.value)} placeholder='JSON: [{"name":"Thieboudienne","price":3500}]\nCSV: name,description,price\nThieboudienne,Rice & fish,3500\nText: Thieboudienne - Rice & fish - 3500' />
               <div className="flex gap-2">
                 <Button variant="outline" onClick={prev}>Back</Button>
                 <Button onClick={parseMenu} disabled={!menuJson.trim() || isParsing}>{isParsing ? "Parsing..." : "Parse Menu"}</Button>
@@ -245,8 +254,37 @@ export default function OnboardingPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="wa">WhatsApp Number (optional)</Label>
+                <Label htmlFor="wa">WhatsApp Number</Label>
                 <Input id="wa" value={whatsAppNumber} onChange={(e) => setWhatsAppNumber(e.target.value)} placeholder="e.g. +221771234567" />
+              </div>
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="space-y-3">
+                  <p className="font-medium">Per-restaurant WhatsApp Credentials</p>
+                  <div className="space-y-2">
+                    <Label htmlFor="wa-phone-id">phone_number_id</Label>
+                    <Input id="wa-phone-id" value={waPhoneId} onChange={(e) => setWaPhoneId(e.target.value)} placeholder="123456789012345" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="wa-access">Access Token</Label>
+                    <Input id="wa-access" type="password" value={waAccessToken} onChange={(e) => setWaAccessToken(e.target.value)} placeholder="EAAB..." />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="wa-secret">App Secret</Label>
+                    <Input id="wa-secret" type="password" value={waAppSecret} onChange={(e) => setWaAppSecret(e.target.value)} placeholder="your app secret" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="wa-verify">Webhook Verify Token</Label>
+                    <Input id="wa-verify" value={waVerifyToken} onChange={(e) => setWaVerifyToken(e.target.value)} placeholder="choose-any-token" />
+                  </div>
+                  <p className="text-xs text-muted-foreground">These are saved per restaurant and used to route and validate messages. You can leave them empty and add later, but you will need them to verify the webhook in Meta.</p>
+                </div>
+                <div className="space-y-3">
+                  <p className="font-medium">Webhook Details</p>
+                  <div className="space-y-1 text-sm text-muted-foreground">
+                    <div><span className="font-medium text-foreground">URL:</span> <code>/api/whatsapp</code></div>
+                    <div><span className="font-medium text-foreground">Verify Token:</span> <code>{waVerifyToken || "<set above>"}</code></div>
+                  </div>
+                </div>
               </div>
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="space-y-3">
@@ -269,7 +307,7 @@ export default function OnboardingPage() {
               </div>
               <div className="flex justify-between">
                 <Button variant="outline" onClick={prev}>Back</Button>
-                <Button onClick={finish}>Finish Setup</Button>
+                <Button onClick={finish} disabled={!name.trim() || parsedItems.length === 0 || !whatsAppNumber.trim() || !waPhoneId.trim() || !waAccessToken.trim() || !waAppSecret.trim() || !waVerifyToken.trim()}>Finish Setup</Button>
               </div>
             </CardContent>
           </Card>

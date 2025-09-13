@@ -1,0 +1,19 @@
+{
+  "entry": [
+    {
+      "changes": [
+        {
+          "field": "messages",
+          "value": {
+            "metadata": { "phone_number_id": "123456789012345" },
+            "contacts": [{ "profile": { "name": "Test User" }, "wa_id": "15551234567" }],
+            "messages": [
+              { "from": "15551234567", "id": "wamid.TEST", "timestamp": "1736800000", "type": "text", "text": { "body": "Hi there" } }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "object": "whatsapp_business_account"
+}
