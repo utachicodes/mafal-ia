@@ -2,7 +2,7 @@
 // Postgres for production. Set DATABASE_URL to your Postgres connection string.
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -20,6 +20,7 @@ model User {
   role          UserRole   @default(USER)
   accounts      Account[]
   sessions      Session[]
+  restaurants   Restaurant[]
   createdAt     DateTime   @default(now())
   updatedAt     DateTime   @updatedAt
 
@@ -82,6 +83,10 @@ model Restaurant {
   // Marks this WhatsApp number as the global concierge that can search across all restaurants
   isConcierge            Boolean     @default(false)
 
+  // User ownership
+  userId                 String
+  user                   User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   // Flattened chatbot context
   welcomeMessage         String      @default("")
   businessHours          String      @default("")
@@ -95,6 +100,8 @@ model Restaurant {
 
   createdAt              DateTime    @default(now())
   updatedAt              DateTime    @updatedAt
+
+  @@index([userId])
 }
 
 model MenuItem {
