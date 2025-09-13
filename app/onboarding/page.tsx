@@ -1,5 +1,6 @@
 "use client"
 
+import type React from "react"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import DashboardLayout from "@/src/components/dashboard-layout"
@@ -11,46 +12,12 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Upload, CheckCircle2, MessageSquare, Store, QrCode } from "lucide-react"
 import { type Restaurant } from "@/lib/data"
-import { LocalStorage } from "@/src/lib/storage"
 import { generateApiKey, autoDetectMenuFromString } from "@/src/lib/data-utils"
 import { useToast } from "@/hooks/use-toast"
 // Removed AIClientBrowser mock usage; parse JSON locally
 
 export default function OnboardingPage() {
-  const [restaurants, setRestaurants] = useState<Restaurant[]>([])
   const { toast } = useToast()
-  
-  useEffect(() => {
-    const loadData = () => {
-      const stored = LocalStorage.loadRestaurants()
-      if (stored && stored.length > 0) {
-        setRestaurants(stored as Restaurant[])
-      } else {
-        // setRestaurants(mockRestaurants) // Removed mock data usage
-      }
-    }
-
-    loadData()
-  }, [])
-  
-  const addRestaurant = (restaurantData: Omit<Restaurant, "id" | "apiKey" | "createdAt" | "updatedAt">) => {
-    const newRestaurant: Restaurant = {
-      ...restaurantData,
-      // Ensure `menu` is initialized even if upstream provided `menuItems`
-      menu: (restaurantData as any).menu ?? (restaurantData as any).menuItems ?? [],
-      id: `restaurant_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`,
-      apiKey: generateApiKey(restaurantData.name),
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    }
-    setRestaurants((prev) => {
-      const next = [...prev, newRestaurant]
-      // Persist immediately to avoid race when navigating to Playground
-      LocalStorage.saveRestaurants(next)
-      return next
-    })
-    return newRestaurant.id
-  }
   const [step, setStep] = useState(1)
   const router = useRouter()
 
@@ -74,8 +41,8 @@ export default function OnboardingPage() {
   const [waAppSecret, setWaAppSecret] = useState("")
   const [waVerifyToken, setWaVerifyToken] = useState("")
 
-  const next = () => setStep((s) => Math.min(4, s + 1))
-  const prev = () => setStep((s) => Math.max(1, s - 1))
+  const next = () => setStep((s: number) => Math.min(4, s + 1))
+  const prev = () => setStep((s: number) => Math.max(1, s - 1))
 
   const parseMenu = async () => {
     setIsParsing(true)
@@ -110,7 +77,7 @@ export default function OnboardingPage() {
     toast({ title: "Scan simulated", description: `Linked to ${whatsAppNumber}. Will be saved on Finish.` })
   }
 
-  const finish = () => {
+  const finish = async () => {
     // Require WhatsApp number and credentials to generate a usable webhook/agent
     if (!whatsAppNumber.trim() || !waPhoneId.trim() || !waAccessToken.trim() || !waAppSecret.trim() || !waVerifyToken.trim()) {
       toast({
@@ -153,11 +120,20 @@ export default function OnboardingPage() {
       updatedAt: new Date(),
     }
 
-    const newId = addRestaurant(restaurantData as any)
-    toast({ title: "Assistant created", description: "You can now test it in the Playground." })
-    setStep(4)
-    // Navigate to playground pre-selecting the new restaurant
-    router.push(`/playground?select=${encodeURIComponent(newId)}`)
+    try {
+      const response = await fetch("/api/restaurants", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(restaurantData),
+      })
+      if (!response.ok) throw new Error(`Failed to create restaurant (${response.status})`)
+      const saved: Restaurant = await response.json()
+      toast({ title: "Assistant created", description: "Webhook can now be verified in Meta." })
+      setStep(4)
+      router.push(`/restaurants/${encodeURIComponent(saved.id)}`)
+    } catch (e: any) {
+      toast({ title: "Create failed", description: e?.message || "Unable to save restaurant.", variant: "destructive" })
+    }
   }
 
   return (
@@ -201,15 +177,15 @@ export default function OnboardingPage() {
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="name">Restaurant Name</Label>
-                <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Chez Fatou" />
+                <Input id="name" value={name} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value)} placeholder="Chez Fatou" />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="desc">Description</Label>
-                <Textarea id="desc" rows={3} value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Authentic Senegalese cuisine"/>
+                <Textarea id="desc" rows={3} value={description} onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setDescription(e.target.value)} placeholder="Authentic Senegalese cuisine"/>
               </div>
               <div className="space-y-2">
                 <Label>Default Language</Label>
-                <Select value={language} onValueChange={setLanguage}>
+                <Select value={language} onValueChange={(v: string) => setLanguage(v)}>
                   <SelectTrigger className="w-[220px]"><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="en">English</SelectItem>
@@ -229,14 +205,14 @@ export default function OnboardingPage() {
         {step === 2 && (
           <Card>
             <CardHeader>
-              <CardTitle>Upload Your Menu (JSON)</CardTitle>
-              <CardDescription>Paste JSON array or object with an "items" array.</CardDescription>
+              <CardTitle>Upload Your Menu (JSON / CSV / Text)</CardTitle>
+              <CardDescription>Paste JSON, CSV, or simple one-item-per-line text. We auto-detect the format.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <Textarea rows={8} value={menuRaw} onChange={(e) => setMenuRaw(e.target.value)} placeholder='JSON: [{"name":"Thieboudienne","price":3500}]\nCSV: name,description,price\nThieboudienne,Rice & fish,3500\nText: Thieboudienne - Rice & fish - 3500' />
+              <Textarea rows={8} value={menuRaw} onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setMenuRaw(e.target.value)} placeholder='JSON: [{"name":"Thieboudienne","price":3500}]\nCSV: name,description,price\nThieboudienne,Rice & fish,3500\nText: Thieboudienne - Rice & fish - 3500' />
               <div className="flex gap-2">
                 <Button variant="outline" onClick={prev}>Back</Button>
-                <Button onClick={parseMenu} disabled={!menuJson.trim() || isParsing}>{isParsing ? "Parsing..." : "Parse Menu"}</Button>
+                <Button onClick={parseMenu} disabled={!menuRaw.trim() || isParsing}>{isParsing ? "Parsing..." : "Parse Menu"}</Button>
                 <Button onClick={next} disabled={parsedItems.length === 0}>Continue</Button>
               </div>
               {parsedItems.length > 0 && (
@@ -255,26 +231,26 @@ export default function OnboardingPage() {
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="wa">WhatsApp Number</Label>
-                <Input id="wa" value={whatsAppNumber} onChange={(e) => setWhatsAppNumber(e.target.value)} placeholder="e.g. +221771234567" />
+                <Input id="wa" value={whatsAppNumber} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setWhatsAppNumber(e.target.value)} placeholder="e.g. +221771234567" />
               </div>
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="space-y-3">
                   <p className="font-medium">Per-restaurant WhatsApp Credentials</p>
                   <div className="space-y-2">
                     <Label htmlFor="wa-phone-id">phone_number_id</Label>
-                    <Input id="wa-phone-id" value={waPhoneId} onChange={(e) => setWaPhoneId(e.target.value)} placeholder="123456789012345" />
+                    <Input id="wa-phone-id" value={waPhoneId} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setWaPhoneId(e.target.value)} placeholder="123456789012345" />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="wa-access">Access Token</Label>
-                    <Input id="wa-access" type="password" value={waAccessToken} onChange={(e) => setWaAccessToken(e.target.value)} placeholder="EAAB..." />
+                    <Input id="wa-access" type="password" value={waAccessToken} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setWaAccessToken(e.target.value)} placeholder="EAAB..." />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="wa-secret">App Secret</Label>
-                    <Input id="wa-secret" type="password" value={waAppSecret} onChange={(e) => setWaAppSecret(e.target.value)} placeholder="your app secret" />
+                    <Input id="wa-secret" type="password" value={waAppSecret} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setWaAppSecret(e.target.value)} placeholder="your app secret" />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="wa-verify">Webhook Verify Token</Label>
-                    <Input id="wa-verify" value={waVerifyToken} onChange={(e) => setWaVerifyToken(e.target.value)} placeholder="choose-any-token" />
+                    <Input id="wa-verify" value={waVerifyToken} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setWaVerifyToken(e.target.value)} placeholder="choose-any-token" />
                   </div>
                   <p className="text-xs text-muted-foreground">These are saved per restaurant and used to route and validate messages. You can leave them empty and add later, but you will need them to verify the webhook in Meta.</p>
                 </div>
