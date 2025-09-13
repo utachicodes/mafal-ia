@@ -1,4 +1,4 @@
-# Mafal-IA - Restaurant WhatsApp Chatbot Platform
+# Mafal-IA - Agentic Whatsapp Platform
 
 <p align="center">
   <a href="https://nextjs.org/"><img src="https://img.shields.io/badge/Next.js-15-black?logo=next.js" alt="Next.js"></a>
