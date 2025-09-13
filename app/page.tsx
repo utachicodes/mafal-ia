@@ -16,7 +16,6 @@ export default function HomePage() {
       <nav className="container mx-auto px-4 py-4 flex justify-between items-center">
         <div className="flex items-center gap-2">
           <Logo className="h-8" />
-          <span className="text-xl font-semibold">Mafal‑IA</span>
         </div>
         <div className="hidden md:flex items-center gap-6 text-sm">
           <a href="#features" className="text-muted-foreground hover:text-foreground">Features</a>
