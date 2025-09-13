@@ -158,3 +158,38 @@
     @apply transition-colors duration-200 hover:bg-accent/10 hover:text-accent-foreground;
   }
 }
+
+@layer utilities {
+  @keyframes float-xy {
+    0% { transform: translate3d(0, 0, 0) scale(1); }
+    25% { transform: translate3d(8px, -10px, 0) scale(1.02); }
+    50% { transform: translate3d(-6px, 6px, 0) scale(0.98); }
+    75% { transform: translate3d(10px, 4px, 0) scale(1.01); }
+    100% { transform: translate3d(0, 0, 0) scale(1); }
+  }
+
+  @keyframes pulse-glow {
+    0%, 100% { opacity: 0.35; filter: blur(40px); }
+    50% { opacity: 0.5; filter: blur(48px); }
+  }
+
+  .blob-base {
+    position: absolute;
+    border-radius: 9999px;
+    will-change: transform, opacity, filter;
+    pointer-events: none;
+    mix-blend-mode: multiply;
+  }
+
+  .blob-float {
+    animation: float-xy 14s ease-in-out infinite;
+  }
+
+  .blob-float-slow {
+    animation: float-xy 20s ease-in-out infinite;
+  }
+
+  .blob-pulse {
+    animation: pulse-glow 6s ease-in-out infinite;
+  }
+}
