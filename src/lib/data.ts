@@ -31,6 +31,7 @@ export interface ApiCredentials {
   whatsappAccessToken?: string
   whatsappPhoneNumberId: string
   webhookVerifyToken?: string
+  whatsappAppSecret?: string
 }
 
 export interface Restaurant {

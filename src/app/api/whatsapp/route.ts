@@ -64,8 +64,21 @@ export async function GET(request: NextRequest) {
 
     console.log("[WhatsApp Webhook] Verification request:", { mode, token, challenge })
 
-    // Verify the webhook
-    if (mode === "subscribe" && token === env.WHATSAPP_VERIFY_TOKEN) {
+    // Verify the webhook against global token OR any restaurant-specific token
+    const isTokenValid = async (t: string | null): Promise<boolean> => {
+      if (!t) return false
+      if (t === env.WHATSAPP_VERIFY_TOKEN) return true
+      try {
+        const prisma = await getPrisma()
+        const found = await prisma.restaurant.findFirst({ where: { webhookVerifyToken: t } })
+        return !!found
+      } catch (e) {
+        console.error("[WhatsApp Webhook] Token lookup error:", e)
+        return false
+      }
+    }
+
+    if (mode === "subscribe" && (await isTokenValid(token))) {
       console.log("[WhatsApp Webhook] Verification successful")
       return new NextResponse(challenge, { status: 200 })
     }
