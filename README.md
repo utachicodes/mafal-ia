@@ -57,10 +57,12 @@ Create environment variables with the following keys (locally and in your hostin
 # Database (PostgreSQL in production)
 DATABASE_URL=postgres://USER:PASSWORD@HOST:PORT/DBNAME?sslmode=require
 
-# WhatsApp Business API
-WHATSAPP_ACCESS_TOKEN=YOUR_META_WHATSAPP_ACCESS_TOKEN
-WHATSAPP_APP_SECRET=YOUR_META_APP_SECRET
-WHATSAPP_VERIFY_TOKEN=YOUR_CHOSEN_VERIFY_TOKEN
+# WhatsApp Business API (global fallbacks; per-restaurant overrides recommended)
+# For multi-tenant setups, set per-restaurant credentials in the dashboard after creating each restaurant.
+# These env vars are only used as fallbacks if a restaurant does not have its own credentials configured.
+WHATSAPP_ACCESS_TOKEN=
+WHATSAPP_APP_SECRET=
+WHATSAPP_VERIFY_TOKEN=
 
 # Genkit / Google AI
 GOOGLE_GENKIT_API_KEY=YOUR_GOOGLE_API_KEY
