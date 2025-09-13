@@ -162,9 +162,9 @@ export default function SignInPage() {
               <Button 
                 variant="outline" 
                 className="w-full py-6 text-base font-medium"
-                onClick={() => router.push('/contact')}
+                onClick={() => router.push('/auth/signup')}
               >
-                Contact us for access
+                Create account
               </Button>
             </div>
           </div>
