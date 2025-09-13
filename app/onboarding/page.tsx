@@ -68,6 +68,11 @@ export default function OnboardingPage() {
   const [whatsAppNumber, setWhatsAppNumber] = useState("")
   const [qrGenerated, setQrGenerated] = useState(false)
   const [qrScanned, setQrScanned] = useState(false)
+  // Per-restaurant WhatsApp credentials (multi-tenant)
+  const [waPhoneId, setWaPhoneId] = useState("")
+  const [waAccessToken, setWaAccessToken] = useState("")
+  const [waAppSecret, setWaAppSecret] = useState("")
+  const [waVerifyToken, setWaVerifyToken] = useState("")
 
   const next = () => setStep((s) => Math.min(4, s + 1))
   const prev = () => setStep((s) => Math.max(1, s - 1))
@@ -130,9 +135,10 @@ export default function OnboardingPage() {
         deliveryInfo: "",
       },
       apiCredentials: {
-        whatsappAccessToken: "",
-        whatsappPhoneNumberId: "",
-        webhookVerifyToken: "",
+        whatsappAccessToken: waAccessToken,
+        whatsappPhoneNumberId: waPhoneId,
+        webhookVerifyToken: waVerifyToken,
+        whatsappAppSecret: waAppSecret,
       },
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -244,6 +250,35 @@ export default function OnboardingPage() {
               </div>
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="space-y-3">
+                  <p className="font-medium">Per-restaurant WhatsApp Credentials</p>
+                  <div className="space-y-2">
+                    <Label htmlFor="wa-phone-id">phone_number_id</Label>
+                    <Input id="wa-phone-id" value={waPhoneId} onChange={(e) => setWaPhoneId(e.target.value)} placeholder="123456789012345" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="wa-access">Access Token</Label>
+                    <Input id="wa-access" type="password" value={waAccessToken} onChange={(e) => setWaAccessToken(e.target.value)} placeholder="EAAB..." />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="wa-secret">App Secret</Label>
+                    <Input id="wa-secret" type="password" value={waAppSecret} onChange={(e) => setWaAppSecret(e.target.value)} placeholder="your app secret" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="wa-verify">Webhook Verify Token</Label>
+                    <Input id="wa-verify" value={waVerifyToken} onChange={(e) => setWaVerifyToken(e.target.value)} placeholder="choose-any-token" />
+                  </div>
+                  <p className="text-xs text-muted-foreground">These are saved per restaurant and used to route and validate messages. You can leave them empty and add later, but you will need them to verify the webhook in Meta.</p>
+                </div>
+                <div className="space-y-3">
+                  <p className="font-medium">Webhook Details</p>
+                  <div className="space-y-1 text-sm text-muted-foreground">
+                    <div><span className="font-medium text-foreground">URL:</span> <code>/api/whatsapp</code></div>
+                    <div><span className="font-medium text-foreground">Verify Token:</span> <code>{waVerifyToken || "<set above>"}</code></div>
+                  </div>
+                </div>
+              </div>
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="space-y-3">
                   <p className="font-medium">Quick Connect (QR Simulator)</p>
                   <div className="w-44 h-44 border rounded grid place-content-center text-muted-foreground bg-muted/20">
                     <QrCode className="h-20 w-20"/>
@@ -263,7 +298,7 @@ export default function OnboardingPage() {
               </div>
               <div className="flex justify-between">
                 <Button variant="outline" onClick={prev}>Back</Button>
-                <Button onClick={finish}>Finish Setup</Button>
+                <Button onClick={finish} disabled={!name.trim() || parsedItems.length === 0}>Finish Setup</Button>
               </div>
             </CardContent>
           </Card>

@@ -226,12 +226,15 @@ Follow these steps to connect a restaurant to WhatsApp Business API and validate
   - `App Secret` (optional per restaurant): used to validate incoming webhook signatures
   - `Webhook Verify Token`: exact token you’ll also supply in Meta for verification
 
-3) Configure the webhook in Meta
+3) Provide per-restaurant WhatsApp credentials during creation
+- In onboarding step 3, enter: `phone_number_id`, Access Token, App Secret, and a Verify Token for this restaurant.
+
+4) Configure the webhook in Meta
 - Webhook URL: `https://YOUR_DOMAIN/api/whatsapp`
 - Verify Token: the exact value set above
 - Subscribe to the “messages” webhook event
 
-4) Verify the webhook (GET)
+5) Verify the webhook (GET)
 
 ```bash
 curl -i -G "https://YOUR_DOMAIN/api/whatsapp" \
@@ -242,7 +245,7 @@ curl -i -G "https://YOUR_DOMAIN/api/whatsapp" \
 
 Expected: `HTTP/1.1 200` with body `123456`.
 
-5) Test a signed POST delivery locally (optional but recommended)
+6) Test a signed POST delivery locally (optional but recommended)
 
 - Save a minimal WhatsApp payload as `wa.json` (set `phone_number_id` to your restaurant’s `phone_number_id`):
 
@@ -281,10 +284,10 @@ curl -i -X POST "https://YOUR_DOMAIN/api/whatsapp" \
 
 Expected: `HTTP/1.1 200` and server logs showing payload processing. If a per‑restaurant App Secret is set, unsigned POSTs will be rejected (`403`).
 
-6) Live test
+7) Live test
 - Send a real WhatsApp message to your WABA number. The platform will route by `metadata.phone_number_id`, generate an AI response with your restaurant’s context/menu, and reply using your Access Token (per‑restaurant if set, otherwise global).
 
-7) Troubleshooting
+8) Troubleshooting
 - 403 on GET: verify the exact Verify Token value.
 - 403 on POST: invalid/missing `X-Hub-Signature-256` for the configured App Secret.
 - No reply sent: check `phone_number_id` mapping, Access Token permissions, and logs.
