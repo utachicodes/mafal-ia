@@ -289,6 +289,19 @@ Expected: `HTTP/1.1 200` and server logs showing payload processing. If a per‑
 - 403 on POST: invalid/missing `X-Hub-Signature-256` for the configured App Secret.
 - No reply sent: check `phone_number_id` mapping, Access Token permissions, and logs.
 
+### Multi-tenant: Per-restaurant credentials (add after creating each restaurant)
+
+For multiple restaurants, configure credentials per restaurant right after creation. Global env vars are optional fallbacks only.
+
+- In the dashboard: `Restaurants → [Select Restaurant] → Settings → API Credentials`
+  - WhatsApp Number (display/reference)
+  - phone_number_id (required for routing)
+  - Access Token (per restaurant; overrides global)
+  - App Secret (per restaurant; enables signature validation)
+  - Webhook Verify Token (used during Meta verification)
+
+Repeat for every restaurant you add.
+
 ## Quick Start for Restaurants (what to send us)
 
 Share the following so we can set you up fast. You can send it by email or via the dashboard form.
