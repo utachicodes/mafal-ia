@@ -1,24 +1,20 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getPrisma } from "@/src/lib/db"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth"
+import { stackServerApp } from "@/src/stack"
 
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    const session = await getServerSession(authOptions as any)
-    const userId = (session as any)?.user?.id as string | undefined
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-    }
+    const user = await stackServerApp.getUser()
+    if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
     const prisma = await getPrisma()
     const restaurant = await prisma.restaurant.findFirst({
       where: {
         id: params.id,
-        userId: userId
+        userId: user.id,
       },
       select: {
         id: true,

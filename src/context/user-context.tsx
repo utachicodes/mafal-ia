@@ -1,8 +1,7 @@
 "use client"
 
 import { createContext, useContext, useEffect, useState } from "react"
-import { useSession } from "next-auth/react"
-import { prisma } from "@/lib/prisma"
+import { useUser as useStackUser } from "@stackframe/stack"
 
 interface User {
   id: string
@@ -20,12 +19,12 @@ interface UserContextType {
 const UserContext = createContext<UserContextType | undefined>(undefined)
 
 export function UserProvider({ children }: { children: React.ReactNode }) {
-  const { data: session, status } = useSession()
+  const stackUser = useStackUser()
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
   const refreshUser = async () => {
-    if (session?.user?.email) {
+    if (stackUser?.primaryEmail) {
       try {
         const response = await fetch("/api/user/profile")
         if (response.ok) {
@@ -39,16 +38,19 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   }
 
   useEffect(() => {
-    if (status === "loading") {
-      setIsLoading(true)
-    } else if (status === "authenticated" && session?.user) {
-      refreshUser()
+    if (stackUser) {
+      setUser({
+        id: stackUser.id,
+        name: stackUser.displayName,
+        email: stackUser.primaryEmail || "",
+        role: "user" // Default role, can be customized based on your needs
+      })
       setIsLoading(false)
     } else {
       setUser(null)
       setIsLoading(false)
     }
-  }, [session, status])
+  }, [stackUser])
 
   return (
     <UserContext.Provider value={{ user, isLoading, refreshUser }}>
