@@ -97,6 +97,7 @@ model Restaurant {
   menuItems              MenuItem[]
   conversations          Conversation[]
   orders                 Order[]
+  messageLogs            MessageLog[]
 
   createdAt              DateTime    @default(now())
   updatedAt              DateTime    @updatedAt
@@ -153,4 +154,30 @@ model Order {
   updatedAt     DateTime     @updatedAt
 
   @@index([restaurantId, createdAt])
+}
+
+enum MessageDirection {
+  inbound
+  outbound
+}
+
+model MessageLog {
+  id                 String            @id @default(cuid())
+  restaurantId       String
+  restaurant         Restaurant        @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  phoneNumber        String
+  whatsappMessageId  String
+  direction          MessageDirection
+  messageType        String?
+  templateName       String?
+  status             String
+  errorCode          String?
+  errorTitle         String?
+  errorDetail        String?
+  raw                Json?
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+
+  @@index([restaurantId, createdAt])
+  @@index([whatsappMessageId])
 }

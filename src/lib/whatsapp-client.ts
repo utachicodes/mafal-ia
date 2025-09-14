@@ -2,6 +2,30 @@ import { env } from "./env"
 
 export class WhatsAppClient {
   private static readonly BASE_URL = "https://graph.facebook.com/v18.0"
+  private static async fetchWithRetry(url: string, init: RequestInit, maxRetries = 3): Promise<Response> {
+    let attempt = 0
+    let lastError: any
+    while (attempt <= maxRetries) {
+      try {
+        const res = await fetch(url, init)
+        if (res.ok) return res
+        // Retry on 429/5xx
+        if (res.status === 429 || (res.status >= 500 && res.status < 600)) {
+          const backoff = Math.min(1000 * Math.pow(2, attempt) + Math.floor(Math.random() * 250), 8000)
+          await new Promise((r) => setTimeout(r, backoff))
+          attempt++
+          continue
+        }
+        return res
+      } catch (err) {
+        lastError = err
+        const backoff = Math.min(1000 * Math.pow(2, attempt) + Math.floor(Math.random() * 250), 8000)
+        await new Promise((r) => setTimeout(r, backoff))
+        attempt++
+      }
+    }
+    throw lastError
+  }
 
   // Send a text message via WhatsApp Business API
   static async sendMessage(
@@ -9,7 +33,7 @@ export class WhatsAppClient {
     to: string,
     message: string,
     accessTokenOverride?: string,
-  ): Promise<boolean> {
+  ): Promise<{ success: boolean; messageId?: string; raw?: any; errorText?: string; status?: number }> {
     try {
       const url = `${this.BASE_URL}/${businessPhoneNumberId}/messages`
 
@@ -28,7 +52,7 @@ export class WhatsAppClient {
       })
 
       const token = accessTokenOverride || env.WHATSAPP_ACCESS_TOKEN
-      const response = await fetch(url, {
+      const response = await this.fetchWithRetry(url, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -44,15 +68,16 @@ export class WhatsAppClient {
           statusText: response.statusText,
           error: errorText,
         })
-        return false
+        return { success: false, errorText, status: response.status }
       }
 
       const result = await response.json()
       console.log("[WhatsApp API] Message sent successfully:", result)
-      return true
+      const msgId = result?.messages?.[0]?.id || result?.messages?.[0]?.message_id
+      return { success: true, messageId: msgId, raw: result }
     } catch (error) {
       console.error("[WhatsApp API] Error sending message:", error)
-      return false
+      return { success: false, errorText: String(error) }
     }
   }
 
@@ -64,7 +89,7 @@ export class WhatsAppClient {
     languageCode = "en",
     parameters: string[] = [],
     accessTokenOverride?: string,
-  ): Promise<boolean> {
+  ): Promise<{ success: boolean; messageId?: string; raw?: any; errorText?: string; status?: number }> {
     try {
       const url = `${this.BASE_URL}/${businessPhoneNumberId}/messages`
 
@@ -98,7 +123,7 @@ export class WhatsAppClient {
       })
 
       const token = accessTokenOverride || env.WHATSAPP_ACCESS_TOKEN
-      const response = await fetch(url, {
+      const response = await this.fetchWithRetry(url, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -114,15 +139,16 @@ export class WhatsAppClient {
           statusText: response.statusText,
           error: errorText,
         })
-        return false
+        return { success: false, errorText, status: response.status }
       }
 
       const result = await response.json()
       console.log("[WhatsApp API] Template message sent successfully:", result)
-      return true
+      const msgId = result?.messages?.[0]?.id || result?.messages?.[0]?.message_id
+      return { success: true, messageId: msgId, raw: result }
     } catch (error) {
       console.error("[WhatsApp API] Error sending template message:", error)
-      return false
+      return { success: false, errorText: String(error) }
     }
   }
 
@@ -142,7 +168,7 @@ export class WhatsAppClient {
       }
 
       const token = accessTokenOverride || env.WHATSAPP_ACCESS_TOKEN
-      const response = await fetch(url, {
+      const response = await this.fetchWithRetry(url, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -169,7 +195,7 @@ export class WhatsAppClient {
       const url = `${this.BASE_URL}/${businessPhoneNumberId}`
 
       const token = accessTokenOverride || env.WHATSAPP_ACCESS_TOKEN
-      const response = await fetch(url, {
+      const response = await this.fetchWithRetry(url, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,

@@ -16,6 +16,41 @@ export const runtime = "nodejs"
 const stripBold = (s: string) => s.replace(/\*\*(.*?)\*\*/g, "$1").replace(/__(.*?)__/g, "$1")
 
 
+async function persistMessageLog(entry: {
+  restaurantId: string
+  phoneNumber: string
+  whatsappMessageId: string
+  direction: "inbound" | "outbound"
+  status: string
+  messageType?: string
+  templateName?: string
+  errorCode?: string
+  errorTitle?: string
+  errorDetail?: string
+  raw?: any
+}) {
+  try {
+    const prisma = await getPrisma()
+    await prisma.messageLog.create({
+      data: {
+        restaurantId: entry.restaurantId,
+        phoneNumber: entry.phoneNumber,
+        whatsappMessageId: entry.whatsappMessageId,
+        direction: entry.direction,
+        status: entry.status,
+        messageType: entry.messageType,
+        templateName: entry.templateName,
+        errorCode: entry.errorCode,
+        errorTitle: entry.errorTitle,
+        errorDetail: entry.errorDetail,
+        raw: entry.raw as any,
+      } as any,
+    })
+  } catch (err) {
+    console.warn("[WhatsApp] Failed to persist message log", err)
+  }
+}
+
 async function getTenantSecretsByPhoneId(phoneNumberId: string): Promise<{ restaurantId: string | null; accessToken: string | null; appSecret: string | null }> {
   try {
     const prisma = await getPrisma()
@@ -141,13 +176,49 @@ export async function POST(request: NextRequest) {
       if (!entry.changes || !Array.isArray(entry.changes)) continue
       for (const change of entry.changes) {
         if (change.field !== "messages" || !change.value) continue
-        const { messages, contacts, metadata } = change.value
+        const { messages, contacts, metadata, statuses } = change.value
+        const businessPhoneNumberId = metadata?.phone_number_id
+
+        // Handle delivery receipts / status updates
+        if (Array.isArray(statuses) && statuses.length > 0 && businessPhoneNumberId) {
+          try {
+            const restaurant = await RestaurantService.getRestaurantByPhoneNumber(businessPhoneNumberId)
+            const restaurantId = restaurant?.id
+            for (const st of statuses) {
+              const phone = st.recipient_id || ""
+              const msgId = st.id || st.message_id || ""
+              const status = st.status || "unknown"
+              const errorCode = st?.errors?.[0]?.code ? String(st.errors[0].code) : undefined
+              const errorTitle = st?.errors?.[0]?.title
+              const errorDetail = st?.errors?.[0]?.detail
+              if (restaurantId && msgId) {
+                await persistMessageLog({
+                  restaurantId,
+                  phoneNumber: phone,
+                  whatsappMessageId: msgId,
+                  direction: "outbound",
+                  status,
+                  messageType: st?.type,
+                  templateName: st?.template?.name,
+                  errorCode,
+                  errorTitle,
+                  errorDetail,
+                  raw: st,
+                })
+              }
+            }
+          } catch (err) {
+            console.warn("[WhatsApp] Failed processing statuses", err)
+          }
+        }
+
+        // Handle inbound messages
         if (messages && Array.isArray(messages)) {
           for (const message of messages) {
-            const businessPhoneNumberId = metadata?.phone_number_id
-            if (!businessPhoneNumberId) continue
+            const bpid = businessPhoneNumberId
+            if (!bpid) continue
 
-            const r = await RestaurantService.getRestaurantByPhoneNumber(businessPhoneNumberId)
+            const r = await RestaurantService.getRestaurantByPhoneNumber(bpid)
             if (r?.isActive && (r as any).isConcierge === true) {
               await processConciergeIncomingMessage(message, contacts, metadata)
             } else {
@@ -265,7 +336,7 @@ async function processIncomingMessage(message: any, contacts: any[], metadata: a
         await WhatsAppClient.sendMessage(
           businessPhoneNumberId,
           phoneNumber,
-          `✅ Order confirmed!\nOrder ID: ${order.id}\nTotal: ${order.total} FCFA\nItems: ${order.itemsSummary}${deliveryLine}`,
+          `✅ Order confirmed!\nOrder ID: ${order.id}\nTotal: ${order.total} FCFA\nItems: ${pending.itemsSummary}${deliveryLine}`,
           tokenOverride,
         )
       } else {
@@ -281,6 +352,19 @@ async function processIncomingMessage(message: any, contacts: any[], metadata: a
       await persistConversation(restaurant.id, phoneNumber, ConversationManager.getConversation(restaurant.id, phoneNumber))
       return
     }
+
+    // Log inbound message (best-effort)
+    try {
+      await persistMessageLog({
+        restaurantId: restaurant.id,
+        phoneNumber,
+        whatsappMessageId: messageId,
+        direction: "inbound",
+        status: "received",
+        messageType: message.type,
+        raw: message,
+      })
+    } catch {}
 
     // Get conversation history for this phone number and add new user message
     const conversationHistory = ConversationManager.getConversation(restaurant.id, phoneNumber)
@@ -329,7 +413,19 @@ Ordering Enabled: ${restaurant.chatbotContext.orderingEnabled ? "Yes" : "No"}
 
     // Send response back to WhatsApp with tenant token override if present
     const tokenOverride = await getAccessTokenForRestaurant(restaurant.id)
-    await WhatsAppClient.sendMessage(businessPhoneNumberId, phoneNumber, outbound, tokenOverride)
+    const sendRes = await WhatsAppClient.sendMessage(businessPhoneNumberId, phoneNumber, outbound, tokenOverride)
+    try {
+      await persistMessageLog({
+        restaurantId: restaurant.id,
+        phoneNumber,
+        whatsappMessageId: sendRes.messageId || `unknown_${Date.now()}`,
+        direction: "outbound",
+        status: sendRes.success ? "sent" : `failed_${sendRes.status ?? ""}`,
+        messageType: "text",
+        errorDetail: sendRes.success ? undefined : sendRes.errorText,
+        raw: sendRes.raw,
+      })
+    } catch {}
 
     // Save conversation history in memory and DB
     ConversationManager.addMessage(restaurant.id, phoneNumber, {
