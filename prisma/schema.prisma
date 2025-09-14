@@ -1,9 +1,10 @@
 // Prisma schema for Mafal-IA
-// Postgres for production. Set DATABASE_URL to your Postgres connection string.
+// Neon (PostgreSQL). Set DATABASE_URL to the pooled connection string and DIRECT_URL to the direct connection string.
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 generator client {

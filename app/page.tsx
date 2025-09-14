@@ -5,21 +5,21 @@ import { MessageSquare, Bot, Globe, Zap, CheckCircle2, Shield, Phone, Layers, Ro
 import Link from "next/link"
 import { Logo } from "@/src/components/logo"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card"
-import { useSession } from "next-auth/react"
+import { useUser } from "@stackframe/stack"
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
 
 export default function HomePage() {
-  const { data: session, status } = useSession()
+  const user = useUser()
   const router = useRouter()
 
   useEffect(() => {
-    if (status === "authenticated" && session) {
+    if (user) {
       router.push("/dashboard")
     }
-  }, [session, status, router])
+  }, [user, router])
 
-  if (status === "loading") {
+  if (user === undefined) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>

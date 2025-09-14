@@ -27,6 +27,12 @@ export function ApiCredentials({ restaurant }: ApiCredentialsProps) {
   const { regenerateApiKey, updateRestaurant } = useRestaurants()
   const { toast } = useToast()
 
+  // Connection tests state
+  const [isTestingVerify, setIsTestingVerify] = useState(false)
+  const [verifyResult, setVerifyResult] = useState<null | { status: number; ok: boolean; body: string; passed: boolean; url: string }>(null)
+  const [isTestingSigned, setIsTestingSigned] = useState(false)
+  const [signedResult, setSignedResult] = useState<null | { status: number; ok: boolean; body: string }>(null)
+
   // Load credentials when component mounts
   useEffect(() => {
     const loadCredentials = async () => {
@@ -214,6 +220,35 @@ export function ApiCredentials({ restaurant }: ApiCredentialsProps) {
               >
                 Save
               </Button>
+              <Button
+                variant="outline"
+                onClick={async () => {
+                  try {
+                    const res = await fetch(`/api/restaurants/${restaurant.id}/credentials/generate-verify-token`, { method: "POST" })
+                    if (!res.ok) throw new Error("Failed to generate token")
+                    const data = await res.json()
+                    setVerifyToken(data.webhookVerifyToken)
+                    updateRestaurant(restaurant.id, {
+                      apiCredentials: { ...restaurant.apiCredentials, webhookVerifyToken: data.webhookVerifyToken },
+                    })
+                    toast({ title: "Verify token generated", description: "Token saved for this restaurant." })
+                  } catch (e) {
+                    toast({ title: "Error", description: "Could not generate token." })
+                  }
+                }}
+              >
+                Generate
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => {
+                  navigator.clipboard.writeText(verifyToken)
+                  toast({ title: "Copied", description: "Verify token copied to clipboard" })
+                }}
+              >
+                <Copy className="h-4 w-4" />
+              </Button>
             </div>
             <p className="text-xs text-muted-foreground">Used during Meta webhook verification GET request.</p>
           </div>
@@ -276,6 +311,91 @@ export function ApiCredentials({ restaurant }: ApiCredentialsProps) {
               <li>Test the integration using the Live View tab</li>
               <li>Deploy your chatbot to production</li>
             </ol>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Connection Status / Real Tests</CardTitle>
+          <CardDescription>Validate your configuration against the live webhook endpoint</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <h4 className="font-medium">GET Verification</h4>
+              <p className="text-xs text-muted-foreground">Calls your deployed webhook with the stored verify token and checks if the challenge is echoed.</p>
+              <div className="flex gap-2">
+                <Button
+                  variant="default"
+                  disabled={isTestingVerify || !verifyToken}
+                  onClick={async () => {
+                    try {
+                      setIsTestingVerify(true)
+                      setVerifyResult(null)
+                      const res = await fetch(`/api/restaurants/${restaurant.id}/credentials/test-verify`, { method: "POST" })
+                      const data = await res.json()
+                      setVerifyResult({ status: data.status, ok: data.ok, body: data.body, passed: Boolean(data.passed), url: data.requestedUrl })
+                      if (data.passed) {
+                        toast({ title: "Verification OK", description: "Webhook responded with the expected challenge." })
+                      } else {
+                        toast({ title: "Verification failed", description: `Status ${data.status}. Check token or endpoint.` })
+                      }
+                    } catch (e) {
+                      toast({ title: "Error", description: "Could not run GET verification." })
+                    } finally {
+                      setIsTestingVerify(false)
+                    }
+                  }}
+                >
+                  {isTestingVerify ? "Testing..." : "Run GET Verify"}
+                </Button>
+              </div>
+              {verifyResult && (
+                <div className={`text-xs rounded-md p-3 ${verifyResult.passed ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-red-700"}`}>
+                  <div><span className="font-semibold">URL:</span> {verifyResult.url}</div>
+                  <div><span className="font-semibold">Status:</span> {verifyResult.status} {verifyResult.ok ? "(ok)" : "(failed)"}</div>
+                  <div className="break-all"><span className="font-semibold">Body:</span> {verifyResult.body}</div>
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <h4 className="font-medium">Signed POST</h4>
+              <p className="text-xs text-muted-foreground">Sends a minimal, signed WhatsApp payload using your App Secret.</p>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  disabled={isTestingSigned || !appSecret || !phoneId}
+                  onClick={async () => {
+                    try {
+                      setIsTestingSigned(true)
+                      setSignedResult(null)
+                      const res = await fetch(`/api/restaurants/${restaurant.id}/credentials/test-signed-post`, { method: "POST" })
+                      const data = await res.json()
+                      setSignedResult({ status: data.status, ok: Boolean(data.ok), body: String(data.body ?? "") })
+                      if (data.ok) {
+                        toast({ title: "Signed POST accepted", description: "Webhook processed the signed payload." })
+                      } else {
+                        toast({ title: "Signed POST failed", description: `Status ${data.status}. Check App Secret or route.` })
+                      }
+                    } catch (e) {
+                      toast({ title: "Error", description: "Could not run signed POST." })
+                    } finally {
+                      setIsTestingSigned(false)
+                    }
+                  }}
+                >
+                  {isTestingSigned ? "Sending..." : "Send Signed POST"}
+                </Button>
+              </div>
+              {signedResult && (
+                <div className={`text-xs rounded-md p-3 ${signedResult.ok ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-red-700"}`}>
+                  <div><span className="font-semibold">Status:</span> {signedResult.status} {signedResult.ok ? "(ok)" : "(failed)"}</div>
+                  <div className="break-all"><span className="font-semibold">Body:</span> {signedResult.body}</div>
+                </div>
+              )}
+            </div>
           </div>
         </CardContent>
       </Card>
