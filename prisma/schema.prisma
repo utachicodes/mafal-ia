@@ -2,7 +2,7 @@
 // Postgres for production. Set DATABASE_URL to your Postgres connection string.
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 

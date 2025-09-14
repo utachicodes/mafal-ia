@@ -83,6 +83,16 @@ GOOGLE_GENKIT_API_KEY=YOUR_GOOGLE_API_KEY
 DEMO_MODE=false
 ```
 
+### Local Development Setup
+
+To run the application locally, you first need to set up your environment variables.
+
+1.  **Copy the example environment file:**
+    ```bash
+    cp .env.example .env
+    ```
+2.  The `.env.example` file is pre-configured to use a PostgreSQL database. The application should now work correctly with the provided `DATABASE_URL`.
+
 ### Installation
 
 1. Clone the repository
