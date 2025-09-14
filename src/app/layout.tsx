@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { StackProvider, StackTheme } from "@stackframe/stack";
+import { stackServerApp } from "../stack";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { Providers } from "../components/providers";
@@ -19,11 +21,11 @@ export default function RootLayout({
   const lang = cookies().get("lang")?.value ?? "en";
   return (
     <html lang={lang} suppressHydrationWarning>
-      <body className={inter.className}>
+      <body className={inter.className}><StackProvider app={stackServerApp}><StackTheme>
         <Providers>
           {children}
         </Providers>
-      </body>
+      </StackTheme></StackProvider></body>
     </html>
   );
 }
