@@ -6,8 +6,6 @@ import { metadata } from "./metadata"
 import { LanguageProvider } from "@/src/context/language-context"
 import { LanguageWrapper } from "./language-wrapper"
 import { I18nProvider } from "@/src/context/i18n"
-import { StackProvider, StackTheme } from "@stackframe/stack"
-import { stackServerApp } from "@/src/stack"
 
 export default function RootLayout({
   children,
@@ -27,15 +25,11 @@ html {
           `}</style>
         </head>
         <body className={`${GeistSans.variable} ${GeistMono.variable}`}>
-          <StackProvider app={stackServerApp}>
-            <StackTheme>
-              <I18nProvider>
-                <Providers>
-                  {children}
-                </Providers>
-              </I18nProvider>
-            </StackTheme>
-          </StackProvider>
+          <I18nProvider>
+            <Providers>
+              {children}
+            </Providers>
+          </I18nProvider>
         </body>
       </LanguageWrapper>
     </LanguageProvider>

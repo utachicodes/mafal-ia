@@ -63,7 +63,9 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
     <div className="flex flex-col h-full">
       <div className="px-6 pt-6 pb-3">
         <div className="h-7 text-foreground flex items-center">
-          <Logo />
+          <Link href="/" className="hover:opacity-80 transition-opacity">
+            <Logo />
+          </Link>
         </div>
       </div>
       <div className="px-6"><div className="h-px w-full bg-border" /></div>
