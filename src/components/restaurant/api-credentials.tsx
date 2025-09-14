@@ -1,13 +1,14 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Copy, RefreshCw, Eye, EyeOff } from "lucide-react"
 import { useRestaurants } from "@/src/hooks/use-restaurants"
+import { useToast } from "@/hooks/use-toast"
 import type { Restaurant } from "@/lib/data"
 
 interface ApiCredentialsProps {
@@ -17,12 +18,35 @@ interface ApiCredentialsProps {
 export function ApiCredentials({ restaurant }: ApiCredentialsProps) {
   const [showApiKey, setShowApiKey] = useState(false)
   const [isRegenerating, setIsRegenerating] = useState(false)
-  const [phoneId, setPhoneId] = useState(restaurant.apiCredentials.whatsappPhoneNumberId || "")
-  const [accessToken, setAccessToken] = useState(restaurant.apiCredentials.whatsappAccessToken || "")
+  const [phoneId, setPhoneId] = useState("")
+  const [accessToken, setAccessToken] = useState("")
   const [appSecret, setAppSecret] = useState("")
-  const [verifyToken, setVerifyToken] = useState(restaurant.apiCredentials.webhookVerifyToken || "")
+  const [verifyToken, setVerifyToken] = useState("")
   const [savingPhoneId, setSavingPhoneId] = useState(false)
+  const [isLoadingCredentials, setIsLoadingCredentials] = useState(true)
   const { regenerateApiKey, updateRestaurant } = useRestaurants()
+  const { toast } = useToast()
+
+  // Load credentials when component mounts
+  useEffect(() => {
+    const loadCredentials = async () => {
+      try {
+        const res = await fetch(`/api/restaurants/${restaurant.id}/credentials`)
+        if (res.ok) {
+          const data = await res.json()
+          setPhoneId(data.whatsappPhoneNumberId || "")
+          setAccessToken(data.whatsappAccessToken || "")
+          setAppSecret(data.whatsappAppSecret || "")
+          setVerifyToken(data.webhookVerifyToken || "")
+        }
+      } catch (error) {
+        console.error("Failed to load credentials:", error)
+      } finally {
+        setIsLoadingCredentials(false)
+      }
+    }
+    loadCredentials()
+  }, [restaurant.id])
 
   const handleCopyApiKey = () => {
     navigator.clipboard.writeText(restaurant.apiKey)
@@ -40,6 +64,18 @@ export function ApiCredentials({ restaurant }: ApiCredentialsProps) {
   }
 
   const maskedApiKey = restaurant.apiKey.replace(/(.{8}).*(.{8})/, "$1***$2")
+
+  if (isLoadingCredentials) {
+    return (
+      <div className="space-y-6">
+        <Card>
+          <CardContent className="flex items-center justify-center h-32">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-6">
@@ -206,7 +242,25 @@ export function ApiCredentials({ restaurant }: ApiCredentialsProps) {
         <CardContent className="space-y-4">
           <div className="space-y-2">
             <h4 className="font-medium">Webhook URL</h4>
-            <code className="block p-3 bg-muted rounded-md text-sm">/api/whatsapp</code>
+            <div className="flex gap-2">
+              <code className="flex-1 p-3 bg-muted rounded-md text-sm break-all">
+                {typeof window !== "undefined" ? `${window.location.origin}/api/whatsapp` : "/api/whatsapp"}
+              </code>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => {
+                  const url = typeof window !== "undefined" ? `${window.location.origin}/api/whatsapp` : "/api/whatsapp"
+                  navigator.clipboard.writeText(url)
+                  toast({ title: "Copied", description: "Webhook URL copied to clipboard" })
+                }}
+              >
+                <Copy className="h-4 w-4" />
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Use this full URL when configuring your WhatsApp Business API webhook in Meta Developer Console
+            </p>
           </div>
 
           <div className="space-y-2">
