@@ -73,3 +73,16 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
   }
 }
 
+export async function HEAD() {
+  return new NextResponse(null, { status: 200 })
+}
+
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 204,
+    headers: {
+      "Allow": "GET, PATCH, HEAD, OPTIONS",
+    },
+  })
+}
+
