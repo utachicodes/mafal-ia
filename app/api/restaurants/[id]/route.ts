@@ -1,2 +1,2 @@
-export { GET, PATCH } from "@/src/app/api/restaurants/[id]/route"
+export { GET, PATCH, HEAD, OPTIONS } from "@/src/app/api/restaurants/[id]/route"
 
