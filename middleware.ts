@@ -1,26 +1,11 @@
-import { withAuth } from "next-auth/middleware"
+import { NextResponse } from "next/server"
 
-export default withAuth(
-  function middleware(req) {
-    // Add any additional middleware logic here
-  },
-  {
-    callbacks: {
-      authorized: ({ token, req }) => {
-        // Allow access to auth pages and public pages
-        if (req.nextUrl.pathname.startsWith("/auth") || 
-            req.nextUrl.pathname === "/" ||
-            req.nextUrl.pathname.startsWith("/api/auth")) {
-          return true
-        }
-        
-        // Require authentication for all other routes
-        return !!token
-      },
-    },
-  }
-)
+export default function middleware() {
+  // Auth disabled – allow all requests to proceed
+  return NextResponse.next()
+}
 
+// Optional: keep matchers if you want to scope where middleware runs (no auth checks applied)
 export const config = {
   matcher: [
     "/dashboard/:path*",
@@ -30,6 +15,6 @@ export const config = {
     "/analytics/:path*",
     "/concierge/:path*",
     "/playground/:path*",
-    "/onboarding/:path*"
-  ]
+    "/onboarding/:path*",
+  ],
 }
