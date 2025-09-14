@@ -8,8 +8,9 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session?.user?.id) {
+    const session = await getServerSession(authOptions as any)
+    const userId = (session as any)?.user?.id as string | undefined
+    if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
@@ -17,7 +18,7 @@ export async function GET(
     const restaurant = await prisma.restaurant.findFirst({
       where: {
         id: params.id,
-        userId: session.user.id
+        userId: userId
       },
       select: {
         id: true,
@@ -44,4 +45,17 @@ export async function GET(
     console.error("Error fetching restaurant credentials:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
+}
+
+export async function HEAD() {
+  return new NextResponse(null, { status: 200 })
+}
+
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 204,
+    headers: {
+      "Allow": "GET, HEAD, OPTIONS",
+    },
+  })
 }

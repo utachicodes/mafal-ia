@@ -1,3 +1,4 @@
+
 export interface MenuItem {
   id: string
   name: string
@@ -49,3 +50,4 @@ export interface ChatMessage {
   content: string
   timestamp: Date
 }
+
