@@ -1,21 +1,44 @@
-#!/usr/bin/env bash
-set -euo pipefail
+#!/bin/bash
 
-# Usage:
-#   DOMAIN="mafal-ia.vercel.app" VERIFY_TOKEN="your_token" ./scripts/verify-webhook.sh
-# Optional: CHALLENGE (default: 123456)
+# WhatsApp Webhook Verification Script
+# Usage: ./scripts/verify-webhook.sh [webhook_url] [verify_token]
 
-DOMAIN=${DOMAIN:-}
-VERIFY_TOKEN=${VERIFY_TOKEN:-}
-CHALLENGE=${CHALLENGE:-123456}
+WEBHOOK_URL=${1:-"http://localhost:3000/api/whatsapp"}
+VERIFY_TOKEN=${2:-"mafal_verify_token_2024"}
 
-if [[ -z "${DOMAIN}" || -z "${VERIFY_TOKEN}" ]]; then
-  echo "Usage: DOMAIN=your.domain VERIFY_TOKEN=your_token ./scripts/verify-webhook.sh" >&2
-  exit 1
+echo "🔗 Testing WhatsApp Webhook Verification"
+echo "========================================"
+echo "Webhook URL: $WEBHOOK_URL"
+echo "Verify Token: $VERIFY_TOKEN"
+echo ""
+
+# Test webhook verification
+VERIFY_URL="${WEBHOOK_URL}?hub.mode=subscribe&hub.verify_token=${VERIFY_TOKEN}&hub.challenge=test_challenge_123"
+
+echo "Testing webhook verification..."
+echo "URL: $VERIFY_URL"
+echo ""
+
+# Make the request
+RESPONSE=$(curl -s -w "\n%{http_code}" "$VERIFY_URL")
+
+# Split response and status code
+HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
+BODY=$(echo "$RESPONSE" | head -n -1)
+
+echo "Response:"
+echo "HTTP Status: $HTTP_CODE"
+echo "Body: $BODY"
+echo ""
+
+if [ "$HTTP_CODE" = "200" ] && [ "$BODY" = "test_challenge_123" ]; then
+    echo "✅ Webhook verification successful!"
+    echo "Your webhook is properly configured and ready to receive messages."
+else
+    echo "❌ Webhook verification failed!"
+    echo "Please check:"
+    echo "1. Your server is running and accessible"
+    echo "2. The webhook URL is correct"
+    echo "3. The verify token matches your configuration"
+    echo "4. Your webhook endpoint is properly implemented"
 fi
-
-curl -i -G "https://${DOMAIN}/api/whatsapp" \
-  --data-urlencode "hub.mode=subscribe" \
-  --data-urlencode "hub.verify_token=${VERIFY_TOKEN}" \
-  --data-urlencode "hub.challenge=${CHALLENGE}"
-
