@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge"
 import { QrCode, CheckCircle2, Phone } from "lucide-react"
 import { type Restaurant } from "@/lib/data"
 import { useToast } from "@/hooks/use-toast"
+import { WhatsAppQRGenerator } from "@/src/components/whatsapp-qr-generator"
 
 export default function WhatsAppQuickConnectPage() {
   const [restaurants, setRestaurants] = useState<Restaurant[]>([])
@@ -52,8 +53,8 @@ export default function WhatsAppQuickConnectPage() {
   
   const restaurant = restaurants.find((r) => r.id === selectedId)
 
-  const simulateGenerateQr = () => {
-    toast({ title: "QR generated", description: "Scan with your test WhatsApp app to link." })
+  const handleQRGenerated = (qrData: string) => {
+    console.log("QR Code generated with data:", qrData)
   }
 
   const simulateScan = () => {
@@ -120,19 +121,26 @@ export default function WhatsAppQuickConnectPage() {
           </CardContent>
         </Card>
 
+        <WhatsAppQRGenerator
+          phoneNumber={phone}
+          restaurantId={selectedId || ""}
+          onQRGenerated={handleQRGenerated}
+        />
+
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2"><QrCode className="h-5 w-5"/> QR Code</CardTitle>
-            <CardDescription>Generate a QR and simulate a scan</CardDescription>
+            <CardTitle>Test Connection</CardTitle>
+            <CardDescription>Simulate a successful WhatsApp connection for testing</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="w-48 h-48 border rounded grid place-content-center text-muted-foreground">
-              <QrCode className="h-24 w-24"/>
-            </div>
             <div className="flex gap-3">
-              <Button onClick={simulateGenerateQr} type="button">Generate QR</Button>
-              <Button variant="outline" onClick={simulateScan} type="button">Simulate Scan</Button>
+              <Button variant="outline" onClick={simulateScan} type="button">
+                Simulate Scan
+              </Button>
             </div>
+            <p className="text-xs text-muted-foreground">
+              This simulates a successful WhatsApp connection for development testing.
+            </p>
           </CardContent>
         </Card>
       </div>
