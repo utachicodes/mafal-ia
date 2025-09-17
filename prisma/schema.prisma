@@ -48,6 +48,11 @@ model Restaurant {
   orderingEnabled        Boolean     @default(true)
   deliveryInfo           String      @default("")
 
+  // API key (production): store ONLY the hash of the key
+  apiKeyHash             String?     @db.VarChar(128)
+  apiKeyCreatedAt        DateTime?
+  apiKeyRevokedAt        DateTime?
+
   menuItems              MenuItem[]
   conversations          Conversation[]
   orders                 Order[]

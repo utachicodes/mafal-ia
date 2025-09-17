@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react"
 import { usePathname } from "next/navigation"
-import { useLanguage } from "@/src/context/language-context"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent } from "@/components/ui/sheet"
 import { Menu, Home, Store, BarChart3, Settings, MessageSquare, Key } from "lucide-react"
@@ -10,8 +9,7 @@ import Link from "next/link"
 import { cn } from "@/lib/utils"
 import { Logo } from "./logo"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { LanguageToggle } from "@/src/components/language-toggle"
-import { ThemeToggle } from "@/src/components/theme-toggle"
+import { SimpleThemeToggle } from "@/src/components/simple-theme-toggle"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -47,7 +45,6 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [isMounted, setIsMounted] = useState(false)
   const pathname = usePathname()
-  const { language, setLanguage } = useLanguage()
   
   useEffect(() => {
     setIsMounted(true)
@@ -131,8 +128,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
             <Menu className="h-5 w-5" />
           </Button>
           <div className="ml-auto flex items-center gap-3">
-            <LanguageToggle />
-            <ThemeToggle />
+            <SimpleThemeToggle />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-8 w-8 rounded-full">

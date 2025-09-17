@@ -117,6 +117,26 @@ Role: Order-taker for {{restaurantName}}.
 
 4) Link your Meta webhook to `/api/whatsapp` and verify using `WHATSAPP_VERIFY_TOKEN`.
 
+## Optional: Chat API for non‑WhatsApp simulation
+
+For simple HTTP simulations (outside WhatsApp), you can call the Chat API with a restaurant ID. This uses the same AI configuration as the webhook path.
+
+Request:
+
+```bash
+curl -X POST "https://YOUR_DOMAIN/api/ai/chat" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "restaurantId": "<your-restaurant-id>",
+    "message": "Hello, I'd like to see your menu",
+    "language": "English"
+  }'
+```
+
+Notes:
+- The `restaurantId` must exist in your database.
+- This endpoint does not require an API key. Production flows still use your server’s configured AI key and the restaurant’s context/menu.
+
 ## Test scenarios
 
 - __Greeting__: send "Bonjour". Expect a friendly greeting + offer to help. If it apologizes:

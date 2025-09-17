@@ -32,9 +32,8 @@ Your intelligent WhatsApp assistant. Get started in minutes.
 
 2. **Add Your Menu (No JSON required)**
    Paste JSON, CSV, or simple text lines. We auto-detect the format and structure it for AI.
-
-3. **Get Your API Key**
-   Copy your unique API key and connect your WhatsApp Business account. Your assistant is ready to serve.
+3. **Connect WhatsApp**
+   Configure your WhatsApp Business credentials (phone_number_id, access token, app secret, verify token). Your assistant is ready to serve.
 
 ## V2 Update (Aug 2025)
 
@@ -99,6 +98,117 @@ DEMO_MODE=false
      - `npx prisma migrate deploy`
 5. Run the development server: `npm run dev`
 6. Open [http://localhost:3000](http://localhost:3000)
+
+## Quick Start (No WhatsApp) — Create Restaurant, Issue API Key, Call Chatbot
+
+This runbook gets you from zero to a working chatbot without connecting WhatsApp. It uses real database records and real API keys (no simulations).
+
+### 0) Configure admin token (protects key management routes)
+
+Set an admin token in your shell or `.env` file. If set, it is required for generating/revoking restaurant API keys and seeding.
+
+Example `.env` (local dev):
+
+```env
+ADMIN_API_TOKEN=mafal_admin_sk_N3bGdXwG2qZr5u8Vh1Jk4Pq7Tt6Yw9_AeBdCfDhEjGlKmNoPqRsTuVwXyZ1a2b3
+```
+
+Restart `npm run dev` after editing `.env`.
+
+### 1) Seed a real sample restaurant (PowerShell on Windows)
+
+Use `curl.exe` (not the PowerShell alias) or `Invoke-WebRequest`.
+
+```powershell
+curl.exe -X POST "http://localhost:3000/api/restaurants/seed" ^
+  -H "Authorization: Bearer $env:ADMIN_API_TOKEN"
+```
+
+Response shows `{ ok: true, restaurant: { id, ... } }`. Copy the `restaurant.id`.
+
+Alternatively, with PowerShell-native:
+
+```powershell
+$seed = Invoke-WebRequest -Method POST `
+  -Uri "http://localhost:3000/api/restaurants/seed" `
+  -Headers @{ Authorization = "Bearer $env:ADMIN_API_TOKEN" }
+$rid = ($seed.Content | ConvertFrom-Json).restaurant.id
+$rid
+```
+
+### 2) Generate a per-restaurant API key
+
+```powershell
+curl.exe -X POST "http://localhost:3000/api/restaurants/$rid/api-key" ^
+  -H "x-admin-token: $env:ADMIN_API_TOKEN"
+```
+
+Save the `apiKey` from the JSON response immediately (it is shown only once).
+
+PowerShell-native (captures the key):
+
+```powershell
+$gen = Invoke-WebRequest -Method POST `
+  -Uri "http://localhost:3000/api/restaurants/$rid/api-key" `
+  -Headers @{ "x-admin-token" = $env:ADMIN_API_TOKEN }
+$apiKey = ( $gen.Content | ConvertFrom-Json ).apiKey
+$apiKey
+```
+
+### 3) Call the chatbot API with your API key
+
+Using PowerShell-native JSON to avoid quoting issues:
+
+```powershell
+$body = @{ restaurantId = $rid; message = "Hello, what's on your menu?" } | ConvertTo-Json
+Invoke-WebRequest -Method POST `
+  -Uri "http://localhost:3000/api/ai/chat" `
+  -Headers @{ "Content-Type" = "application/json"; "x-api-key" = $apiKey } `
+  -Body $body
+```
+
+Or with `curl.exe` and single-quoted JSON (escape apostrophes by doubling them):
+
+```powershell
+curl.exe -X POST "http://localhost:3000/api/ai/chat" `
+  -H "Content-Type: application/json" `
+  -H "x-api-key: $apiKey" `
+  -d '{ "restaurantId": "'$rid'", "message": "Hello, what''s on your menu?" }'
+```
+
+### 4) (Optional) Validate or revoke API key
+
+Validate:
+
+```powershell
+Invoke-WebRequest -Method POST `
+  -Uri "http://localhost:3000/api/ai/validate" `
+  -Headers @{ "x-api-key" = $apiKey }
+```
+
+Revoke (admin-only):
+
+```powershell
+curl.exe -X DELETE "http://localhost:3000/api/restaurants/$rid/api-key" ^
+  -H "x-admin-token: $env:ADMIN_API_TOKEN"
+```
+
+### HTTP Routes Involved
+
+- `POST /api/restaurants/seed` — Create a sample restaurant. Requires `ADMIN_API_TOKEN` if set.
+- `POST /api/restaurants/{id}/api-key` — Generate a new key (returns plaintext once). Requires `ADMIN_API_TOKEN` if set.
+- `DELETE /api/restaurants/{id}/api-key` — Revoke the current key. Requires `ADMIN_API_TOKEN` if set.
+- `POST /api/ai/validate` — Check if a key is valid; returns the `restaurantId` if so.
+- `POST /api/ai/chat` — Send a message for a specific restaurant; requires a valid API key.
+
+### Troubleshooting (Windows PowerShell)
+
+- **Missing API key**: ensure the header is exactly `Authorization: Bearer <key>` or `x-api-key: <key>`; avoid nested quotes.
+- **JSON parse error (500)**: build JSON with `ConvertTo-Json` or use `--data-binary @request.json`.
+- **Bad hostname / continuation (>>)**: avoid stray carets `^` in PowerShell; use backticks `` ` `` for line breaks or single-line commands.
+- **Unauthorized on key generation/revocation**: set `ADMIN_API_TOKEN` and include it via `Authorization: Bearer` or `x-admin-token`.
+
+No WhatsApp is required for the above. You can add WhatsApp later.
 
 ## Project Structure
 
@@ -221,6 +331,24 @@ curl -X POST "https://your-domain.com/api/whatsapp" \
 ```
 
 If `Restaurant.whatsappPhoneNumberId` matches the Meta `phone_number_id`, the request is routed to your restaurant. Mafal-IA generates a reply and sends it via the WhatsApp Business API.
+
+### Optional: Direct Chat API (non-WhatsApp simulation)
+
+For simple HTTP tests without WhatsApp, call the Chat API with a restaurant ID:
+
+```bash
+curl -X POST "https://your-domain.com/api/ai/chat" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "restaurantId": "<your-restaurant-id>",
+    "message": "Hello, I'd like to see your menu",
+    "language": "English"
+  }'
+```
+
+Notes:
+- The `restaurantId` must exist in your DB.
+- No API key is required; the server’s configured AI key is used.
 
 ### WhatsApp Integration - Step by Step
 

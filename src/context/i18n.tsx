@@ -1,11 +1,10 @@
 "use client"
 
 import React, { createContext, useContext, ReactNode, useMemo } from "react"
-import { useLanguage } from "@/src/context/language-context"
 import en from "@/src/locales/en.json"
-import fr from "@/src/locales/fr.json"
 
-const dicts = { en, fr } as const
+// Single-language dictionary (English only)
+const dicts = { en } as const
 
 type Dict = typeof en
 
@@ -21,8 +20,7 @@ interface I18nContextType {
 const I18nContext = createContext<I18nContextType | null>(null)
 
 export function I18nProvider({ children }: { children: ReactNode }) {
-  const { language } = useLanguage()
-  const lang = (language === "fr" ? "fr" : "en") as keyof typeof dicts
+  const lang = "en" as keyof typeof dicts
   const value = useMemo(() => {
     const t = (key: string, params?: Record<string, string | number>) => {
       const raw = get(dicts[lang], key)

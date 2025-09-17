@@ -81,7 +81,7 @@ export function importRestaurantData(jsonString: string): Restaurant {
     const parsed = JSON.parse(jsonString)
 
     // Validate the imported data structure
-    if (!parsed.id || !parsed.name || !parsed.apiKey) {
+    if (!parsed.id || !parsed.name || !Array.isArray(parsed.menu) || !parsed.chatbotContext || !parsed.apiCredentials) {
       throw new Error("Invalid restaurant data structure")
     }
 

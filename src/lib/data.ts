@@ -46,7 +46,6 @@ export interface Restaurant {
   menu: MenuItem[]
   chatbotContext: ChatbotContext
   apiCredentials: ApiCredentials
-  apiKey: string
   createdAt: Date
   updatedAt: Date
 }

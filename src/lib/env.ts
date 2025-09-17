@@ -10,6 +10,8 @@ export const env = {
   // Demo mode defaults to OFF unless explicitly enabled (DEMO_MODE=true or 1)
   DEMO_MODE:
     ((process.env.DEMO_MODE ?? "false") === "true" || (process.env.DEMO_MODE ?? "false") === "1") as boolean,
+  // Admin token for protecting privileged endpoints like API key management
+  ADMIN_API_TOKEN: process.env.ADMIN_API_TOKEN || "",
 } as const
 
 // Validation function to ensure required environment variables are set

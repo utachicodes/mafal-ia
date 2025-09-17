@@ -10,6 +10,7 @@ import Link from "next/link"
 // Removed useRestaurants import as we're using local state instead
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import ApiKeyManager from "@/src/components/restaurant/api-key-manager"
 
 // Define StatCard component
 interface StatCardProps {
@@ -39,7 +40,7 @@ const StatCard = ({ title, value, icon, description, trend, trendType = "up" }: 
 
 export default function DashboardPage() {
   // Use default values in case RestaurantsProvider is not available
-  const [restaurants, setRestaurants] = useState([])
+  const [restaurants, setRestaurants] = useState<{ id?: string; name?: string }[]>([])
   const [restaurantsLoading, setRestaurantsLoading] = useState(false)
   const [loading, setLoading] = useState(true)
   const [orderLoading, setOrderLoading] = useState(true)
@@ -137,6 +138,8 @@ export default function DashboardPage() {
           </TabsList>
           
           <TabsContent value="overview" className="space-y-4 mt-4">
+            {/* API Key Manager */}
+            <ApiKeyManager />
             {/* Stats Overview */}
             <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
               <Card>
@@ -283,7 +286,7 @@ export default function DashboardPage() {
                           outerRadius={80}
                           fill="#8884d8"
                           dataKey="value"
-                          label={({ name, percent }: { name: string; percent: number }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                          label={(props: any) => `${props.name} ${(props.percent * 100).toFixed(0)}%`}
                         >
                           {pieData.map((entry, index) => (
                             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />

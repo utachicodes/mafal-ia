@@ -34,7 +34,6 @@ export interface Restaurant {
     webhookVerifyToken: string
   }
   // App-managed fields used in UI and hooks
-  apiKey: string
   createdAt: Date
   updatedAt: Date
 }

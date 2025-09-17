@@ -3,8 +3,7 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Sparkles, Bot, Zap, MessageSquare, Globe, CheckCircle } from 'lucide-react'
-import { ThemeToggle } from '@/src/components/theme-toggle'
-import { LanguageToggle } from '@/src/components/language-toggle'
+import { SimpleThemeToggle } from '@/src/components/simple-theme-toggle'
 import { useI18n } from '@/src/context/i18n'
 
 export default function Home() {
@@ -19,10 +18,10 @@ export default function Home() {
             <span className="text-2xl font-semibold text-neutral-900">{t('app.name')}</span>
           </div>
           <div className="flex items-center gap-3">
-            <LanguageToggle />
-            <ThemeToggle />
+            <SimpleThemeToggle />
+            {/* Auth removed: direct users to dashboard instead of sign-in */}
             <Button asChild variant="ghost" className="button-hover">
-              <Link href="/auth/signin">{t('header.login')}</Link>
+              <Link href="/dashboard">{t('header.login')}</Link>
             </Button>
             <Button asChild className="button-hover">
               <Link href="/dashboard">{t('header.dashboard')}</Link>

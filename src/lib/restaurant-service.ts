@@ -1,13 +1,8 @@
 import { getPrisma } from "@/src/lib/db"
 import type { Restaurant, MenuItem } from "@/lib/data"
-// import { mockRestaurants } from "@/lib/data" // Removed mock data usage
-import { env } from "@/src/lib/env"
 
 // Service for restaurant-related operations (Prisma-backed)
 export class RestaurantService {
-  // In-memory store for demo mode
-  private static demoStore: Restaurant[] | null = null
-
   // Provide safe defaults so chatbot always has guidance
   private static defaultChatbotContext(restaurantName?: string) {
     return {
@@ -20,17 +15,9 @@ export class RestaurantService {
     }
   }
 
-  private static ensureDemoStore() {
-    if (!this.demoStore) {
-      // this.demoStore = JSON.parse(JSON.stringify(mockRestaurants)) // Removed mock data usage
-    }
-}
-
   private static async ensureSeeded() {
-    if (env.DEMO_MODE) return
-    const prisma = await getPrisma()
-    const count = await prisma.restaurant.count()
-    if (count > 0) return
+    // No-op: seeding is handled elsewhere when needed.
+    return
   }
 
   private static mapPrismaToRestaurant(p: any): Restaurant {
@@ -69,18 +56,12 @@ export class RestaurantService {
         whatsappPhoneNumberId: p.whatsappPhoneNumberId ?? "",
         webhookVerifyToken: "", // intentionally not exposing tokens via API
       },
-      apiKey: "",
       createdAt: new Date(),
       updatedAt: new Date(),
     }
   }
 
   static async getRestaurantByPhoneNumber(phoneNumberId: string): Promise<Restaurant | null> {
-    if (env.DEMO_MODE) {
-      this.ensureDemoStore()
-      const found = this.demoStore!.find((r) => r.apiCredentials?.whatsappPhoneNumberId === phoneNumberId) || this.demoStore![0]
-      return found || null
-    }
     await this.ensureSeeded()
     const prisma = await getPrisma()
     const p = await prisma.restaurant.findFirst({
@@ -88,16 +69,10 @@ export class RestaurantService {
       include: { menuItems: true },
     })
     if (p) return this.mapPrismaToRestaurant(p)
-
-    const anyR = await prisma.restaurant.findFirst({ include: { menuItems: true } })
-    return anyR ? this.mapPrismaToRestaurant(anyR) : null
+    return null
   }
 
   static async getRestaurantById(id: string): Promise<Restaurant | null> {
-    if (env.DEMO_MODE) {
-      this.ensureDemoStore()
-      return this.demoStore!.find((r) => r.id === id) || null
-    }
     await this.ensureSeeded()
     const prisma = await getPrisma()
     const p = await prisma.restaurant.findUnique({ where: { id }, include: { menuItems: true } })
@@ -105,10 +80,6 @@ export class RestaurantService {
   }
 
   static async getAllRestaurants(): Promise<Restaurant[]> {
-    if (env.DEMO_MODE) {
-      this.ensureDemoStore()
-      return this.demoStore as Restaurant[]
-    }
     await this.ensureSeeded()
     const prisma = await getPrisma()
     const list = await prisma.restaurant.findMany({ include: { menuItems: true } })
@@ -116,19 +87,6 @@ export class RestaurantService {
   }
 
   static async updateRestaurant(id: string, updates: Partial<Restaurant>): Promise<boolean> {
-    if (env.DEMO_MODE) {
-      this.ensureDemoStore()
-      const idx = this.demoStore!.findIndex((r) => r.id === id)
-      if (idx >= 0) {
-        this.demoStore![idx] = {
-          ...this.demoStore![idx],
-          ...updates,
-          chatbotContext: { ...this.demoStore![idx].chatbotContext, ...(updates.chatbotContext || {}) },
-        }
-        return true
-      }
-      return false
-    }
     await this.ensureSeeded()
     const prisma = await getPrisma()
     await prisma.restaurant.update({
@@ -155,19 +113,7 @@ export class RestaurantService {
     return true
   }
 
-  static async createRestaurant(restaurantData: Omit<Restaurant, "id" | "apiKey" | "createdAt" | "updatedAt">): Promise<Restaurant> {
-    if (env.DEMO_MODE) {
-      this.ensureDemoStore()
-      const newRestaurant: Restaurant = {
-        ...restaurantData,
-        id: `restaurant_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`,
-        apiKey: "", // API key not persisted on server side in demo
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      }
-      this.demoStore!.push(newRestaurant)
-      return newRestaurant
-    }
+  static async createRestaurant(restaurantData: Omit<Restaurant, "id" | "createdAt" | "updatedAt">): Promise<Restaurant> {
     await this.ensureSeeded()
     const prisma = await getPrisma()
     const createdPrismaRestaurant = await prisma.restaurant.create({
@@ -180,6 +126,8 @@ export class RestaurantService {
         whatsappAccessToken: restaurantData.apiCredentials?.whatsappAccessToken || "",
         whatsappAppSecret: (restaurantData as any)?.apiCredentials?.whatsappAppSecret || "",
         webhookVerifyToken: restaurantData.apiCredentials?.webhookVerifyToken || "",
+        // Fallback owner in absence of auth: seed/admin user
+        userId: (restaurantData as any)?.userId || "seed-admin",
         supportedLanguages: restaurantData.supportedLanguages || [],
         isActive: restaurantData.isActive ?? true,
         isConcierge: restaurantData.isConcierge ?? false,
@@ -202,4 +150,6 @@ export class RestaurantService {
     })
     return this.mapPrismaToRestaurant(createdPrismaRestaurant)
   }
+
+  // API key functionality handled via dedicated API routes
 }

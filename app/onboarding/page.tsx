@@ -9,10 +9,9 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Upload, CheckCircle2, MessageSquare, Store, QrCode } from "lucide-react"
 import { type Restaurant } from "@/lib/data"
-import { generateApiKey, autoDetectMenuFromString } from "@/src/lib/data-utils"
+import { autoDetectMenuFromString } from "@/src/lib/data-utils"
 import { useToast } from "@/hooks/use-toast"
 // Removed AIClientBrowser mock usage; parse JSON locally
 
@@ -24,7 +23,8 @@ export default function OnboardingPage() {
   // Step 1 – Basic info
   const [name, setName] = useState("")
   const [description, setDescription] = useState("")
-  const [language, setLanguage] = useState("en")
+  // Default English; language selection removed
+  const language = "en"
 
   // Step 2 – Menu upload
   const [menuRaw, setMenuRaw] = useState("")
@@ -183,18 +183,7 @@ export default function OnboardingPage() {
                 <Label htmlFor="desc">Description</Label>
                 <Textarea id="desc" rows={3} value={description} onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setDescription(e.target.value)} placeholder="Authentic Senegalese cuisine"/>
               </div>
-              <div className="space-y-2">
-                <Label>Default Language</Label>
-                <Select value={language} onValueChange={(v: string) => setLanguage(v)}>
-                  <SelectTrigger className="w-[220px]"><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="en">English</SelectItem>
-                    <SelectItem value="fr">French</SelectItem>
-                    <SelectItem value="wo">Wolof</SelectItem>
-                    <SelectItem value="ar">Arabic</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+              {/* Language selection removed; default to English */}
               <div className="flex justify-end gap-2">
                 <Button onClick={next} disabled={!name.trim()}>Continue</Button>
               </div>

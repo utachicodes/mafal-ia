@@ -3,16 +3,14 @@
 import type React from "react"
 import { createContext, useContext, useState, useCallback, useEffect } from "react"
 import { type Restaurant } from "@/lib/data"
-import { generateApiKey } from "@/src/lib/data-utils"
 import { LocalStorage } from "@/src/lib/storage"
 
 interface RestaurantsContextType {
   restaurants: Restaurant[]
-  addRestaurant: (restaurant: Omit<Restaurant, "id" | "apiKey" | "createdAt" | "updatedAt">) => string
+  addRestaurant: (restaurant: Omit<Restaurant, "id" | "createdAt" | "updatedAt">) => Promise<string>
   updateRestaurant: (id: string, updates: Partial<Restaurant>) => void
   deleteRestaurant: (id: string) => void
   getRestaurantById: (id: string) => Restaurant | undefined
-  regenerateApiKey: (id: string) => void
   isLoading: boolean
 }
 
@@ -48,13 +46,12 @@ export function RestaurantsProvider({ children }: { children: React.ReactNode })
 
 
 
-  const addRestaurant = useCallback(async (restaurantData: Omit<Restaurant, "id" | "apiKey" | "createdAt" | "updatedAt">) => {
+  const addRestaurant = useCallback(async (restaurantData: Omit<Restaurant, "id" | "createdAt" | "updatedAt">) => {
     const newRestaurant: Restaurant = {
       ...restaurantData,
       // Ensure `menu` is initialized even if upstream provided `menuItems`
       menu: (restaurantData as any).menu ?? (restaurantData as any).menuItems ?? [],
       id: `restaurant_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`, // Temporary ID
-      apiKey: generateApiKey(restaurantData.name),
       createdAt: new Date(),
       updatedAt: new Date(),
     }
@@ -100,17 +97,6 @@ export function RestaurantsProvider({ children }: { children: React.ReactNode })
     [restaurants],
   )
 
-  const regenerateApiKey = useCallback(
-    (id: string) => {
-      const restaurant = restaurants.find((r) => r.id === id)
-      if (restaurant) {
-        const newApiKey = generateApiKey(restaurant.name)
-        updateRestaurant(id, { apiKey: newApiKey })
-      }
-    },
-    [restaurants, updateRestaurant],
-  )
-
   return (
     <RestaurantsContext.Provider
       value={{
@@ -119,7 +105,6 @@ export function RestaurantsProvider({ children }: { children: React.ReactNode })
         updateRestaurant,
         deleteRestaurant,
         getRestaurantById,
-        regenerateApiKey,
         isLoading,
       }}
     >

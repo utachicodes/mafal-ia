@@ -6,9 +6,12 @@ export class TestUtils {
       id: "test-restaurant-1",
       name: "Test Restaurant",
       description: "A test restaurant for integration testing",
-      apiKey: "test_api_key_123",
-      context: "We are a test restaurant open 24/7 for testing purposes.",
-      menuItems: [
+      cuisine: "Test",
+      whatsappNumber: "+221123456789",
+      supportedLanguages: ["English"],
+      isActive: true,
+      isConcierge: false,
+      menu: [
         {
           id: "test-item-1",
           name: "Test Burger",
@@ -26,6 +29,18 @@ export class TestUtils {
           isAvailable: true,
         },
       ],
+      chatbotContext: {
+        welcomeMessage: "Welcome to Test Restaurant!",
+        businessHours: "",
+        specialInstructions: "",
+        orderingEnabled: true,
+        deliveryInfo: "",
+      },
+      apiCredentials: {
+        whatsappAccessToken: "",
+        whatsappPhoneNumberId: "",
+        webhookVerifyToken: "",
+      },
       createdAt: new Date("2024-01-01"),
       updatedAt: new Date("2024-01-01"),
       ...overrides,
@@ -91,7 +106,7 @@ export class TestUtils {
 
   // Validate restaurant data structure
   static validateRestaurant(restaurant: any): boolean {
-    const requiredFields = ["id", "name", "description", "apiKey", "context", "menuItems"]
+    const requiredFields = ["id", "name", "description", "menu", "chatbotContext", "apiCredentials"]
     return requiredFields.every((field) => restaurant.hasOwnProperty(field))
   }
 
