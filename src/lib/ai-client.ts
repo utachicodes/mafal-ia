@@ -35,8 +35,18 @@ export class AIClient {
       })
       return result as any
     } catch (error) {
-      console.error("Error generating AI response:", error)
-      throw new Error("Failed to generate response")
+      // Fallback: return a lightweight heuristic response so WhatsApp keeps working
+      console.warn("[AIClient] Genkit flow unavailable, using fallback response:", error)
+      const lastUser = [...messages].reverse().find((m) => m.role === "user")
+      const sample = menuItems.slice(0, 3).map((m) => `${m.name} (${m.price} CFA)`).join(", ")
+      return {
+        response:
+          lastUser?.content?.toLowerCase().includes("menu") || lastUser?.content?.toLowerCase().includes("price")
+            ? `Welcome to ${restaurantName}! Here are a few items: ${sample}.`
+            : `Noo ngi fi pour jàppal! (${restaurantName})\n${restaurantContext?.slice(0, 200)}`,
+        detectedLanguage: "auto",
+        usedTools: [],
+      }
     }
   }
 

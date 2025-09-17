@@ -7,10 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-// No mock client; we require a valid API key and always call server-backed Gemini
-import type { ChatMessage, Restaurant } from "@/lib/data"
-// import { mockRestaurants } from "@/lib/data" // Removed mock data usage
-import { LocalStorage } from "@/src/lib/storage"
+import type { ChatMessage } from "@/lib/data"
+import { useRestaurants } from "@/src/hooks/use-restaurants"
 import { cn } from "@/lib/utils"
 
 // Helper to remove markdown bold while preserving bullets
@@ -66,33 +64,14 @@ function SearchSelectInitializer({
 }
 
 export default function PlaygroundPage() {
-  const [restaurants, setRestaurants] = useState<Restaurant[]>([])
-  const [isLoading, setIsLoading] = useState(true)
+  const { restaurants, isLoading } = useRestaurants()
   const [selectedRestaurantId, setSelectedRestaurantId] = useState<string>("")
   const [input, setInput] = useState("")
   const [isSending, setIsSending] = useState(false)
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const bottomRef = useRef<HTMLDivElement | null>(null)
   
-  useEffect(() => {
-    const loadData = () => {
-      const stored = LocalStorage.loadRestaurants()
-      if (stored && stored.length > 0) {
-        setRestaurants(stored as Restaurant[])
-      } else {
-        // setRestaurants(mockRestaurants) // Removed mock data usage
-      }
-      setIsLoading(false)
-    }
 
-    loadData()
-  }, [])
-
-  // API key gate state
-  const [apiKey, setApiKey] = useState("")
-  const [validatingKey, setValidatingKey] = useState(false)
-  const [keyError, setKeyError] = useState<string>("")
-  const [hasValidKey, setHasValidKey] = useState<boolean>(false)
   const [globalError, setGlobalError] = useState<string>("")
 
   useEffect(() => {
@@ -118,70 +97,10 @@ export default function PlaygroundPage() {
     }
   }, [restaurant?.id])
 
-  // Load any stored key on mount
-  useEffect(() => {
-    if (typeof window === "undefined") return
-    const saved = localStorage.getItem("gemini_api_key") || ""
-    if (saved) {
-      setApiKey(saved)
-      // Optimistically mark as valid; we will re-validate on first send if needed
-      setHasValidKey(true)
-    }
-  }, [])
-
-  // Probe if server has a default API key configured; if yes, we can skip the prompt
-  useEffect(() => {
-    ;(async () => {
-      if (hasValidKey) return
-      try {
-        const res = await fetch("/api/ai/validate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({}) })
-        const data = await res.json().catch(() => ({}))
-        if (res.ok && data?.ok) {
-          setHasValidKey(true)
-          setKeyError("")
-        }
-      } catch (_) {
-        // ignore; prompt will remain
-      }
-    })()
-  }, [hasValidKey])
-
-  async function validateAndSaveKey() {
-    setKeyError("")
-    setValidatingKey(true)
-    try {
-      const res = await fetch("/api/ai/validate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ apiKey, model: "models/gemini-1.5-flash" }),
-      })
-      const data = await res.json()
-      if (!data?.ok) {
-        throw new Error(data?.error || "Invalid API key")
-      }
-      if (typeof window !== "undefined") localStorage.setItem("gemini_api_key", apiKey)
-      setHasValidKey(true)
-      setGlobalError("")
-    } catch (e: any) {
-      setKeyError(e?.message || "Failed to validate API key")
-      setHasValidKey(false)
-    } finally {
-      setValidatingKey(false)
-    }
-  }
-
-  function clearStoredKey() {
-    if (typeof window !== "undefined") localStorage.removeItem("gemini_api_key")
-    setApiKey("")
-    setHasValidKey(false)
-  }
+  // No API key gating; server handles model access.
 
   const send = async () => {
     if (!input.trim() || !restaurant) return
-    if (!hasValidKey) {
-      setGlobalError("API key required. Click 'Change Key' to enter a valid key.")
-      return
-    }
     const userMsg: ChatMessage = { id: "u_" + Date.now(), role: "user", content: input.trim(), timestamp: new Date() }
     setMessages((prev) => [...prev, userMsg])
     setInput("")
@@ -192,7 +111,6 @@ export default function PlaygroundPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          ...(apiKey?.trim() ? { apiKey } : {}),
           model: "models/gemini-1.5-flash",
           messages: [...messages, userMsg].map((m) => ({ role: m.role, content: m.content })),
           restaurantContext: buildRestaurantContext(restaurant),
@@ -226,41 +144,7 @@ export default function PlaygroundPage() {
     }
   }
 
-  // If no valid key, prompt for it first
-  if (!isLoading && !hasValidKey) {
-    return (
-      <DashboardLayout>
-        <div className="max-w-xl mx-auto py-12">
-          <Card>
-            <CardHeader>
-              <CardTitle>Enter Gemini API Key</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground mb-4">
-                Provide your Google Gemini API key to enable the server-backed assistant. Your key is stored locally in
-                your browser and used only for requests from this page.
-              </p>
-              <div className="flex gap-2">
-                <Input
-                  type="password"
-                  value={apiKey}
-                  onChange={(e) => setApiKey(e.target.value)}
-                  placeholder="AIza..."
-                />
-                <Button onClick={validateAndSaveKey} disabled={validatingKey || !apiKey.trim()}>
-                  {validatingKey ? "Validating..." : "Save & Continue"}
-                </Button>
-              </div>
-              {keyError ? <div className="text-sm text-red-600 mt-2">{keyError}</div> : null}
-              <div className="text-xs text-muted-foreground mt-3">
-                Tip: You can clear or change the key anytime by refreshing and re-entering it.
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </DashboardLayout>
-    )
-  }
+  // No API key prompt; proceed with restaurants only.
 
   if (isLoading) {
     return (
@@ -315,7 +199,6 @@ export default function PlaygroundPage() {
                 ))}
               </SelectContent>
             </Select>
-            <Button variant="outline" size="sm" onClick={clearStoredKey}>Change Key</Button>
           </div>
         </div>
 

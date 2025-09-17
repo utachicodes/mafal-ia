@@ -16,16 +16,13 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Badge } from "@/components/ui/badge"
-import { X } from "lucide-react"
+import { Switch } from "@/components/ui/switch"
+import { Key } from "lucide-react"
 
 interface AddRestaurantDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
 }
-
-const AVAILABLE_LANGUAGES = ["English", "Spanish", "French", "German", "Italian", "Portuguese", "Arabic", "Chinese"]
 
 export function AddRestaurantDialog({ open, onOpenChange }: AddRestaurantDialogProps) {
   const { addRestaurant } = useRestaurants()
@@ -61,8 +58,10 @@ export function AddRestaurantDialog({ open, onOpenChange }: AddRestaurantDialogP
 
     addRestaurant(newRestaurant)
     onOpenChange(false)
+    resetForm()
+  }
 
-    // Reset form
+  const resetForm = () => {
     setFormData({
       name: "",
       description: "",
@@ -70,22 +69,6 @@ export function AddRestaurantDialog({ open, onOpenChange }: AddRestaurantDialogP
       whatsappNumber: "",
       supportedLanguages: ["English"],
     })
-  }
-
-  const addLanguage = (language: string) => {
-    if (!formData.supportedLanguages.includes(language)) {
-      setFormData((prev) => ({
-        ...prev,
-        supportedLanguages: [...prev.supportedLanguages, language],
-      }))
-    }
-  }
-
-  const removeLanguage = (language: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      supportedLanguages: prev.supportedLanguages.filter((lang) => lang !== language),
-    }))
   }
 
   return (
@@ -141,34 +124,8 @@ export function AddRestaurantDialog({ open, onOpenChange }: AddRestaurantDialogP
             />
           </div>
 
-          <div className="space-y-2">
-            <Label>Supported Languages</Label>
-            <Select onValueChange={addLanguage}>
-              <SelectTrigger>
-                <SelectValue placeholder="Add a language" />
-              </SelectTrigger>
-              <SelectContent>
-                {AVAILABLE_LANGUAGES.filter((lang) => !formData.supportedLanguages.includes(lang)).map((language) => (
-                  <SelectItem key={language} value={language}>
-                    {language}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <div className="flex flex-wrap gap-2 mt-2">
-              {formData.supportedLanguages.map((language) => (
-                <Badge key={language} variant="secondary" className="flex items-center gap-1">
-                  {language}
-                  {language !== "English" && (
-                    <X className="w-3 h-3 cursor-pointer" onClick={() => removeLanguage(language)} />
-                  )}
-                </Badge>
-              ))}
-            </div>
-          </div>
-
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+            <Button type="button" variant="outline" onClick={() => { onOpenChange(false); resetForm(); }}>
               Cancel
             </Button>
             <Button type="submit" className="bg-red-600 hover:bg-red-700">

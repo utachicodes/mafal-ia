@@ -9,10 +9,10 @@ export function validateRestaurant(restaurant: Partial<Restaurant>): restaurant 
   return !!(
     restaurant.id &&
     restaurant.name &&
-    restaurant.description &&
-    restaurant.apiKey &&
-    restaurant.context &&
-    Array.isArray(restaurant.menuItems) &&
+    typeof restaurant.description === "string" &&
+    Array.isArray(restaurant.menu) &&
+    restaurant.chatbotContext &&
+    restaurant.apiCredentials &&
     restaurant.createdAt &&
     restaurant.updatedAt
   )
@@ -224,14 +224,6 @@ export function formatDate(date: Date): string {
   }).format(date)
 }
 
-// API key generation
-export function generateApiKey(restaurantName: string): string {
-  const timestamp = Date.now()
-  const randomSuffix = Math.random().toString(36).substring(2, 8)
-  const cleanName = restaurantName.toLowerCase().replace(/[^a-z0-9]/g, "_")
-  return `mafal_${cleanName}_${timestamp}_${randomSuffix}`
-}
-
 // Menu item utilities
 export function createMenuItem(name: string, description: string, price: number, category?: string): MenuItem {
   return {
@@ -241,22 +233,6 @@ export function createMenuItem(name: string, description: string, price: number,
     price: Math.max(0, price),
     category: category?.trim(),
     isAvailable: true,
-  }
-}
-
-// Restaurant utilities
-export function createRestaurant(
-  name: string,
-  description: string,
-  context = "",
-): Omit<Restaurant, "id" | "apiKey" | "createdAt" | "updatedAt"> {
-  return {
-    name: name.trim(),
-    description: description.trim(),
-    context:
-      context.trim() ||
-      `We are ${name.trim()}, a restaurant serving delicious food. We are open daily and offer both dine-in and takeaway options.`,
-    menuItems: [],
   }
 }
 

@@ -1,7 +1,6 @@
 "use client"
 
 import { createContext, useContext, useEffect, useState } from "react"
-import { useUser as useStackUser } from "@stackframe/stack"
 
 interface User {
   id: string
@@ -19,38 +18,19 @@ interface UserContextType {
 const UserContext = createContext<UserContextType | undefined>(undefined)
 
 export function UserProvider({ children }: { children: React.ReactNode }) {
-  const stackUser = useStackUser()
   const [user, setUser] = useState<User | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(false)
 
   const refreshUser = async () => {
-    if (stackUser?.primaryEmail) {
-      try {
-        const response = await fetch("/api/user/profile")
-        if (response.ok) {
-          const userData = await response.json()
-          setUser(userData)
-        }
-      } catch (error) {
-        console.error("Failed to fetch user data:", error)
-      }
-    }
+    // No-op: auth removed
+    setUser(null)
   }
 
   useEffect(() => {
-    if (stackUser) {
-      setUser({
-        id: stackUser.id,
-        name: stackUser.displayName,
-        email: stackUser.primaryEmail || "",
-        role: "user" // Default role, can be customized based on your needs
-      })
-      setIsLoading(false)
-    } else {
-      setUser(null)
-      setIsLoading(false)
-    }
-  }, [stackUser])
+    // Ensure stable defaults in client-only provider
+    setUser(null)
+    setIsLoading(false)
+  }, [])
 
   return (
     <UserContext.Provider value={{ user, isLoading, refreshUser }}>

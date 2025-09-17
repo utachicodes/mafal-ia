@@ -1,15 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getPrisma } from "@/src/lib/db";
-import { stackServerApp } from "@/src/stack";
 
 export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const user = await stackServerApp.getUser();
-    if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
     const prisma = await getPrisma();
     const restaurant = await prisma.restaurant.findFirst({
-      where: { id: params.id, userId: user.id },
+      where: { id: params.id },
       select: { webhookVerifyToken: true },
     });
     if (!restaurant) return NextResponse.json({ error: "Restaurant not found" }, { status: 404 });

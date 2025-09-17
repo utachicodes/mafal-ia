@@ -36,11 +36,7 @@ export function ChatbotLiveView({ restaurant }: ChatbotLiveViewProps) {
   const [error, setError] = useState<string | null>(null)
   const scrollAreaRef = useRef<HTMLDivElement>(null)
 
-  // Gemini API key gate
-  const [apiKey, setApiKey] = useState("")
-  const [hasValidKey, setHasValidKey] = useState(false)
-  const [validatingKey, setValidatingKey] = useState(false)
-  const [keyError, setKeyError] = useState("")
+  // No API key gate
 
   // Auto-scroll to bottom when new messages are added
   useEffect(() => {
@@ -52,71 +48,12 @@ export function ChatbotLiveView({ restaurant }: ChatbotLiveViewProps) {
     }
   }, [messages])
 
-  // Load stored key on mount
-  useEffect(() => {
-    if (typeof window === "undefined") return
-    const saved = localStorage.getItem("gemini_api_key") || ""
-    if (saved) {
-      setApiKey(saved)
-      setHasValidKey(true)
-    }
-  }, [])
-
-  // Probe if server has a default API key configured to skip prompt when possible
-  useEffect(() => {
-    ;(async () => {
-      if (hasValidKey) return
-      try {
-        const res = await fetch("/api/ai/validate", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({}),
-        })
-        const data = await res.json().catch(() => ({}))
-        if (res.ok && data?.ok) {
-          setHasValidKey(true)
-          setKeyError("")
-        }
-      } catch (_) {
-        // leave gate visible
-      }
-    })()
-  }, [hasValidKey])
-
-  async function validateAndSaveKey() {
-    setKeyError("")
-    setValidatingKey(true)
-    try {
-      const res = await fetch("/api/ai/validate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ apiKey, model: "models/gemini-1.5-flash" }),
-      })
-      const data = await res.json()
-      if (!data?.ok) throw new Error(data?.error || "Invalid API key")
-      if (typeof window !== "undefined") localStorage.setItem("gemini_api_key", apiKey)
-      setHasValidKey(true)
-    } catch (e: any) {
-      setKeyError(e?.message || "Failed to validate API key")
-      setHasValidKey(false)
-    } finally {
-      setValidatingKey(false)
-    }
-  }
-
-  function clearStoredKey() {
-    if (typeof window !== "undefined") localStorage.removeItem("gemini_api_key")
-    setApiKey("")
-    setHasValidKey(false)
-  }
+  // No API key storage/validation
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!inputMessage.trim() || isLoading) return
-    if (!hasValidKey) {
-      setError("API key required. Click 'Change Key' to enter a valid key.")
-      return
-    }
+    // No API key gate
 
     const userMessage: ExtendedChatMessage = {
       id: `user_${Date.now()}`,
@@ -144,7 +81,6 @@ export function ChatbotLiveView({ restaurant }: ChatbotLiveViewProps) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          ...(apiKey?.trim() ? { apiKey } : {}),
           model: "models/gemini-1.5-flash",
           messages: [...messages, userMessage].map((m) => ({ role: m.role, content: m.content })),
           restaurantContext: contextText,
@@ -240,32 +176,7 @@ export function ChatbotLiveView({ restaurant }: ChatbotLiveViewProps) {
       </Card>
 
       {/* Chat Interface */}
-      {/* If key not present, show gate */}
-      {!hasValidKey ? (
-        <Card>
-          <CardHeader>
-            <CardTitle>Enter Gemini API Key</CardTitle>
-            <CardDescription>
-              Provide your Google Gemini API key to enable real AI responses. Stored locally in your browser.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex gap-2">
-              <Input
-                type="password"
-                value={apiKey}
-                onChange={(e) => setApiKey(e.target.value)}
-                placeholder="AIza..."
-              />
-              <Button onClick={validateAndSaveKey} disabled={validatingKey || !apiKey.trim()}>
-                {validatingKey ? "Validating..." : "Save & Continue"}
-              </Button>
-            </div>
-            {keyError ? <div className="text-sm text-red-600 mt-2">{keyError}</div> : null}
-          </CardContent>
-        </Card>
-      ) : (
-        <Card className="h-[600px] flex flex-col">
+      <Card className="h-[600px] flex flex-col">
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
@@ -279,9 +190,6 @@ export function ChatbotLiveView({ restaurant }: ChatbotLiveViewProps) {
                 <Button variant="outline" size="sm" onClick={handleClearChat} disabled={isLoading}>
                   <Trash2 className="h-4 w-4 mr-1" />
                   Clear
-                </Button>
-                <Button variant="outline" size="sm" onClick={clearStoredKey} disabled={isLoading}>
-                  Change Key
                 </Button>
               </div>
             </div>
@@ -397,7 +305,6 @@ export function ChatbotLiveView({ restaurant }: ChatbotLiveViewProps) {
           </form>
         </CardContent>
       </Card>
-      )}
 
       {/* Chat Statistics */}
       <Card>

@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server"
 import { RestaurantService } from "@/src/lib/restaurant-service"
-import { stackServerApp } from "@/src/stack"
 import { getPrisma } from "@/src/lib/db"
 
 export async function GET(req: Request, { params }: { params: { id: string } }) {
@@ -16,13 +15,9 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
 
 export async function PATCH(req: Request, { params }: { params: { id: string } }) {
   try {
-    // Auth: only owner can update the restaurant
-    const user = await stackServerApp.getUser()
-    if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     const prisma = await getPrisma()
     const existing = await prisma.restaurant.findUnique({ where: { id: params.id }, select: { userId: true, whatsappPhoneNumberId: true, webhookVerifyToken: true, whatsappAppSecret: true } })
     if (!existing) return NextResponse.json({ error: "Restaurant not found" }, { status: 404 })
-    if (existing.userId && existing.userId !== user.id) return NextResponse.json({ error: "Forbidden" }, { status: 403 })
 
     const id = params.id
     const body = await req.json()

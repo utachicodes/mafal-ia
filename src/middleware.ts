@@ -1,15 +1,15 @@
-import { withAuth } from "next-auth/middleware"
+import { NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server'
 
-export default withAuth({
-  pages: {
-    signIn: "/auth/signin",
-  },
-})
+export function middleware(request: NextRequest) {
+  // No authentication - allow all requests
+  return NextResponse.next()
+}
 
 export const config = {
   matcher: [
     "/dashboard/:path*",
-    "/restaurants/:path*",
+    "/restaurants/:path*", 
     "/orders/:path*",
     "/analytics/:path*",
     "/settings/:path*",
