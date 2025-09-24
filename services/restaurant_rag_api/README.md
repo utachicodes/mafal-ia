@@ -4,12 +4,12 @@ A FastAPI-powered microservice that provides RAG (Retrieval-Augmented Generation
 
 ## Features
 
-- 🔑 **API Key Authentication** - Each restaurant gets a unique API key
-- 🤖 **RAG Pipeline** - Uses OpenAI embeddings and ChatGPT for contextual responses
-- 📝 **Menu-Based Responses** - Only answers based on restaurant's specific menu and info
-- 🚀 **FastAPI Framework** - High-performance async API
-- 🔍 **Vector Search** - ChromaDB for semantic similarity search
-- 📊 **Restaurant Management** - CRUD operations for restaurants
+- **API Key Authentication** - Each restaurant gets a unique API key
+- **RAG Pipeline** - Uses OpenAI embeddings and ChatGPT for contextual responses
+- **Menu-Based Responses** - Only answers based on restaurant's specific menu and info
+- **FastAPI Framework** - High-performance async API
+- **Vector Search** - ChromaDB for semantic similarity search
+- **Restaurant Management** - CRUD operations for restaurants
 
 ## Setup
 
