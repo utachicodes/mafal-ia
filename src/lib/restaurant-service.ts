@@ -1,5 +1,6 @@
-import { getPrisma } from "@/src/lib/db"
-import type { Restaurant, MenuItem } from "@/lib/data"
+import { getPrisma } from "@/src/lib/db";
+import type { Restaurant, MenuItem } from "@/lib/data";
+import crypto from "crypto";
 
 // Service for restaurant-related operations (Prisma-backed)
 export class RestaurantService {
@@ -149,6 +150,22 @@ export class RestaurantService {
       include: { menuItems: true },
     })
     return this.mapPrismaToRestaurant(createdPrismaRestaurant)
+  }
+
+  static async getRestaurantByApiKey(apiKey: string): Promise<Restaurant | null> {
+    const prisma = await getPrisma();
+    const apiKeyHash = crypto.createHash('sha256').update(apiKey).digest('hex');
+
+    const p = await prisma.restaurant.findFirst({
+      where: {
+        apiKeyHash,
+        apiKeyRevokedAt: null,
+      },
+      include: { menuItems: true },
+    });
+
+    if (p) return this.mapPrismaToRestaurant(p);
+    return null;
   }
 
   // API key functionality handled via dedicated API routes
