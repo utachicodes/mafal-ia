@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent } from "@/components/ui/sheet"
-import { Menu, Home, Store, BarChart3, Settings, MessageSquare, Key } from "lucide-react"
+import { Menu, Home, Store, BarChart3, Settings, MessageSquare, Key, Layers, PanelLeftOpen, PanelLeftClose } from "lucide-react"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
 import { Logo } from "./logo"
@@ -29,6 +29,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: Home },
+  { name: "Tools", href: "/dashboard/tools", icon: Layers },
   { name: "Orders", href: "/orders", icon: BarChart3 },
   { name: "Analytics", href: "/analytics", icon: BarChart3 },
   { name: "Restaurants", href: "/restaurants", icon: Store },
@@ -43,6 +44,7 @@ interface DashboardLayoutProps {
 
 const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [collapsed, setCollapsed] = useState(false)
   const [isMounted, setIsMounted] = useState(false)
   const pathname = usePathname()
   
@@ -86,7 +88,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
               onClick={() => setSidebarOpen(false)}
             >
               <Icon className={cn("h-4 w-4 transition-transform duration-200", isActive ? "scale-105" : "group-hover:scale-105")} />
-              <span className="truncate">{item.name}</span>
+              {!collapsed && <span className="truncate">{item.name}</span>}
             </Link>
           )
         })}
@@ -107,7 +109,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   return (
     <div className="flex h-screen bg-background">
       {/* Desktop Sidebar */}
-      <div className="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0">
+      <div className={cn("hidden md:flex md:flex-col md:fixed md:inset-y-0 transition-all", collapsed ? "md:w-16" : "md:w-64")}>
         <div className="flex flex-col flex-grow border-r bg-card/80 backdrop-blur supports-[backdrop-filter]:bg-card/70">
           <SidebarContent />
         </div>
@@ -121,12 +123,17 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
       </Sheet>
 
       {/* Main content */}
-      <div className="flex-1 flex flex-col overflow-hidden md:pl-64">
+      <div className={cn("flex-1 flex flex-col overflow-hidden transition-all", collapsed ? "md:pl-16" : "md:pl-64")}>
         {/* Top bar */}
         <div className="h-16 border-b bg-card/60 backdrop-blur flex items-center px-4 sticky top-0 z-10">
           <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setSidebarOpen(true)}>
             <Menu className="h-5 w-5" />
           </Button>
+          <div className="ml-2 hidden md:flex">
+            <Button variant="ghost" size="icon" onClick={() => setCollapsed(!collapsed)} aria-label="Toggle sidebar">
+              {collapsed ? <PanelLeftOpen className="h-5 w-5" /> : <PanelLeftClose className="h-5 w-5" />}
+            </Button>
+          </div>
           <div className="ml-auto flex items-center gap-3">
             <SimpleThemeToggle />
             <DropdownMenu>

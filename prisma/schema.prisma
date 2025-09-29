@@ -1,10 +1,9 @@
 // Prisma schema for Mafal-IA
-// Neon (PostgreSQL). Set DATABASE_URL to the pooled connection string and DIRECT_URL to the direct connection string.
+// Local development uses SQLite. For production, change provider to postgresql and set env URLs.
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider = "sqlite"
+  url      = "file:./dev.db"
 }
 
 generator client {
@@ -49,7 +48,7 @@ model Restaurant {
   deliveryInfo           String      @default("")
 
   // API key (production): store ONLY the hash of the key
-  apiKeyHash             String?     @db.VarChar(128)
+  apiKeyHash             String?
   apiKeyCreatedAt        DateTime?
   apiKeyRevokedAt        DateTime?
 
