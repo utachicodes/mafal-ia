@@ -14,6 +14,8 @@
 
 Mafal-IA is a B2B, API-first platform for restaurants. You pay for the service, we provide the WhatsApp AI API and a simple dashboard. Plug it into your existing workflows to answer customers, share menus, and calculate orders automatically.
 
+> Quickstart: see `docs/QUICKSTART.md` for setup, creating a restaurant, and calling your chatbot endpoint (RAG-based retrieval).
+
 ## Webhook & LAM Quick Setup
 
 Follow these steps to connect your WhatsApp provider in under 2 minutes.
