@@ -8,11 +8,9 @@ import chromadb
 from chromadb.utils import embedding_functions
 from fastapi import UploadFile
 from pypdf import PdfReader
-from openai import OpenAI
+import google.generativeai as genai
 
-# Simple text splitter
 def split_text(text: str, chunk_size: int = 900, chunk_overlap: int = 150) -> List[str]:
-    """Heuristic splitter: paragraph -> sentence -> fixed window fallback."""
     text = text.replace("\r\n", "\n").strip()
     if not text:
         return []
@@ -20,7 +18,6 @@ def split_text(text: str, chunk_size: int = 900, chunk_overlap: int = 150) -> Li
     paras = [p.strip() for p in text.split("\n\n") if p.strip()]
     sentences: List[str] = []
     for p in paras:
-        # naive sentence split
         parts = []
         buff = ""
         for ch in p:
@@ -40,9 +37,7 @@ def split_text(text: str, chunk_size: int = 900, chunk_overlap: int = 150) -> Li
         else:
             if cur:
                 chunks.append(cur)
-            # start new
             if len(s) > chunk_size:
-                # hard wrap overly long sentence
                 i = 0
                 while i < len(s):
                     chunks.append(s[i:i+chunk_size])
@@ -53,7 +48,6 @@ def split_text(text: str, chunk_size: int = 900, chunk_overlap: int = 150) -> Li
     if cur:
         chunks.append(cur)
 
-    # add overlaps
     if chunk_overlap > 0 and len(chunks) > 1:
         overlapped: List[str] = []
         for i, ch in enumerate(chunks):
@@ -73,12 +67,15 @@ class RagEngine:
         os.makedirs(self.persist_dir, exist_ok=True)
         self.client = chromadb.PersistentClient(path=self.persist_dir)
         self.embedder = embedding_functions.SentenceTransformerEmbeddingFunction(model_name=model_name)
-        self.openai_client: OpenAI | None = None
-        if os.getenv("OPENAI_API_KEY"):
+        self.gen_model = None
+        api_key = os.getenv("GEMINI_API_KEY")
+        if api_key:
             try:
-                self.openai_client = OpenAI()
+                genai.configure(api_key=api_key)
+                model_name = os.getenv("GEMINI_MODEL", "gemini-1.5-flash")
+                self.gen_model = genai.GenerativeModel(model_name)
             except Exception:
-                self.openai_client = None
+                self.gen_model = None
 
     def _collection(self, namespace: str):
         return self.client.get_or_create_collection(name=namespace, embedding_function=self.embedder)
@@ -113,24 +110,22 @@ class RagEngine:
         if lower.endswith('.docx'):
             try:
                 from io import BytesIO
-                from docx import Document  # type: ignore
+                from docx import Document
                 doc = Document(BytesIO(content))
                 return "\n".join(p.text for p in doc.paragraphs)
             except Exception:
                 return ""
         if lower.endswith('.html') or lower.endswith('.htm'):
             try:
-                from bs4 import BeautifulSoup  # type: ignore
+                from bs4 import BeautifulSoup
                 html = content.decode('utf-8', errors='ignore')
                 soup = BeautifulSoup(html, 'html.parser')
-                # Remove scripts/styles
                 for t in soup(['script','style']):
                     t.decompose()
                 return soup.get_text('\n', strip=True)
             except Exception:
                 return ""
         else:
-            # Treat as utf-8 text
             try:
                 return content.decode("utf-8", errors="ignore")
             except Exception:
@@ -150,36 +145,24 @@ class RagEngine:
         }
         if with_answer:
             context_text = "\n\n".join(contexts)
-            if answer_mode == "llm" and self.openai_client is not None:
-                try:
-                    answer = self._llm_answer(question, context_text)
-                    response["answer"] = answer
-                except Exception:
-                    response["answer"] = self._simple_answer(question, context_text)
+            if answer_mode == "llm":
+                if self.gen_model is None:
+                    return {"ok": False, "error": "GEMINI_API_KEY not set; cannot generate LLM answers.", "contexts": contexts, "metadatas": metadatas}
+                answer = self._llm_answer(question, context_text)
+                response["answer"] = answer
             else:
-                response["answer"] = self._simple_answer(question, context_text)
+                response["answer"] = context_text[:2000]
         return response
 
     def _simple_answer(self, question: str, context: str) -> str:
-        # Placeholder non-LLM answer: echo most relevant context
-        if not context:
-            return "No context available. Try indexing documents first."
-        return (
-            "Based on the indexed documents, here are the most relevant passages:\n\n"
-            + context[:1200]
-        )
+        return context[:2000]
 
     def _llm_answer(self, question: str, context: str) -> str:
-        if not self.openai_client:
-            return self._simple_answer(question, context)
+        if not self.gen_model:
+            raise RuntimeError("GEMINI_API_KEY not configured")
         prompt = (
-            "You are a helpful assistant. Answer the user's question using ONLY the provided context. "
-            "If the answer isn't in the context, say you don't know succinctly.\n\n"
+            "Answer with information contained only in the provided context. "
             f"Context:\n{context[:6000]}\n\nQuestion: {question}\nAnswer:"
         )
-        chat = self.openai_client.chat.completions.create(
-            model=os.getenv("OPENAI_MODEL", "gpt-4o-mini"),
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0.2,
-        )
-        return chat.choices[0].message.content or ""
+        resp = self.gen_model.generate_content(prompt)
+        return getattr(resp, "text", None) or ""

@@ -12,6 +12,12 @@ export const env = {
     ((process.env.DEMO_MODE ?? "false") === "true" || (process.env.DEMO_MODE ?? "false") === "1") as boolean,
   // Admin token for protecting privileged endpoints like API key management
   ADMIN_API_TOKEN: process.env.ADMIN_API_TOKEN || "",
+  // Optional: LafricaMobile WhatsApp API integration
+  LAM_API_BASE_URL: process.env.LAM_API_BASE_URL || "",
+  LAM_API_KEY: process.env.LAM_API_KEY || "",
+  LAM_SENDER_ID: process.env.LAM_SENDER_ID || "",
+  // Outbound provider: 'lam' | 'meta'
+  OUTBOUND_PROVIDER: (process.env.OUTBOUND_PROVIDER || "lam") as "lam" | "meta",
 } as const
 
 // Validation function to ensure required environment variables are set

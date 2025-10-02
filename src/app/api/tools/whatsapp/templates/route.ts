@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { getPrisma } from "@/src/lib/db"
+import { env } from "@/src/lib/env"
 
 const GRAPH_BASE = "https://graph.facebook.com/v18.0"
 export const runtime = "nodejs"
@@ -15,8 +16,8 @@ export async function GET(req: Request) {
     }
     const prisma = await getPrisma()
     const r = await prisma.restaurant.findUnique({ where: { id: restaurantId }, select: { whatsappAccessToken: true } })
-    const accessToken = r?.whatsappAccessToken
-    if (!accessToken) return NextResponse.json({ error: "Restaurant missing access token" }, { status: 400 })
+    const accessToken = r?.whatsappAccessToken || env.WHATSAPP_ACCESS_TOKEN
+    if (!accessToken) return NextResponse.json({ error: "Missing access token (tenant or env)" }, { status: 400 })
 
     const res = await fetch(`${GRAPH_BASE}/${businessAccountId}/message_templates`, {
       headers: { Authorization: `Bearer ${accessToken}` },
@@ -45,8 +46,9 @@ export async function POST(req: Request) {
 
     const prisma = await getPrisma()
     const r = await prisma.restaurant.findUnique({ where: { id: restaurantId }, select: { whatsappPhoneNumberId: true, whatsappAccessToken: true } })
-    if (!r?.whatsappPhoneNumberId || !r.whatsappAccessToken) {
-      return NextResponse.json({ error: "Restaurant missing WhatsApp credentials" }, { status: 400 })
+    const token = r?.whatsappAccessToken || env.WHATSAPP_ACCESS_TOKEN
+    if (!r?.whatsappPhoneNumberId || !token) {
+      return NextResponse.json({ error: "Missing WhatsApp credentials (phoneNumberId or token)" }, { status: 400 })
     }
 
     const payload = {
@@ -70,7 +72,7 @@ export async function POST(req: Request) {
     const res = await fetch(`${GRAPH_BASE}/${r.whatsappPhoneNumberId}/messages`, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${r.whatsappAccessToken}`,
+        Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(payload),

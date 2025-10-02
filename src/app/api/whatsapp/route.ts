@@ -9,12 +9,30 @@ import { ConversationManager } from "@/src/lib/conversation-manager"
 import { estimateDelivery, formatEstimate } from "@/src/lib/delivery"
 import { OrderService } from "@/src/lib/order-service"
 import { getPrisma } from "@/src/lib/db"
+import { LamClient } from "@/src/lib/lam-client"
 
 export const runtime = "nodejs"
 
 // Helper to strip Markdown bold markers while keeping bullets
 const stripBold = (s: string) => s.replace(/\*\*(.*?)\*\*/g, "$1").replace(/__(.*?)__/g, "$1")
 
+
+async function sendOutboundMessage(
+  businessPhoneNumberId: string,
+  to: string,
+  text: string,
+  tokenOverride?: string,
+) {
+  if (
+    env.OUTBOUND_PROVIDER === "lam" &&
+    env.LAM_API_BASE_URL &&
+    env.LAM_API_KEY &&
+    env.LAM_SENDER_ID
+  ) {
+    return await LamClient.sendMessage({ to, text })
+  }
+  return await WhatsAppClient.sendMessage(businessPhoneNumberId, to, text, tokenOverride)
+}
 
 async function persistMessageLog(entry: {
   restaurantId: string
@@ -155,7 +173,6 @@ export async function POST(request: NextRequest) {
       const { appSecret } = await getTenantSecretsByPhoneId(phoneIdFromBody)
       if (appSecret && appSecret.length > 0) appSecretToUse = appSecret
     }
-
     if (appSecretToUse) {
       const valid = WebhookValidator.validateSignature(rawBody, signature, appSecretToUse)
       if (!valid) {
@@ -168,6 +185,32 @@ export async function POST(request: NextRequest) {
 
     if (!WebhookValidator.validatePayload(body)) {
       console.log("[WhatsApp Webhook] Invalid payload structure")
+      return new NextResponse("OK", { status: 200 })
+    }
+
+    // DEMO MODE: minimal processing without DB/AI — echo back the first inbound text
+    if (env.DEMO_MODE) {
+      try {
+        const change = body?.entry?.[0]?.changes?.[0]?.value
+        const messages = change?.messages
+        const metadata = change?.metadata
+        const firstMsg = Array.isArray(messages) ? messages[0] : null
+        const bpid = metadata?.phone_number_id
+        const from = firstMsg?.from
+        const text = firstMsg?.text?.body || "Hello"
+        if (bpid && from) {
+          const reply = `Echo: ${text}`
+          if (env.LAM_API_BASE_URL && env.LAM_API_KEY && env.LAM_SENDER_ID) {
+            // Send via LafricaMobile API if configured
+            await LamClient.sendMessage({ to: from, text: reply })
+          } else {
+            // Default: send via WhatsApp Graph using our WhatsAppClient
+            await WhatsAppClient.sendMessage(bpid, from, reply)
+          }
+        }
+      } catch (err) {
+        console.warn("[WhatsApp DEMO] Failed to echo message:", err)
+      }
       return new NextResponse("OK", { status: 200 })
     }
 
@@ -276,14 +319,14 @@ async function processIncomingMessage(message: any, contacts: any[], metadata: a
     const restaurant = await RestaurantService.getRestaurantByPhoneNumber(businessPhoneNumberId)
     if (!restaurant) {
       console.error("[WhatsApp] No restaurant found for phone number:", businessPhoneNumberId)
-      await WhatsAppClient.sendMessage(businessPhoneNumberId, phoneNumber, "Sorry, this restaurant is not configured properly. Please contact support.")
+      await sendOutboundMessage(businessPhoneNumberId, phoneNumber, "Sorry, this restaurant is not configured properly. Please contact support.")
       return
     }
 
     if (!restaurant.isActive) {
       console.log("[WhatsApp] Restaurant is inactive:", restaurant.name)
       const tokenOverride = await getAccessTokenForRestaurant(restaurant.id)
-      await WhatsAppClient.sendMessage(
+      await sendOutboundMessage(
         businessPhoneNumberId,
         phoneNumber,
         "Sorry, our chatbot is currently offline. Please contact us directly for assistance.",
@@ -333,7 +376,7 @@ async function processIncomingMessage(message: any, contacts: any[], metadata: a
         } as any)
         ConversationManager.updateMetadata(restaurant.id, phoneNumber, { pendingOrder: undefined })
         const deliveryLine = existingMeta.delivery ? `\n${formatEstimate(existingMeta.delivery)}` : ""
-        await WhatsAppClient.sendMessage(
+        await sendOutboundMessage(
           businessPhoneNumberId,
           phoneNumber,
           `✅ Order confirmed!\nOrder ID: ${order.id}\nTotal: ${order.total} FCFA\nItems: ${pending.itemsSummary}${deliveryLine}`,
@@ -341,7 +384,7 @@ async function processIncomingMessage(message: any, contacts: any[], metadata: a
         )
       } else {
         ConversationManager.updateMetadata(restaurant.id, phoneNumber, { pendingOrder: undefined })
-        await WhatsAppClient.sendMessage(
+        await sendOutboundMessage(
           businessPhoneNumberId,
           phoneNumber,
           "❌ Order canceled. You can send a new order anytime.",
@@ -413,7 +456,7 @@ Ordering Enabled: ${restaurant.chatbotContext.orderingEnabled ? "Yes" : "No"}
 
     // Send response back to WhatsApp with tenant token override if present
     const tokenOverride = await getAccessTokenForRestaurant(restaurant.id)
-    const sendRes = await WhatsAppClient.sendMessage(businessPhoneNumberId, phoneNumber, outbound, tokenOverride)
+    const sendRes = await sendOutboundMessage(businessPhoneNumberId, phoneNumber, outbound, tokenOverride)
     try {
       await persistMessageLog({
         restaurantId: restaurant.id,
@@ -444,7 +487,7 @@ Ordering Enabled: ${restaurant.chatbotContext.orderingEnabled ? "Yes" : "No"}
     try {
       const businessPhoneNumberId = metadata?.phone_number_id
       if (businessPhoneNumberId && message.from) {
-        await WhatsAppClient.sendMessage(
+        await sendOutboundMessage(
           businessPhoneNumberId,
           message.from,
           "Sorry, I'm experiencing technical difficulties. Please try again later.",
@@ -510,7 +553,7 @@ async function processConciergeIncomingMessage(message: any, contacts: any[], me
       orderItems: po.orderItems,
     } as any)
     ConversationManager.updateMetadata(CONCIERGE_ID, phoneNumber, { conciergePendingOrder: undefined })
-    await WhatsAppClient.sendMessage(
+    await sendOutboundMessage(
       businessPhoneNumberId,
       phoneNumber,
       `✅ Order sent to ${po.restaurantName}!\nOrder ID: ${order.id}\nTotal: ${order.total} FCFA`,
@@ -519,7 +562,7 @@ async function processConciergeIncomingMessage(message: any, contacts: any[], me
   }
   if (meta.conciergePendingOrder && ["no", "n", "cancel", "non"].includes(lower)) {
     ConversationManager.updateMetadata(CONCIERGE_ID, phoneNumber, { conciergePendingOrder: undefined })
-    await WhatsAppClient.sendMessage(businessPhoneNumberId, phoneNumber, "❌ No problem. Tell me what you'd like instead.")
+    await sendOutboundMessage(businessPhoneNumberId, phoneNumber, "❌ No problem. Tell me what you'd like instead.")
     return
   }
 
@@ -533,7 +576,7 @@ async function processConciergeIncomingMessage(message: any, contacts: any[], me
     locationKnown = true
   }
   if (!locationKnown) {
-    await WhatsAppClient.sendMessage(
+    await sendOutboundMessage(
       businessPhoneNumberId,
       phoneNumber,
       "Hello! Please share your location (send a location pin or type your neighborhood). Then tell me what you want, e.g. 'burgers'",
@@ -542,7 +585,7 @@ async function processConciergeIncomingMessage(message: any, contacts: any[], me
   }
 
   if (!messageText || lower.startsWith("location:") || lower.startsWith("coords:")) {
-    await WhatsAppClient.sendMessage(
+    await sendOutboundMessage(
       businessPhoneNumberId,
       phoneNumber,
       "Got it! Now tell me what you're craving (e.g. 'shawarma', 'burger', 'vegan salad').",
@@ -564,7 +607,7 @@ async function processConciergeIncomingMessage(message: any, contacts: any[], me
     .sort((a, b) => b.matches.length - a.matches.length)
 
   if (scored.length === 0) {
-    await WhatsAppClient.sendMessage(
+    await sendOutboundMessage(
       businessPhoneNumberId,
       phoneNumber,
       "I couldn't find any restaurants matching that. Try another description (e.g. 'grilled chicken', 'pizza', 'sushi').",
@@ -583,7 +626,7 @@ async function processConciergeIncomingMessage(message: any, contacts: any[], me
       orderItems: [{ itemName: chosen.sample, quantity: 1 }],
     }
     ConversationManager.updateMetadata(CONCIERGE_ID, phoneNumber, { conciergePendingOrder: po })
-    await WhatsAppClient.sendMessage(
+    await sendOutboundMessage(
       businessPhoneNumberId,
       phoneNumber,
       `Great choice: ${chosen.name}.\nI'll place an order for 1x ${chosen.sample} (${chosen.price} FCFA). Reply YES to confirm or NO to cancel.`,
@@ -599,7 +642,7 @@ async function processConciergeIncomingMessage(message: any, contacts: any[], me
   ConversationManager.updateMetadata(CONCIERGE_ID, phoneNumber, { conciergeOptions: options, lastQuery: q })
 
   const lines = options.map((o: any, i: number) => `${i + 1}. ${o.name} — try: ${o.sample} (${o.price} FCFA)`).join("\n")
-  await WhatsAppClient.sendMessage(
+  await sendOutboundMessage(
     businessPhoneNumberId,
     phoneNumber,
     `Here are some options near you for "${messageText}":\n${lines}\n\nReply with a number (1-${options.length}) to choose.`,

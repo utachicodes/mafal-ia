@@ -14,6 +14,37 @@
 
 Mafal-IA is a B2B, API-first platform for restaurants. You pay for the service, we provide the WhatsApp AI API and a simple dashboard. Plug it into your existing workflows to answer customers, share menus, and calculate orders automatically.
 
+## Webhook & LAM Quick Setup
+
+Follow these steps to connect your WhatsApp provider in under 2 minutes.
+
+1. Environment (.env)
+   - DEMO_MODE=true
+   - WHATSAPP_VERIFY_TOKEN=your_token
+   - Optional (LAM replies):
+     - LAM_API_BASE_URL=https://waba.lafricamobile.com/api
+     - LAM_API_KEY=your_bearer_token
+     - LAM_SENDER_ID=your_sender_or_number
+
+2. Webhook URL (provider/BSP)
+   - URL: https://YOUR_DOMAIN/webhook/whatsapp
+   - Verify Token: same as WHATSAPP_VERIFY_TOKEN
+
+3. Verify (GET)
+   - Visit: https://YOUR_DOMAIN/webhook/whatsapp?hub.mode=subscribe&hub.verify_token=YOUR_TOKEN&hub.challenge=123
+   - Expect HTTP 200 with body: 123
+
+4. Test (send a message to your WABA number)
+   - In DEMO_MODE: you receive “Echo: <your text>”.
+   - If LAM_* envs set, reply is sent via LAM. Otherwise it uses WhatsApp Graph.
+
+5. Go production later
+   - Set DEMO_MODE=false, add WHATSAPP_APP_SECRET, WHATSAPP_ACCESS_TOKEN (or per-restaurant creds) to enable signature validation and full AI/order logic.
+
+Endpoints involved:
+- GET/POST `app/webhook/whatsapp/route.ts` → alias to `app/api/whatsapp/route.ts`.
+- Templates helper: `app/api/tools/whatsapp/templates/route.ts` (uses per-restaurant token or fallback to env token).
+
 ## Features
 
 - **AI that understands your customers**: Built on Google Genkit (Gemini), detects language and intent.
