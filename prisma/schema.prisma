@@ -46,6 +46,7 @@ model Restaurant {
   specialInstructions    String      @default("")
   orderingEnabled        Boolean     @default(true)
   deliveryInfo           String      @default("")
+  location               String      @default("")
 
   // API key (production): store ONLY the hash of the key
   apiKeyHash             String?

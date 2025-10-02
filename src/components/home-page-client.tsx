@@ -30,7 +30,7 @@ export default function HomeClient() {
             <div className="hidden md:flex items-center gap-8">
               <a href="#features" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Features</a>
               <a href="#how" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">How it works</a>
-              <a href="#whatsapp" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">WhatsApp</a>
+              {/* Removed provider-specific nav */}
               <SimpleThemeToggle />
               <Link href="/restaurants">
                 <Button size="sm" className="shadow-sm">
@@ -52,7 +52,7 @@ export default function HomeClient() {
             </div>
             
             <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold text-foreground mb-8 leading-[0.9] tracking-tight animate-in fade-in-50 delay-100">
-              Build WhatsApp agents
+              Build Chatbot endpoints
               <br />
               <span className="relative inline-block">
                 for your restaurants
@@ -61,7 +61,7 @@ export default function HomeClient() {
             </h1>
             
             <p className="text-xl md:text-2xl text-muted-foreground max-w-4xl mx-auto mb-12 leading-relaxed animate-in fade-in-50 delay-200">
-              Paste your menu, add your WhatsApp credentials, verify the webhook, and go live. 
+              Create your restaurant, add your menu, and get a chatbot API endpoint you can plug into any webhook.
               AI answers in French, English, Wolof, or Arabic.
             </p>
             
@@ -105,18 +105,18 @@ export default function HomeClient() {
             
             <Card className="bg-card/80 backdrop-blur border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.05] hover:-rotate-1 p-8 animate-in fade-in-50 delay-100 group">
               <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-primary/20 transition-colors">
-                <Globe className="h-8 w-8 text-primary group-hover:scale-110 transition-transform animate-spin" style={{animationDuration: '8s'}} />
+                <Globe className="h-8 w-8 text-primary group-hover:scale-110 transition-transform animate-spin" style={{ animationDuration: '8s' }} />
               </div>
               <h3 className="text-xl font-semibold text-foreground mb-3 group-hover:text-primary transition-colors">Multilingual</h3>
               <p className="text-muted-foreground leading-relaxed">French, English, Wolof, Arabic automatically detected and supported.</p>
             </Card>
             
-            <Card className="bg-card/80 backdrop-blur border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.05] hover:rotate-1 p-8 animate-in fade-in-50 delay-150 group">
+            <Card className="bg-card/80 backdrop-blur border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.05] hover:-rotate-1 p-8 animate-in fade-in-50 delay-150 group">
               <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-primary/20 transition-colors">
                 <MessageSquare className="h-8 w-8 text-primary group-hover:scale-110 transition-transform animate-bounce" style={{animationDuration: '2s'}} />
               </div>
-              <h3 className="text-xl font-semibold text-foreground mb-3 group-hover:text-primary transition-colors">WhatsApp‑native</h3>
-              <p className="text-muted-foreground leading-relaxed">Works seamlessly with your WhatsApp Business API and phone number.</p>
+              <h3 className="text-xl font-semibold text-foreground mb-3 group-hover:text-primary transition-colors">Channel-agnostic</h3>
+              <p className="text-muted-foreground leading-relaxed">Integrate your chatbot endpoint with any provider that can POST messages.</p>
             </Card>
             
             <Card className="bg-card/80 backdrop-blur border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.05] hover:-rotate-1 p-8 animate-in fade-in-50 delay-200 group">
@@ -134,21 +134,16 @@ export default function HomeClient() {
       <section id="how" className="relative z-10 py-32">
         <div className="container mx-auto px-6">
           <div className="text-center mb-20">
-            <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
-              How it works
-            </h2>
-            <p className="text-xl text-muted-foreground">
-              Five simple steps to your WhatsApp agent
-            </p>
+            <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6">How it works</h2>
+            <p className="text-xl text-muted-foreground">Four simple steps to your chatbot endpoint</p>
           </div>
-          
+
           <div className="grid md:grid-cols-5 gap-6">
             {[
               { step: "1", title: "Restaurant", desc: "Add name, description, and operating hours" },
               { step: "2", title: "Menu", desc: "Paste JSON, CSV, or text—we auto-structure it" },
-              { step: "3", title: "WhatsApp", desc: "Enter credentials: phone ID, tokens, secrets" },
-              { step: "4", title: "Verify", desc: "Test webhook with GET verify and signed POST" },
-              { step: "5", title: "Go live", desc: "Start taking orders via WhatsApp instantly" }
+              { step: "3", title: "Endpoint", desc: "Copy your /api/chatbots/[id]/messages endpoint" },
+              { step: "4", title: "Integrate", desc: "Point your external webhook to POST {from,text}" }
             ].map((item, index) => (
               <Card key={index} className="bg-card border-border/50 p-6 text-center hover:shadow-lg hover:scale-[1.03] hover:-translate-y-2 transition-all duration-300 group">
                 <div className="w-12 h-12 bg-primary text-primary-foreground rounded-full flex items-center justify-center font-bold text-lg mx-auto mb-4 group-hover:animate-bounce group-hover:bg-primary/80">
@@ -162,81 +157,17 @@ export default function HomeClient() {
         </div>
       </section>
 
-      {/* Integration Section */}
-      <section id="whatsapp" className="relative z-10 py-32 bg-muted/30">
-        <div className="container mx-auto px-6">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            <div>
-              <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-8">
-                WhatsApp integration made simple
-              </h2>
-              <p className="text-xl text-muted-foreground mb-10">
-                Multi‑tenant by design. Each restaurant stores its own credentials for maximum security and flexibility.
-              </p>
-              
-              <div className="space-y-6">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
-                    <Shield className="h-6 w-6 text-primary" />
-                  </div>
-                  <span className="text-lg text-foreground">Per‑restaurant App Secret for signature validation</span>
-                </div>
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
-                    <Layers className="h-6 w-6 text-primary" />
-                  </div>
-                  <span className="text-lg text-foreground">Per‑restaurant Access Token override</span>
-                </div>
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
-                    <CheckCircle2 className="h-6 w-6 text-primary" />
-                  </div>
-                  <span className="text-lg text-foreground">Per‑restaurant Verify Token for webhook setup</span>
-                </div>
-              </div>
-            </div>
-            
-            <div>
-              <Card className="bg-card/80 backdrop-blur border-0 shadow-xl p-10">
-                <div className="flex items-center gap-4 mb-8">
-                  <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center">
-                    <Rocket className="h-8 w-8 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="text-2xl font-semibold text-foreground">Why Mafal‑IA</h3>
-                    <p className="text-muted-foreground">Purpose‑built for restaurants in Senegal and beyond</p>
-                  </div>
-                </div>
-                
-                <div className="space-y-4 text-foreground">
-                  <div className="flex items-center gap-3">
-                    <div className="w-2 h-2 bg-primary rounded-full" />
-                    <span>Menu‑aware answers and order totals</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-2 h-2 bg-primary rounded-full" />
-                    <span>Delivery zones and ETA hints</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-2 h-2 bg-primary rounded-full" />
-                    <span>Concierge mode across multiple brands</span>
-                  </div>
-                </div>
-              </Card>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Provider-specific integration section removed */}
 
       {/* CTA Section */}
       <section className="relative z-10 py-32">
         <div className="container mx-auto px-6">
           <Card className="bg-gradient-to-r from-primary to-primary/90 border-0 text-primary-foreground text-center p-16 max-w-5xl mx-auto shadow-2xl hover:shadow-3xl hover:scale-[1.02] transition-all duration-500 animate-pulse hover:animate-none">
             <h2 className="text-4xl md:text-5xl font-bold mb-6 animate-in fade-in-50">
-              Ready to launch your WhatsApp agent?
+              Ready to launch your chatbot endpoint?
             </h2>
             <p className="text-xl opacity-90 mb-12 max-w-3xl mx-auto animate-in slide-in-from-bottom-4 delay-200">
-              Create your first restaurant and start taking orders through WhatsApp today.
+              Create your first restaurant and start taking orders via your own channel.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center animate-in zoom-in-50 delay-400">
               <Link href="/restaurants">
