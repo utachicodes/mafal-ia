@@ -4,11 +4,16 @@ const globalForPrisma = globalThis as unknown as { prisma?: PrismaClientType }
 
 const isProd = process.env.NODE_ENV === 'production'
 
-// Decide database URL: prefer provided DATABASE_URL; fallback to SQLite file
+// Decide database URL: in production REQUIRE DATABASE_URL; in dev allow SQLite fallback
 let resolvedDbUrl = process.env.DATABASE_URL
 if (!resolvedDbUrl || resolvedDbUrl.length === 0) {
-  // On Vercel, use /tmp for writable storage
-  const sqlitePath = isProd ? '/tmp/dev.db' : process.cwd() + '/prisma/dev.db'
+  if (isProd) {
+    throw new Error(
+      'DATABASE_URL is not set in production. Please configure a Postgres connection string in your environment (and Vercel project settings).'
+    )
+  }
+  // Dev-only SQLite fallback for convenience
+  const sqlitePath = process.cwd() + '/prisma/dev.db'
   resolvedDbUrl = `file:${sqlitePath}?connection_limit=1`
 }
 process.env.DATABASE_URL = resolvedDbUrl

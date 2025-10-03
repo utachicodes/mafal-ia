@@ -1,92 +1,114 @@
-// Prisma schema for Mafal-IA
-// Local development uses SQLite. For production, change provider to postgresql and set env URLs.
-
-datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
-}
-
 generator client {
   provider = "prisma-client-js"
 }
 
+datasource db {
+  provider = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
 model users_sync {
-  id              String    @id
-  name            String?
-  email           String?
-  created_at      DateTime
-  updated_at      DateTime
-  deleted_at      DateTime?
-  raw_json        Json
+  id         String    @id
+  name       String?
+  email      String?
+  created_at DateTime
+  updated_at DateTime
+  deleted_at DateTime?
+  raw_json   Json
 }
 
 model Restaurant {
-  id                     String      @id @default(cuid())
-  name                   String
-  description            String
-  cuisine                String
-  whatsappNumber         String
-  whatsappPhoneNumberId  String      @default("") // maps to Meta business phone number ID
-  // Optional per-tenant credentials (fallback to env vars when empty)
-  whatsappAccessToken    String?     @default("")
-  whatsappAppSecret      String?     @default("")
-  // Per-restaurant webhook verification token (used by Meta webhook verification GET)
-  webhookVerifyToken     String      @default("")
-  supportedLanguages     Json
-  isActive               Boolean     @default(true)
-  // Marks this WhatsApp number as the global concierge that can search across all restaurants
-  isConcierge            Boolean     @default(false)
-
-  // User ownership
-  userId                 String
-
-  // Flattened chatbot context
-  welcomeMessage         String      @default("")
-  businessHours          String      @default("")
-  specialInstructions    String      @default("")
-  orderingEnabled        Boolean     @default(true)
-  deliveryInfo           String      @default("")
-  location               String      @default("")
-
-  // API key (production): store ONLY the hash of the key
-  apiKeyHash             String?
-  apiKeyCreatedAt        DateTime?
-  apiKeyRevokedAt        DateTime?
-
-  menuItems              MenuItem[]
-  conversations          Conversation[]
-  orders                 Order[]
-  messageLogs            MessageLog[]
-
-  createdAt              DateTime    @default(now())
-  updatedAt              DateTime    @updatedAt
+  id                    String         @id @default(cuid())
+  name                  String
+  description           String
+  cuisine               String
+  whatsappNumber        String
+  whatsappPhoneNumberId String         @default("")
+  whatsappAccessToken   String?        @default("")
+  whatsappAppSecret     String?        @default("")
+  webhookVerifyToken    String         @default("")
+  supportedLanguages    Json
+  isActive              Boolean        @default(true)
+  isConcierge           Boolean        @default(false)
+  userId                String
+  welcomeMessage        String         @default("")
+  businessHours         String         @default("")
+  specialInstructions   String         @default("")
+  orderingEnabled       Boolean        @default(true)
+  deliveryInfo          String         @default("")
+  createdAt             DateTime       @default(now())
+  updatedAt             DateTime       @updatedAt
+  apiKeyCreatedAt       DateTime?
+  apiKeyHash            String?        @db.VarChar(128)
+  apiKeyRevokedAt       DateTime?
+  conversations         Conversation[]
+  menuItems             MenuItem[]
+  messageLogs           MessageLog[]
+  orders                Order[]
 
   @@index([userId])
 }
 
 model MenuItem {
-  id            String     @id @default(cuid())
-  restaurantId  String
-  restaurant    Restaurant @relation(fields: [restaurantId], references: [id])
-  name          String
-  description   String
-  price         Int
-  category      String?
-  isAvailable   Boolean    @default(true)
-  // Optional embeddings for RAG (store as vector-like JSON for now)
-  embedding     Json?
+  id           String     @id @default(cuid())
+  restaurantId String
+  name         String
+  description  String
+  price        Int
+  category     String?
+  isAvailable  Boolean    @default(true)
+  embedding    Json?
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
 }
 
 model Conversation {
-  id            String     @id @default(cuid())
-  restaurantId  String
-  restaurant    Restaurant @relation(fields: [restaurantId], references: [id])
-  phoneNumber   String
-  messages      Json       // array of ChatMessage
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
+  id           String     @id @default(cuid())
+  restaurantId String
+  phoneNumber  String
+  messages     Json
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
 
   @@index([restaurantId, phoneNumber])
+}
+
+model Order {
+  id           String      @id @default(cuid())
+  restaurantId String
+  customerName String
+  phoneNumber  String
+  items        Json
+  total        Int
+  notes        String?
+  status       OrderStatus @default(pending)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  restaurant   Restaurant  @relation(fields: [restaurantId], references: [id])
+
+  @@index([restaurantId, createdAt])
+}
+
+model MessageLog {
+  id                String           @id @default(cuid())
+  restaurantId      String
+  phoneNumber       String
+  whatsappMessageId String
+  direction         MessageDirection
+  messageType       String?
+  templateName      String?
+  status            String
+  errorCode         String?
+  errorTitle        String?
+  errorDetail       String?
+  raw               Json?
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+  restaurant        Restaurant       @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+
+  @@index([restaurantId, createdAt])
+  @@index([whatsappMessageId])
 }
 
 enum OrderStatus {
@@ -97,46 +119,7 @@ enum OrderStatus {
   cancelled
 }
 
-model Order {
-  id            String       @id @default(cuid())
-  restaurantId  String
-  restaurant    Restaurant   @relation(fields: [restaurantId], references: [id])
-  customerName  String
-  phoneNumber   String
-  // items: array of { itemName, quantity, price, specs } with arbitrary specs object
-  items         Json
-  // total in smallest currency unit (e.g., CFA)
-  total         Int
-  notes         String?
-  status        OrderStatus  @default(pending)
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
-
-  @@index([restaurantId, createdAt])
-}
-
 enum MessageDirection {
   inbound
   outbound
-}
-
-model MessageLog {
-  id                 String            @id @default(cuid())
-  restaurantId       String
-  restaurant         Restaurant        @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
-  phoneNumber        String
-  whatsappMessageId  String
-  direction          MessageDirection
-  messageType        String?
-  templateName       String?
-  status             String
-  errorCode          String?
-  errorTitle         String?
-  errorDetail        String?
-  raw                Json?
-  createdAt          DateTime          @default(now())
-  updatedAt          DateTime          @updatedAt
-
-  @@index([restaurantId, createdAt])
-  @@index([whatsappMessageId])
 }
