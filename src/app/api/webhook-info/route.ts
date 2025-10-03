@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server"
-import { env } from "@/src/lib/env"
 
 export const runtime = "nodejs"
 
@@ -24,10 +23,9 @@ export async function GET(req: Request) {
     webhook: {
       url: alias,
       canonical,
-      verifyTokenEnv: "WHATSAPP_VERIFY_TOKEN",
-      demoMode: env.DEMO_MODE,
-      outbound: env.LAM_API_BASE_URL && env.LAM_API_KEY && env.LAM_SENDER_ID ? "lam" : "meta",
+      verifyTokenEnv: null,
+      outbound: "http",
     },
-    note: "Use the 'url' as your webhook endpoint in your provider. In DEMO_MODE, replies are sent via LAM if configured; otherwise via Meta Graph.",
+    note: "WhatsApp webhook has been decommissioned. Use the chatbot HTTP endpoint /api/chatbots/[id]/messages.",
   })
 }

@@ -1,5 +1,4 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { env } from "@/src/lib/env"
 import { AIClient } from "@/src/lib/ai-client"
 import { WhatsAppClient } from "@/src/lib/whatsapp-client"
 import { RestaurantService } from "@/src/lib/restaurant-service"
@@ -9,7 +8,6 @@ import { ConversationManager } from "@/src/lib/conversation-manager"
 import { estimateDelivery, formatEstimate } from "@/src/lib/delivery"
 import { OrderService } from "@/src/lib/order-service"
 import { getPrisma } from "@/src/lib/db"
-import { LamClient } from "@/src/lib/lam-client"
 
 export const runtime = "nodejs"
 
@@ -23,14 +21,6 @@ async function sendOutboundMessage(
   text: string,
   tokenOverride?: string,
 ) {
-  if (
-    env.OUTBOUND_PROVIDER === "lam" &&
-    env.LAM_API_BASE_URL &&
-    env.LAM_API_KEY &&
-    env.LAM_SENDER_ID
-  ) {
-    return await LamClient.sendMessage({ to, text })
-  }
   return await WhatsAppClient.sendMessage(businessPhoneNumberId, to, text, tokenOverride)
 }
 
@@ -108,175 +98,19 @@ async function persistConversation(restaurantId: string, phoneNumber: string, me
 }
 
 // GET endpoint for WhatsApp webhook verification
-export async function GET(request: NextRequest) {
-  try {
-    const searchParams = request.nextUrl.searchParams
-    const mode = searchParams.get("hub.mode")
-    const token = searchParams.get("hub.verify_token")
-    const challenge = searchParams.get("hub.challenge")
-
-    console.log("[WhatsApp Webhook] Verification request:", { mode, token, challenge })
-
-    // Verify the webhook against global token OR any restaurant-specific token
-    const isTokenValid = async (t: string | null): Promise<boolean> => {
-      if (!t) return false
-      if (t === env.WHATSAPP_VERIFY_TOKEN) return true
-      try {
-        const prisma = await getPrisma()
-        const found = await prisma.restaurant.findFirst({ where: { webhookVerifyToken: t } })
-        return !!found
-      } catch (e) {
-        console.error("[WhatsApp Webhook] Token lookup error:", e)
-        return false
-      }
-    }
-
-    if (mode === "subscribe" && (await isTokenValid(token))) {
-      console.log("[WhatsApp Webhook] Verification successful")
-      return new NextResponse(challenge, { status: 200 })
-    }
-
-    console.log("[WhatsApp Webhook] Verification failed - invalid token")
-    return new NextResponse("Forbidden", { status: 403 })
-  } catch (error) {
-    console.error("[WhatsApp Webhook] Verification error:", error)
-    return new NextResponse("Internal Server Error", { status: 500 })
-  }
+export async function GET(_request: NextRequest) {
+  return NextResponse.json(
+    { ok: false, error: "whatsapp_webhook_decommissioned", message: "This endpoint has been removed. Use /api/chatbots/[id]/messages instead." },
+    { status: 410 },
+  )
 }
 
 // POST endpoint for receiving WhatsApp messages
-export async function POST(request: NextRequest) {
-  try {
-    // Read raw body for signature verification
-    const rawBody = await request.text()
-    const signature = request.headers.get("x-hub-signature-256") || ""
-
-    // Attempt to parse body to extract phone_number_id for per-tenant secret lookup
-    let body: any = {}
-    try {
-      body = JSON.parse(rawBody)
-    } catch {
-      console.warn("[WhatsApp Webhook] Failed to parse JSON body before signature validation")
-    }
-
-    const phoneIdFromBody = (() => {
-      try {
-        return body?.entry?.[0]?.changes?.[0]?.value?.metadata?.phone_number_id || null
-      } catch {
-        return null
-      }
-    })()
-
-    // Validate signature with per-tenant secret if available, otherwise fallback to env
-    let appSecretToUse = env.WHATSAPP_APP_SECRET
-    if (phoneIdFromBody) {
-      const { appSecret } = await getTenantSecretsByPhoneId(phoneIdFromBody)
-      if (appSecret && appSecret.length > 0) appSecretToUse = appSecret
-    }
-    if (appSecretToUse) {
-      const valid = WebhookValidator.validateSignature(rawBody, signature, appSecretToUse)
-      if (!valid) {
-        console.warn("[WhatsApp Webhook] Invalid signature")
-        return new NextResponse("Forbidden", { status: 403 })
-      }
-    }
-
-    console.log("[WhatsApp Webhook] Received payload:", JSON.stringify(body, null, 2))
-
-    if (!WebhookValidator.validatePayload(body)) {
-      console.log("[WhatsApp Webhook] Invalid payload structure")
-      return new NextResponse("OK", { status: 200 })
-    }
-
-    // DEMO MODE: minimal processing without DB/AI — echo back the first inbound text
-    if (env.DEMO_MODE) {
-      try {
-        const change = body?.entry?.[0]?.changes?.[0]?.value
-        const messages = change?.messages
-        const metadata = change?.metadata
-        const firstMsg = Array.isArray(messages) ? messages[0] : null
-        const bpid = metadata?.phone_number_id
-        const from = firstMsg?.from
-        const text = firstMsg?.text?.body || "Hello"
-        if (bpid && from) {
-          const reply = `Echo: ${text}`
-          if (env.LAM_API_BASE_URL && env.LAM_API_KEY && env.LAM_SENDER_ID) {
-            // Send via LafricaMobile API if configured
-            await LamClient.sendMessage({ to: from, text: reply })
-          } else {
-            // Default: send via WhatsApp Graph using our WhatsAppClient
-            await WhatsAppClient.sendMessage(bpid, from, reply)
-          }
-        }
-      } catch (err) {
-        console.warn("[WhatsApp DEMO] Failed to echo message:", err)
-      }
-      return new NextResponse("OK", { status: 200 })
-    }
-
-    // Process each entry in the webhook payload
-    for (const entry of body.entry || []) {
-      if (!entry.changes || !Array.isArray(entry.changes)) continue
-      for (const change of entry.changes) {
-        if (change.field !== "messages" || !change.value) continue
-        const { messages, contacts, metadata, statuses } = change.value
-        const businessPhoneNumberId = metadata?.phone_number_id
-
-        // Handle delivery receipts / status updates
-        if (Array.isArray(statuses) && statuses.length > 0 && businessPhoneNumberId) {
-          try {
-            const restaurant = await RestaurantService.getRestaurantByPhoneNumber(businessPhoneNumberId)
-            const restaurantId = restaurant?.id
-            for (const st of statuses) {
-              const phone = st.recipient_id || ""
-              const msgId = st.id || st.message_id || ""
-              const status = st.status || "unknown"
-              const errorCode = st?.errors?.[0]?.code ? String(st.errors[0].code) : undefined
-              const errorTitle = st?.errors?.[0]?.title
-              const errorDetail = st?.errors?.[0]?.detail
-              if (restaurantId && msgId) {
-                await persistMessageLog({
-                  restaurantId,
-                  phoneNumber: phone,
-                  whatsappMessageId: msgId,
-                  direction: "outbound",
-                  status,
-                  messageType: st?.type,
-                  templateName: st?.template?.name,
-                  errorCode,
-                  errorTitle,
-                  errorDetail,
-                  raw: st,
-                })
-              }
-            }
-          } catch (err) {
-            console.warn("[WhatsApp] Failed processing statuses", err)
-          }
-        }
-
-        // Handle inbound messages
-        if (messages && Array.isArray(messages)) {
-          for (const message of messages) {
-            const bpid = businessPhoneNumberId
-            if (!bpid) continue
-
-            const r = await RestaurantService.getRestaurantByPhoneNumber(bpid)
-            if (r?.isActive && (r as any).isConcierge === true) {
-              await processConciergeIncomingMessage(message, contacts, metadata)
-            } else {
-              await processIncomingMessage(message, contacts, metadata)
-            }
-          }
-        }
-      }
-    }
-
-    return new NextResponse("OK", { status: 200 })
-  } catch (error) {
-    console.error("[WhatsApp Webhook] Processing error:", error)
-    return new NextResponse("Internal Server Error", { status: 500 })
-  }
+export async function POST(_request: NextRequest) {
+  return NextResponse.json(
+    { ok: false, error: "whatsapp_webhook_decommissioned", message: "This endpoint has been removed. Use /api/chatbots/[id]/messages instead." },
+    { status: 410 },
+  )
 }
 
 // Process individual incoming messages

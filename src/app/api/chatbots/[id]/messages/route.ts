@@ -3,10 +3,6 @@ import { AIClient } from "@/src/lib/ai-client"
 import { RestaurantService } from "@/src/lib/restaurant-service"
 import { ConversationManager } from "@/src/lib/conversation-manager"
 import { estimateDelivery, formatEstimate } from "@/src/lib/delivery"
-import { env } from "@/src/lib/env"
-import { LamClient } from "@/src/lib/lam-client"
-import { WhatsAppClient } from "@/src/lib/whatsapp-client"
-import { getPrisma } from "@/src/lib/db"
 
 export const runtime = "nodejs"
 
@@ -14,34 +10,8 @@ function stripBold(s: string) {
   return s.replace(/\*\*(.*?)\*\*/g, "$1").replace(/__(.*?)__/g, "$1")
 }
 
-async function getAccessTokenForRestaurant(restaurantId: string): Promise<string | undefined> {
-  try {
-    const prisma = await getPrisma()
-    const r = await prisma.restaurant.findUnique({ where: { id: restaurantId }, select: { whatsappAccessToken: true } })
-    return r?.whatsappAccessToken || undefined
-  } catch {
-    return undefined
-  }
-}
-
-async function sendOutboundMessage(
-  businessPhoneNumberId: string | undefined,
-  to: string,
-  text: string,
-  tokenOverride?: string,
-) {
-  if (
-    env.OUTBOUND_PROVIDER === "lam" &&
-    env.LAM_API_BASE_URL &&
-    env.LAM_API_KEY &&
-    env.LAM_SENDER_ID
-  ) {
-    return await LamClient.sendMessage({ to, text })
-  }
-  if (!businessPhoneNumberId) {
-    return { success: false, status: 400, errorText: "Missing business phone number id", raw: null, messageId: undefined }
-  }
-  return await WhatsAppClient.sendMessage(businessPhoneNumberId, to, text, tokenOverride)
+export async function GET(_req: NextRequest, ctx: { params: { id: string } }) {
+  return NextResponse.json({ ok: true, id: ctx.params.id, status: "healthy" })
 }
 
 export async function POST(req: NextRequest, ctx: { params: { id: string } }) {
@@ -101,11 +71,6 @@ Ordering Enabled: ${restaurant.chatbotContext.orderingEnabled ? "Yes" : "No"}
       outbound = `${outbound}\n\nReply YES to confirm this order or NO to cancel.`
     }
 
-    // Send out via provider
-    const bpid = restaurant.apiCredentials?.whatsappPhoneNumberId || undefined
-    const tokenOverride = await getAccessTokenForRestaurant(restaurant.id)
-    await sendOutboundMessage(bpid, from, outbound, tokenOverride)
-
     // Save conversation
     ConversationManager.addMessage(restaurant.id, from, {
       id: `ai_${Date.now()}`,
@@ -114,7 +79,13 @@ Ordering Enabled: ${restaurant.chatbotContext.orderingEnabled ? "Yes" : "No"}
       timestamp: new Date(),
     })
 
-    return NextResponse.json({ ok: true })
+    return NextResponse.json({
+      ok: true,
+      response: outbound,
+      detectedLanguage: ai.detectedLanguage,
+      usedTools: ai.usedTools,
+      orderQuote: ai.orderQuote ?? null,
+    })
   } catch (e) {
     console.error("[Chatbot API] error:", e)
     return NextResponse.json({ ok: false, error: "internal_error" }, { status: 500 })
