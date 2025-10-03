@@ -677,11 +677,4 @@ Use these targeted checks when things go wrong.
 
 This project is licensed under the MIT License.
 
-## Support
-
-For support and questions, please contact: abdoullahaljersi@gmail.com
-
-Built with ❤️ by utachicodes.
-
-
-
+ 
