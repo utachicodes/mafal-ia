@@ -47,22 +47,55 @@ export function RestaurantsProvider({ children }: { children: React.ReactNode })
 
 
   const addRestaurant = useCallback(async (restaurantData: Omit<Restaurant, "id" | "createdAt" | "updatedAt">) => {
-    const newRestaurant: Restaurant = {
-      ...restaurantData,
-      // Ensure `menu` is initialized even if upstream provided `menuItems`
-      menu: (restaurantData as any).menu ?? (restaurantData as any).menuItems ?? [],
-      id: `restaurant_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`, // Temporary ID
-      createdAt: new Date(),
-      updatedAt: new Date(),
+    // Normalize client payload before sending to API
+    const asAny: any = restaurantData || {}
+    // Supported languages can be array or JSON string
+    let supportedLanguages: string[] = []
+    if (Array.isArray(asAny.supportedLanguages)) supportedLanguages = asAny.supportedLanguages
+    else if (typeof asAny.supportedLanguages === "string") {
+      try { const p = JSON.parse(asAny.supportedLanguages); if (Array.isArray(p)) supportedLanguages = p } catch {}
+    }
+
+    // Menu can be array or JSON string
+    let menu: any[] = []
+    const inputMenu = asAny.menu ?? asAny.menuItems
+    if (Array.isArray(inputMenu)) menu = inputMenu
+    else if (typeof inputMenu === "string") {
+      try { const p = JSON.parse(inputMenu); if (Array.isArray(p)) menu = p } catch {}
+    }
+
+    // Coerce each menu item
+    const normalizedMenu = (menu || []).map((m: any) => ({
+      name: String(m?.name ?? ""),
+      description: String(m?.description ?? ""),
+      price: Number.isFinite(m?.price) ? Number(m.price) : parseInt(String(m?.price ?? 0), 10) || 0,
+      category: m?.category ? String(m.category) : undefined,
+      isAvailable: typeof m?.isAvailable === "boolean" ? m.isAvailable : true,
+    }))
+
+    const sanitizedPayload = {
+      name: String(asAny.name ?? ""),
+      description: String(asAny.description ?? ""),
+      cuisine: String(asAny.cuisine ?? ""),
+      whatsappNumber: String(asAny.whatsappNumber ?? ""),
+      supportedLanguages,
+      isActive: typeof asAny.isActive === "boolean" ? asAny.isActive : true,
+      isConcierge: typeof asAny.isConcierge === "boolean" ? asAny.isConcierge : false,
+      menu: normalizedMenu,
+      chatbotContext: asAny.chatbotContext ?? {},
+      apiCredentials: asAny.apiCredentials ?? {
+        whatsappAccessToken: asAny.whatsappAccessToken ?? "",
+        whatsappPhoneNumberId: asAny.whatsappPhoneNumberId ?? "",
+        webhookVerifyToken: asAny.webhookVerifyToken ?? "",
+        whatsappAppSecret: asAny.whatsappAppSecret ?? "",
+      },
     }
 
     try {
       const response = await fetch("/api/restaurants", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(newRestaurant),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(sanitizedPayload),
       })
 
       if (!response.ok) {
