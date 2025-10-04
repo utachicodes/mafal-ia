@@ -158,11 +158,11 @@ export class RestaurantService {
         deliveryInfo: r.chatbotContext?.deliveryInfo || this.defaultChatbotContext().deliveryInfo,
         menuItems: {
           create: menuArray.map((m: any) => ({
-            name: m.name,
-            description: m.description,
-            price: m.price,
-            category: m.category || null,
-            isAvailable: m.isAvailable ?? true,
+            name: String(m.name ?? ""),
+            description: String(m.description ?? ""),
+            price: Number.isFinite(m?.price) ? Number(m.price) : parseInt(String(m?.price ?? 0), 10) || 0,
+            category: m?.category ? String(m.category) : null,
+            isAvailable: typeof m?.isAvailable === 'boolean' ? m.isAvailable : true,
           })) || [],
         },
       },

@@ -5,6 +5,7 @@ import type { MenuItem, ChatMessage } from "@/lib/data"
 import { getMenuItemInformationFlow } from "./smart-menu-retrieval"
 import { calculateOrderTotalFlow } from "./calculate-order-total"
 import { z } from "zod"
+import { estimateDelivery, formatEstimate } from "@/src/lib/delivery"
 
 // Define the input schema for the main conversational flow
 interface GenerateResponseInput {
@@ -139,9 +140,21 @@ export const generateResponseFlow = defineFlow(
           orderText: lastMessage,
           menuItems,
         })
-        toolResponse = `Order Total: ${orderCalc.total} FCFA\nItems: ${orderCalc.itemsSummary}\n${orderCalc.notFoundItems ? `Items not found: ${orderCalc.notFoundItems}` : ""}`
+        // Try to infer delivery zone from message; if present, include delivery fee in total
+        const deliveryEst = estimateDelivery(lastMessage)
+        const baseToolLine = `Order Subtotal: ${orderCalc.total} FCFA` 
+        const itemsLine = `Items: ${orderCalc.itemsSummary}`
+        let deliveryLine = ""
+        let finalTotal = orderCalc.total
+        if (deliveryEst) {
+          deliveryLine = `Delivery: ${formatEstimate(deliveryEst)}`
+          finalTotal = orderCalc.total + deliveryEst.fee
+          usedTools.push("estimateDelivery")
+        }
+
+        toolResponse = [baseToolLine, itemsLine, deliveryLine].filter(Boolean).join("\n")
         orderQuote = {
-          total: orderCalc.total,
+          total: finalTotal,
           itemsSummary: orderCalc.itemsSummary,
           notFoundItems: orderCalc.notFoundItems,
           orderItems: orderCalc.orderItems,
@@ -188,13 +201,13 @@ ${toolResponse ? `TOOL INFORMATION: ${toolResponse}` : ""}
 ${fullMenu ? `FULL MENU:\n${fullMenu}` : ""}
 
 INSTRUCTIONS:
-- If delivery info in context is unknown, politely ask for the customer's location/neighborhood to estimate fee and ETA.
-- If customer name is unknown, ask for their name (short and polite). Always keep their phone number as the record key.
-- If delivery info is present in context, mention the delivery fee and estimated time in your reply.
-- For orders, confirm items, quantities, subtotal, and clearly state delivery fee if known, then the total.
-- If the user seems undecided, propose 2-3 popular or complementary items with prices.
+- Start by greeting the customer using the restaurant name. Offer to show the menu.
+- When an order is detected, ALWAYS ask: "Dine-in or delivery?" If delivery, ask for their neighborhood/location.
+- If location is provided, estimate delivery fee and ETA. If unknown, ask a clarifying follow-up.
+- Confirm items and quantities, show subtotal, delivery fee (if any), and the final total.
+- Do not require a phone number; proceed with the chat context only.
 - For menu questions, be specific about ingredients and prices.
-- Keep responses concise but helpful and professional.
+- Keep responses concise, warm, and professional.
 
 Current user message: "${lastMessage}"
 
