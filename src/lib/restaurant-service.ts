@@ -116,28 +116,48 @@ export class RestaurantService {
   static async createRestaurant(restaurantData: Omit<Restaurant, "id" | "createdAt" | "updatedAt">): Promise<Restaurant> {
     await this.ensureSeeded()
     const prisma = await getPrisma()
+    // Normalize incoming payload (handles onboarding form quirks)
+    const r: any = restaurantData || {}
+    const normalizedApi = r.apiCredentials ?? {
+      whatsappAccessToken: r.whatsappAccessToken ?? "",
+      whatsappPhoneNumberId: r.whatsappPhoneNumberId ?? "",
+      webhookVerifyToken: r.webhookVerifyToken ?? "",
+      whatsappAppSecret: r.whatsappAppSecret ?? "",
+    }
+    let supportedLanguages: string[] = []
+    if (Array.isArray(r.supportedLanguages)) supportedLanguages = r.supportedLanguages
+    else if (typeof r.supportedLanguages === 'string') {
+      try { const parsed = JSON.parse(r.supportedLanguages); if (Array.isArray(parsed)) supportedLanguages = parsed }
+      catch { supportedLanguages = [] }
+    }
+    let menuArray: any[] = []
+    if (Array.isArray(r.menu)) menuArray = r.menu
+    else if (typeof r.menu === 'string') {
+      try { const parsed = JSON.parse(r.menu); if (Array.isArray(parsed)) menuArray = parsed } catch {}
+    }
+
     const createdPrismaRestaurant = await prisma.restaurant.create({
       data: {
-        name: restaurantData.name,
-        description: restaurantData.description,
-        cuisine: restaurantData.cuisine,
-        whatsappNumber: restaurantData.whatsappNumber,
-        whatsappPhoneNumberId: restaurantData.apiCredentials?.whatsappPhoneNumberId || "",
-        whatsappAccessToken: restaurantData.apiCredentials?.whatsappAccessToken || "",
-        whatsappAppSecret: (restaurantData as any)?.apiCredentials?.whatsappAppSecret || "",
-        webhookVerifyToken: restaurantData.apiCredentials?.webhookVerifyToken || "",
+        name: r.name || "",
+        description: r.description ?? "",
+        cuisine: r.cuisine ?? "",
+        whatsappNumber: r.whatsappNumber ?? "",
+        whatsappPhoneNumberId: normalizedApi?.whatsappPhoneNumberId || "",
+        whatsappAccessToken: normalizedApi?.whatsappAccessToken || "",
+        whatsappAppSecret: normalizedApi?.whatsappAppSecret || "",
+        webhookVerifyToken: normalizedApi?.webhookVerifyToken || "",
         // Fallback owner in absence of auth: seed/admin user
-        userId: (restaurantData as any)?.userId || "seed-admin",
-        supportedLanguages: restaurantData.supportedLanguages || [],
-        isActive: restaurantData.isActive ?? true,
-        isConcierge: restaurantData.isConcierge ?? false,
-        welcomeMessage: restaurantData.chatbotContext?.welcomeMessage || this.defaultChatbotContext().welcomeMessage,
-        businessHours: restaurantData.chatbotContext?.businessHours || this.defaultChatbotContext().businessHours,
-        specialInstructions: restaurantData.chatbotContext?.specialInstructions || this.defaultChatbotContext().specialInstructions,
-        orderingEnabled: restaurantData.chatbotContext?.orderingEnabled ?? this.defaultChatbotContext().orderingEnabled,
-        deliveryInfo: restaurantData.chatbotContext?.deliveryInfo || this.defaultChatbotContext().deliveryInfo,
+        userId: r.userId || "seed-admin",
+        supportedLanguages,
+        isActive: r.isActive ?? true,
+        isConcierge: r.isConcierge ?? false,
+        welcomeMessage: r.chatbotContext?.welcomeMessage || this.defaultChatbotContext().welcomeMessage,
+        businessHours: r.chatbotContext?.businessHours || this.defaultChatbotContext().businessHours,
+        specialInstructions: r.chatbotContext?.specialInstructions || this.defaultChatbotContext().specialInstructions,
+        orderingEnabled: r.chatbotContext?.orderingEnabled ?? this.defaultChatbotContext().orderingEnabled,
+        deliveryInfo: r.chatbotContext?.deliveryInfo || this.defaultChatbotContext().deliveryInfo,
         menuItems: {
-          create: restaurantData.menu?.map((m) => ({
+          create: menuArray.map((m: any) => ({
             name: m.name,
             description: m.description,
             price: m.price,
