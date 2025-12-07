@@ -58,14 +58,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
       {/* Premium Logo Area */}
       <div className="px-6 pt-8 pb-6">
         <Link href="/" className="group flex items-center gap-2 hover:opacity-80 transition-opacity">
-          <div className="h-8 w-8 rounded-xl bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform duration-300">
-            <Sparkles className="h-5 w-5" />
-          </div>
-          {!collapsed && (
-            <span className="font-bold text-xl tracking-tight text-gradient">
-              Mafal-IA
-            </span>
-          )}
+          <Logo className="h-8" />
         </Link>
       </div>
 
@@ -156,9 +149,11 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
 
           <div className="ml-auto flex items-center gap-4">
             <div className="glass px-2 py-1 rounded-full"><SimpleThemeToggle /></div>
-            <Button variant="outline" className="rounded-full gap-2 hidden sm:flex border-primary/20 hover:bg-primary/5">
-              <Settings className="w-4 h-4" />
-              <span>System</span>
+            <Button asChild variant="outline" className="rounded-full gap-2 hidden sm:flex border-primary/20 hover:bg-primary/5">
+              <Link href="/settings">
+                <Settings className="w-4 h-4" />
+                <span>System</span>
+              </Link>
             </Button>
           </div>
         </div>
