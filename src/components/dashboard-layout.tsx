@@ -29,7 +29,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: Home },
-  { name: "Tools", href: "/dashboard/tools", icon: Layers },
+
   { name: "Orders", href: "/orders", icon: BarChart3 },
   { name: "Analytics", href: "/analytics", icon: BarChart3 },
   { name: "Restaurants", href: "/restaurants", icon: Store },
@@ -47,11 +47,11 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   const [collapsed, setCollapsed] = useState(false)
   const [isMounted, setIsMounted] = useState(false)
   const pathname = usePathname()
-  
+
   useEffect(() => {
     setIsMounted(true)
   }, [])
-  
+
   if (!isMounted) {
     return <div className="flex items-center justify-center min-h-screen">
       <Skeleton className="h-12 w-12 rounded-full" />
