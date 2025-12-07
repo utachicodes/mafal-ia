@@ -75,6 +75,13 @@ Your intelligent WhatsApp assistant. Get started in minutes.
 - **Browser-safe AI client**: Use `src/lib/ai-client-browser.ts` in client components; keep `src/lib/ai-client.ts` for server code only.
 - **Local dev DB**: Default to SQLite via `prisma/dev.db` (PostgreSQL recommended for production).
 
+## V3 Update (Dec 2025) - Production Readiness
+
+- **Persistent State**: Conversation history and metadata (orders, delivery info) are now stored in the database (PostgreSQL/SQLite). No more data loss on server restarts.
+- **Smart RAG (Fuse.js)**: Replaced full-menu context with fuzzy search. Handles large menus (1000+ items) efficiently by sending only relevant items to the AI.
+- **Robust Routing**: The webhook now intelligently routes messages based on `phone_number_id`, loading the correct restaurant context and API tokens for true multi-tenancy.
+- **Async Architecture**: Webhook returns `200 OK` immediately to Meta to prevent timeouts, processing logic in the background.
+
 ## Technology Stack
 
 - **Framework**: Next.js 15 (App Router)
@@ -82,7 +89,8 @@ Your intelligent WhatsApp assistant. Get started in minutes.
 - **Styling**: Tailwind CSS
 - **UI Components**: ShadCN/UI
 - **AI Backend**: Google Genkit
-- **State Management**: React Context and Hooks
+- **Search Engine**: Fuse.js (Fuzzy Search for RAG)
+- **State Management**: PostgreSQL (Persistent Conversations)
 - **Data Storage**: Prisma ORM + PostgreSQL (production), SQLite (local dev)
 
 ## Getting Started
@@ -307,7 +315,9 @@ No WhatsApp is required for the above. You can add WhatsApp later.
 - **Generate Response**: Main conversational AI flow
 - **Menu Information**: RAG tool for menu queries
 - **Order Calculator**: Order total computation
+
 - **Menu Processor**: JSON menu parsing
+- **Smart RAG**: Fuse.js integration to filter menu items before AI generation
 
 ### Dashboard Features
 - Restaurant management and configuration
