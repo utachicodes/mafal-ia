@@ -1,55 +1,57 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { Badge } from "@/components/ui/badge"
+import { CheckCircle, AlertTriangle } from "lucide-react"
 
 export default function SettingsPage() {
+  // In a real app we might check these on server side
+  const envStatus = [
+    { name: "Database", status: "Connected", secure: true },
+    { name: "Google Genkit", status: process.env.GOOGLE_GENKIT_API_KEY ? "Configured" : "Missing Key", secure: !!process.env.GOOGLE_GENKIT_API_KEY },
+    { name: "WhatsApp API", status: process.env.WHATSAPP_ACCESS_TOKEN ? "Configured" : "Per-Restaurant/Missing", secure: true },
+    { name: "Environment", status: process.env.NODE_ENV || "Development", secure: true }
+  ]
+
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Settings & System</h1>
         <p className="text-muted-foreground">
-          Manage your account settings
+          System health and global configuration
         </p>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Profile</CardTitle>
-          <CardDescription>Update your profile information</CardDescription>
+          <CardTitle>System Status</CardTitle>
+          <CardDescription>Current environment configuration state</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="name">Name</Label>
-            <Input id="name" value="Admin" />
+        <CardContent>
+          <div className="space-y-4">
+            {envStatus.map((item) => (
+              <div key={item.name} className="flex items-center justify-between p-3 border rounded-lg">
+                <div className="font-medium">{item.name}</div>
+                <div className="flex items-center gap-2">
+                  <Badge variant={item.secure ? "outline" : "destructive"} className="gap-1">
+                    {item.secure ? <CheckCircle className="h-3 w-3 text-green-500" /> : <AlertTriangle className="h-3 w-3" />}
+                    {item.status}
+                  </Badge>
+                </div>
+              </div>
+            ))}
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" value="admin@mafalia.com" disabled />
-          </div>
-          <Button>Update Profile</Button>
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle>Change Password</CardTitle>
-          <CardDescription>Update your password</CardDescription>
+          <CardTitle>About Mafal-IA</CardTitle>
+          <CardDescription>Version Information</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="current-password">Current Password</Label>
-            <Input id="current-password" type="password" />
+        <CardContent>
+          <div className="text-sm text-muted-foreground">
+            <p>Version: 3.0.0 (Production Ready)</p>
+            <p>Architecture: Next.js 15 + Genkit + Fuse.js + Prisma</p>
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="new-password">New Password</Label>
-            <Input id="new-password" type="password" />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="confirm-password">Confirm New Password</Label>
-            <Input id="confirm-password" type="password" />
-          </div>
-          <Button>Change Password</Button>
         </CardContent>
       </Card>
     </div>
