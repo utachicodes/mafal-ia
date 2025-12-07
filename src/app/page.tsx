@@ -96,49 +96,34 @@ export default function Home() {
       </section>
 
       {/* How it works */}
+      {/* How it works */}
       <section className="py-24 bg-muted/30 border-y border-border/50">
         <div className="container mx-auto px-6 max-w-6xl">
-          <div className="grid md:grid-cols-2 gap-16 items-center">
-            <div>
-              <h2 className="text-4xl font-bold mb-6">{t('steps.heading')}</h2>
-              <p className="text-lg text-muted-foreground mb-8">Get up and running in minutes, not days.</p>
-              <div className="space-y-8">
-                {[
-                  { n: '1', title: t('steps.s1.title'), desc: t('steps.s1.desc') },
-                  { n: '2', title: t('steps.s2.title'), desc: t('steps.s2.desc') },
-                  { n: '3', title: t('steps.s3.title'), desc: t('steps.s3.desc') },
-                ].map((s, i) => (
-                  <div key={s.n} className="flex gap-4">
-                    <div className="h-10 w-10 shrink-0 rounded-full bg-primary/10 text-primary font-bold flex items-center justify-center border border-primary/20">
-                      {s.n}
+          <div className="text-center max-w-2xl mx-auto mb-16">
+            <h2 className="text-4xl font-bold mb-6">{t('steps.heading')}</h2>
+            <p className="text-lg text-muted-foreground">Start automating your restaurant in just 3 simple steps.</p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              { n: '1', title: t('steps.s1.title'), desc: t('steps.s1.desc'), icon: MessageSquare },
+              { n: '2', title: t('steps.s2.title'), desc: t('steps.s2.desc'), icon: Bot },
+              { n: '3', title: t('steps.s3.title'), desc: t('steps.s3.desc'), icon: Zap },
+            ].map((s, i) => (
+              <div key={s.n} className="relative group">
+                <div className="absolute top-0 left-0 w-full h-full bg-primary/5 rounded-3xl transform rotate-3 scale-95 group-hover:rotate-0 group-hover:scale-100 transition-all duration-300" />
+                <div className="glass-card relative rounded-3xl p-8 h-full border-primary/10 hover:border-primary/30 transition-colors">
+                  <div className="flex items-center justify-between mb-6">
+                    <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-primary to-rose-600 flex items-center justify-center text-white shadow-lg shadow-primary/20">
+                      <s.icon className="h-7 w-7" />
                     </div>
-                    <div>
-                      <h3 className="font-bold text-lg mb-1">{s.title}</h3>
-                      <p className="text-muted-foreground">{s.desc}</p>
-                    </div>
+                    <span className="text-6xl font-black text-muted/20 select-none">{s.n}</span>
                   </div>
-                ))}
-              </div>
-            </div>
-            <div className="relative">
-              {/* Abstract graphic representing the app interface */}
-              <div className="glass-card rounded-2xl p-6 rotate-3 hover:rotate-0 transition-transform duration-500 shadow-2xl">
-                <div className="flex items-center gap-2 mb-4 border-b pb-4">
-                  <div className="h-3 w-3 rounded-full bg-red-400" />
-                  <div className="h-3 w-3 rounded-full bg-yellow-400" />
-                  <div className="h-3 w-3 rounded-full bg-green-400" />
-                </div>
-                <div className="space-y-3">
-                  <div className="h-20 w-3/4 bg-primary/10 rounded-lg rounded-tl-none" />
-                  <div className="h-8 w-1/2 bg-muted rounded-lg self-end ml-auto" />
-                  <div className="h-8 w-1/3 bg-muted rounded-lg self-end ml-auto" />
-                  <div className="h-24 w-5/6 bg-primary/5 rounded-lg border border-primary/10 p-4">
-                    <div className="h-2 w-1/3 bg-primary/20 rounded mb-2" />
-                    <div className="h-2 w-full bg-primary/10 rounded" />
-                  </div>
+                  <h3 className="text-xl font-bold mb-3">{s.title}</h3>
+                  <p className="text-muted-foreground leading-relaxed">{s.desc}</p>
                 </div>
               </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
