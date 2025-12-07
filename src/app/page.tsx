@@ -2,56 +2,66 @@
 
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { Sparkles, Bot, Zap, MessageSquare, Globe, CheckCircle } from 'lucide-react'
+import { Bot, Zap, MessageSquare, Globe, CheckCircle, ArrowRight } from 'lucide-react'
 import { SimpleThemeToggle } from '@/src/components/simple-theme-toggle'
+import { Logo } from '@/src/components/logo'
 import { useI18n } from '@/src/context/i18n'
 
 export default function Home() {
   const { t } = useI18n()
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-neutral-50">
-      {/* Header */}
-      <header className="sticky top-0 z-40 backdrop-blur supports-[backdrop-filter]:bg-white/70 bg-white/80 border-b">
-        <div className="container mx-auto px-6 py-4 flex justify-between items-center">
+    <div className="min-h-screen">
+      {/* Header (Glass) */}
+      <header className="sticky top-0 z-50 glass border-b-0 shadow-sm">
+        <div className="container mx-auto px-6 h-16 flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <Sparkles className="h-7 w-7 text-primary" />
-            <span className="text-2xl font-semibold text-neutral-900">{t('app.name')}</span>
+            <Link href="/" className="hover:opacity-80 transition-opacity">
+              <Logo className="h-8" />
+            </Link>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4">
             <SimpleThemeToggle />
-            {/* Auth removed: direct users to dashboard instead of sign-in */}
-            <Button asChild variant="ghost" className="button-hover">
-              <Link href="/dashboard">{t('header.login')}</Link>
-            </Button>
-            <Button asChild className="button-hover">
-              <Link href="/dashboard">{t('header.dashboard')}</Link>
-            </Button>
+            <div className="hidden md:flex gap-2">
+              <Button asChild variant="ghost" className="rounded-full hover:bg-primary/10 hover:text-primary">
+                <Link href="/dashboard">{t('header.login')}</Link>
+              </Button>
+              <Button asChild className="rounded-full shadow-lg shadow-primary/25 hover:shadow-primary/40">
+                <Link href="/dashboard">{t('header.dashboard')}</Link>
+              </Button>
+            </div>
           </div>
         </div>
       </header>
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden">
-        {/* subtle animated gradient blob */}
-        <div className="pointer-events-none absolute inset-0 -z-10">
-          <div className="absolute -top-24 -left-24 h-80 w-80 rounded-full bg-primary/10 blur-2xl animate-in fade-in zoom-in duration-1000" />
-          <div className="absolute -bottom-24 -right-24 h-96 w-96 rounded-full bg-accent/20 blur-2xl animate-in fade-in zoom-in duration-1000 delay-200" />
+      <section className="relative overflow-hidden pt-20 pb-32">
+        {/* Animated Background Elements */}
+        <div className="absolute inset-0 -z-10 overflow-hidden">
+          <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-primary/10 rounded-full blur-[100px] animate-float opacity-50" />
+          <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-accent/10 rounded-full blur-[120px] animate-float opacity-60" style={{ animationDelay: '-3s' }} />
         </div>
-        <div className="container mx-auto max-w-6xl px-6 py-24 text-center">
-          <p className="inline-flex items-center gap-2 text-xs font-medium text-primary bg-primary/10 rounded-full px-3 py-1 mb-4">
-            <CheckCircle className="h-3.5 w-3.5" /> {t('hero.badge')}
-          </p>
-          <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-6">
-            {t('hero.title')}
+
+        <div className="container mx-auto max-w-6xl px-6 text-center relative z-10">
+          <div className="inline-flex items-center gap-2 text-sm font-semibold text-primary bg-primary/5 border border-primary/10 rounded-full px-4 py-1.5 mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            <CheckCircle className="h-4 w-4" /> {t('hero.badge')}
+          </div>
+
+          <h1 className="text-6xl md:text-7xl font-extrabold tracking-tight mb-8 leading-tight animate-in fade-in slide-in-from-bottom-6 duration-700 delay-100">
+            {t('hero.title')}<span className="text-primary">.</span>
           </h1>
-          <p className="text-lg md:text-xl text-neutral-600 mb-10 max-w-3xl mx-auto">
+
+          <p className="text-xl md:text-2xl text-muted-foreground mb-12 max-w-3xl mx-auto leading-relaxed animate-in fade-in slide-in-from-bottom-6 duration-700 delay-200">
             {t('hero.subtitle')}
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button asChild size="lg" className="px-8 py-6 text-lg button-hover">
-              <Link href="/onboarding">{t('hero.ctaPrimary')}</Link>
+
+          <div className="flex flex-col sm:flex-row gap-4 justify-center animate-in fade-in slide-in-from-bottom-6 duration-700 delay-300">
+            <Button asChild size="lg" className="h-14 px-8 text-lg rounded-full shadow-xl shadow-primary/20 hover:shadow-primary/40 hover:-translate-y-1 transition-all">
+              <Link href="/onboarding">
+                {t('hero.ctaPrimary')} <ArrowRight className="ml-2 h-5 w-5" />
+              </Link>
             </Button>
-            <Button asChild variant="outline" size="lg" className="px-8 py-6 text-lg border-2 button-hover">
+            <Button asChild variant="outline" size="lg" className="h-14 px-8 text-lg rounded-full border-primary/20 hover:bg-primary/5 hover:border-primary/50 transition-all">
               <Link href="#features">{t('hero.ctaSecondary')}</Link>
             </Button>
           </div>
@@ -59,22 +69,26 @@ export default function Home() {
       </section>
 
       {/* Feature Grid */}
-      <section id="features" className="py-20">
+      <section id="features" className="py-24 relative">
         <div className="container mx-auto px-6">
-          <h2 className="text-3xl font-bold text-center mb-14">{t('features.heading')}</h2>
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold mb-4">{t('features.heading')}</h2>
+            <div className="h-1 w-20 bg-primary mx-auto rounded-full" />
+          </div>
+
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
-              { icon: Bot, title: t('features.menu'), desc: t('features.menuDesc') },
-              { icon: Globe, title: t('features.multi'), desc: t('features.multiDesc') },
-              { icon: MessageSquare, title: t('features.wa'), desc: t('features.waDesc') },
-              { icon: Zap, title: t('features.fast'), desc: t('features.fastDesc') },
+              { icon: Bot, title: t('features.menu'), desc: t('features.menuDesc'), color: "text-blue-500" },
+              { icon: Globe, title: t('features.multi'), desc: t('features.multiDesc'), color: "text-green-500" },
+              { icon: MessageSquare, title: t('features.wa'), desc: t('features.waDesc'), color: "text-indigo-500" },
+              { icon: Zap, title: t('features.fast'), desc: t('features.fastDesc'), color: "text-amber-500" },
             ].map((f, i) => (
-              <div key={f.title} className="card rounded-xl border bg-card/50 p-6 backdrop-blur animate-in fade-in slide-in-from-bottom duration-500" style={{ animationDelay: `${150 * i}ms` } as any}>
-                <div className="h-10 w-10 rounded-full bg-primary/10 text-primary flex items-center justify-center mb-4">
-                  <f.icon className="h-5 w-5" />
+              <div key={f.title} className="glass-card rounded-2xl p-8 card-hover" style={{ animationDelay: `${100 * i}ms` }}>
+                <div className={`h-12 w-12 rounded-xl bg-white dark:bg-neutral-800 shadow-sm flex items-center justify-center mb-6 ${f.color}`}>
+                  <f.icon className="h-6 w-6" />
                 </div>
-                <h3 className="font-semibold mb-1">{f.title}</h3>
-                <p className="text-sm text-neutral-600">{f.desc}</p>
+                <h3 className="text-xl font-bold mb-3">{f.title}</h3>
+                <p className="text-muted-foreground leading-relaxed">{f.desc}</p>
               </div>
             ))}
           </div>
@@ -82,44 +96,79 @@ export default function Home() {
       </section>
 
       {/* How it works */}
-      <section className="py-16 bg-neutral-50">
-        <div className="container mx-auto px-6 max-w-5xl">
-          <h2 className="text-3xl font-bold text-center mb-10">{t('steps.heading')}</h2>
-          <div className="grid md:grid-cols-3 gap-6">
-            {[
-              { n: '1', title: t('steps.s1.title'), desc: t('steps.s1.desc') },
-              { n: '2', title: t('steps.s2.title'), desc: t('steps.s2.desc') },
-              { n: '3', title: t('steps.s3.title'), desc: t('steps.s3.desc') },
-            ].map((s, i) => (
-              <div key={s.n} className="rounded-xl border bg-white p-6 hover:shadow-lg transition-all duration-300">
-                <div className="text-primary text-sm font-semibold mb-2">{s.n}</div>
-                <h3 className="font-semibold mb-1">{s.title}</h3>
-                <p className="text-sm text-neutral-600">{s.desc}</p>
+      <section className="py-24 bg-muted/30 border-y border-border/50">
+        <div className="container mx-auto px-6 max-w-6xl">
+          <div className="grid md:grid-cols-2 gap-16 items-center">
+            <div>
+              <h2 className="text-4xl font-bold mb-6">{t('steps.heading')}</h2>
+              <p className="text-lg text-muted-foreground mb-8">Get up and running in minutes, not days.</p>
+              <div className="space-y-8">
+                {[
+                  { n: '1', title: t('steps.s1.title'), desc: t('steps.s1.desc') },
+                  { n: '2', title: t('steps.s2.title'), desc: t('steps.s2.desc') },
+                  { n: '3', title: t('steps.s3.title'), desc: t('steps.s3.desc') },
+                ].map((s, i) => (
+                  <div key={s.n} className="flex gap-4">
+                    <div className="h-10 w-10 shrink-0 rounded-full bg-primary/10 text-primary font-bold flex items-center justify-center border border-primary/20">
+                      {s.n}
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-lg mb-1">{s.title}</h3>
+                      <p className="text-muted-foreground">{s.desc}</p>
+                    </div>
+                  </div>
+                ))}
               </div>
-            ))}
+            </div>
+            <div className="relative">
+              {/* Abstract graphic representing the app interface */}
+              <div className="glass-card rounded-2xl p-6 rotate-3 hover:rotate-0 transition-transform duration-500 shadow-2xl">
+                <div className="flex items-center gap-2 mb-4 border-b pb-4">
+                  <div className="h-3 w-3 rounded-full bg-red-400" />
+                  <div className="h-3 w-3 rounded-full bg-yellow-400" />
+                  <div className="h-3 w-3 rounded-full bg-green-400" />
+                </div>
+                <div className="space-y-3">
+                  <div className="h-20 w-3/4 bg-primary/10 rounded-lg rounded-tl-none" />
+                  <div className="h-8 w-1/2 bg-muted rounded-lg self-end ml-auto" />
+                  <div className="h-8 w-1/3 bg-muted rounded-lg self-end ml-auto" />
+                  <div className="h-24 w-5/6 bg-primary/5 rounded-lg border border-primary/10 p-4">
+                    <div className="h-2 w-1/3 bg-primary/20 rounded mb-2" />
+                    <div className="h-2 w-full bg-primary/10 rounded" />
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
       {/* CTA */}
-      <section className="py-20">
-        <div className="container mx-auto px-6 text-center max-w-3xl">
-          <h3 className="text-3xl font-semibold mb-4">{t('cta.heading')}</h3>
-          <p className="text-neutral-600 mb-8">{t('cta.desc')}</p>
-          <Button asChild size="lg" className="button-hover">
+      <section className="py-24 relative overflow-hidden">
+        <div className="absolute inset-0 bg-primary text-primary-foreground transform -skew-y-3 scale-110 -z-10 origin-center" />
+        <div className="container mx-auto px-6 text-center max-w-3xl relative z-10 text-white">
+          <h3 className="text-4xl font-bold mb-6 tracking-tight">{t('cta.heading')}</h3>
+          <p className="text-primary-foreground/80 text-xl mb-10">{t('cta.desc')}</p>
+          <Button asChild size="lg" variant="secondary" className="h-16 px-10 text-xl rounded-full shadow-2xl hover:scale-105 transition-transform text-primary font-bold">
             <Link href="/onboarding">{t('cta.button')}</Link>
           </Button>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="py-10 bg-neutral-950 text-neutral-400">
-        <div className="container mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-white" />
-            <span className="text-white font-medium">Mafal-IA</span>
+      <footer className="py-12 bg-card border-t">
+        <div className="container mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="opacity-80 grayscale hover:grayscale-0 transition-all">
+            <Logo className="h-6" />
           </div>
-          <div className="text-xs">© {new Date().getFullYear()} {t('app.name')}. {t('footer.copyright')}</div>
+          <div className="flex gap-8 text-sm text-muted-foreground font-medium">
+            <Link href="#" className="hover:text-primary transition-colors">Privacy</Link>
+            <Link href="#" className="hover:text-primary transition-colors">Terms</Link>
+            <Link href="#" className="hover:text-primary transition-colors">Contact</Link>
+          </div>
+          <div className="text-xs text-muted-foreground">
+            © {new Date().getFullYear()} {t('app.name')} Inc.
+          </div>
         </div>
       </footer>
     </div>
