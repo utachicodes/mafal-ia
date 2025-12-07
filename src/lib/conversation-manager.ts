@@ -1,3 +1,4 @@
+import { getPrisma } from "@/src/lib/db"
 import type { ChatMessage } from "@/lib/data"
 import type { DeliveryEstimate } from "./delivery"
 
@@ -8,157 +9,137 @@ type PendingOrder = {
   orderItems: { itemName: string; quantity: number }[]
 }
 
-// Enhanced conversation management (in production, use a database)
+type ConversationMetadata = {
+  name?: string
+  locationText?: string
+  delivery?: DeliveryEstimate
+  pendingOrder?: PendingOrder | undefined
+  conciergeOptions?: { id: string; name: string; sample: string; price: number }[]
+  conciergePendingOrder?: {
+    restaurantId: string
+    restaurantName: string
+    itemsSummary: string
+    total: number
+    orderItems: { itemName: string; quantity: number }[]
+  }
+  lastQuery?: string
+}
+
 export class ConversationManager {
-  private static conversations = new Map<string, ChatMessage[]>()
   private static readonly MAX_MESSAGES_PER_CONVERSATION = 50
-  private static readonly CONVERSATION_TIMEOUT = 24 * 60 * 60 * 1000 // 24 hours
+  // No memory cache - direct DB access for stateless reliability
 
-  // Lightweight metadata store (name, location, delivery, concierge state)
-  private static metadata = new Map<
-    string,
-    {
-      name?: string
-      locationText?: string
-      delivery?: DeliveryEstimate
-      pendingOrder?: PendingOrder | undefined
-      // Concierge-only fields (global assistant)
-      conciergeOptions?: { id: string; name: string; sample: string; price: number }[]
-      conciergePendingOrder?: {
-        restaurantId: string
-        restaurantName: string
-        itemsSummary: string
-        total: number
-        orderItems: { itemName: string; quantity: number }[]
-      }
-      lastQuery?: string
-    }
-  >()
-
-  // Get conversation key
   private static getConversationKey(restaurantId: string, phoneNumber: string): string {
     return `${restaurantId}:${phoneNumber}`
   }
 
   // Get conversation history
-  static getConversation(restaurantId: string, phoneNumber: string): ChatMessage[] {
-    const key = this.getConversationKey(restaurantId, phoneNumber)
-    const messages = this.conversations.get(key) || []
+  static async getConversation(restaurantId: string, phoneNumber: string): Promise<ChatMessage[]> {
+    const prisma = await getPrisma()
+    const conv = await prisma.conversation.findFirst({
+      where: { restaurantId, phoneNumber },
+      select: { messages: true },
+    })
 
-    // Filter out old messages
-    const cutoffTime = Date.now() - this.CONVERSATION_TIMEOUT
-    return messages.filter((msg) => msg.timestamp.getTime() > cutoffTime)
+    if (!conv || !conv.messages) return []
+
+    // Parse JSON messages
+    try {
+      const messages = conv.messages as unknown as ChatMessage[]
+      // Reconstitute Date objects if they were serialized
+      return messages.map(m => ({
+        ...m,
+        timestamp: new Date(m.timestamp)
+      }))
+    } catch {
+      return []
+    }
   }
 
   // Add message to conversation
-  static addMessage(restaurantId: string, phoneNumber: string, message: ChatMessage): void {
-    const key = this.getConversationKey(restaurantId, phoneNumber)
-    const messages = this.getConversation(restaurantId, phoneNumber)
+  static async addMessage(restaurantId: string, phoneNumber: string, message: ChatMessage): Promise<void> {
+    const prisma = await getPrisma()
 
-    messages.push(message)
+    // Fetch existing
+    const existing = await this.getConversation(restaurantId, phoneNumber)
+    const updated = [...existing, message].slice(-this.MAX_MESSAGES_PER_CONVERSATION)
 
-    // Keep only recent messages
-    const recentMessages = messages.slice(-this.MAX_MESSAGES_PER_CONVERSATION)
-    this.conversations.set(key, recentMessages)
+    // Upsert conversation
+    const existingConv = await prisma.conversation.findFirst({
+      where: { restaurantId, phoneNumber },
+      select: { id: true }
+    })
+
+    if (existingConv) {
+      await prisma.conversation.update({
+        where: { id: existingConv.id },
+        data: {
+          messages: updated as any,
+          lastActive: new Date()
+        }
+      })
+    } else {
+      await prisma.conversation.create({
+        data: {
+          restaurantId,
+          phoneNumber,
+          messages: updated as any,
+          lastActive: new Date()
+        }
+      })
+    }
+  }
+
+  // Get metadata (state)
+  static async getMetadata(restaurantId: string, phoneNumber: string): Promise<ConversationMetadata> {
+    const prisma = await getPrisma()
+    const conv = await prisma.conversation.findFirst({
+      where: { restaurantId, phoneNumber },
+      select: { metadata: true }
+    })
+
+    if (!conv || !conv.metadata) return {}
+    return conv.metadata as ConversationMetadata
+  }
+
+  // Update metadata (state)
+  static async updateMetadata(
+    restaurantId: string,
+    phoneNumber: string,
+    patch: Partial<ConversationMetadata>
+  ): Promise<void> {
+    const prisma = await getPrisma()
+    const current = await this.getMetadata(restaurantId, phoneNumber)
+    const updated = { ...current, ...patch }
+
+    const existingConv = await prisma.conversation.findFirst({
+      where: { restaurantId, phoneNumber },
+      select: { id: true }
+    })
+
+    if (existingConv) {
+      await prisma.conversation.update({
+        where: { id: existingConv.id },
+        data: { metadata: updated as any }
+      })
+    } else {
+      // Create if doesn't exist (rare case if metadata set before message, but possible)
+      await prisma.conversation.create({
+        data: {
+          restaurantId,
+          phoneNumber,
+          messages: [],
+          metadata: updated as any
+        }
+      })
+    }
   }
 
   // Clear conversation
-  static clearConversation(restaurantId: string, phoneNumber: string): void {
-    const key = this.getConversationKey(restaurantId, phoneNumber)
-    this.conversations.delete(key)
-    this.metadata.delete(key)
-  }
-
-  // Get conversation summary for analytics
-  static getConversationSummary(
-    restaurantId: string,
-    phoneNumber: string,
-  ): {
-    messageCount: number
-    lastMessageTime: Date | null
-    conversationDuration: number
-  } {
-    const messages = this.getConversation(restaurantId, phoneNumber)
-
-    if (messages.length === 0) {
-      return {
-        messageCount: 0,
-        lastMessageTime: null,
-        conversationDuration: 0,
-      }
-    }
-
-    const firstMessage = messages[0]
-    const lastMessage = messages[messages.length - 1]
-    const duration = lastMessage.timestamp.getTime() - firstMessage.timestamp.getTime()
-
-    return {
-      messageCount: messages.length,
-      lastMessageTime: lastMessage.timestamp,
-      conversationDuration: duration,
-    }
-  }
-
-  // Clean up old conversations
-  static cleanupOldConversations(): void {
-    const cutoffTime = Date.now() - this.CONVERSATION_TIMEOUT
-
-    for (const [key, messages] of this.conversations.entries()) {
-      const recentMessages = messages.filter((msg) => msg.timestamp.getTime() > cutoffTime)
-
-      if (recentMessages.length === 0) {
-        this.conversations.delete(key)
-        this.metadata.delete(key)
-      } else if (recentMessages.length !== messages.length) {
-        this.conversations.set(key, recentMessages)
-      }
-    }
-  }
-
-  // Metadata helpers
-  static getMetadata(
-    restaurantId: string,
-    phoneNumber: string,
-  ): {
-    name?: string
-    locationText?: string
-    delivery?: DeliveryEstimate
-    pendingOrder?: PendingOrder | undefined
-    conciergeOptions?: { id: string; name: string; sample: string; price: number }[]
-    conciergePendingOrder?: {
-      restaurantId: string
-      restaurantName: string
-      itemsSummary: string
-      total: number
-      orderItems: { itemName: string; quantity: number }[]
-    }
-    lastQuery?: string
-  } {
-    const key = this.getConversationKey(restaurantId, phoneNumber)
-    return this.metadata.get(key) || {}
-  }
-
-  static updateMetadata(
-    restaurantId: string,
-    phoneNumber: string,
-    patch: Partial<{
-      name: string
-      locationText: string
-      delivery: DeliveryEstimate
-      pendingOrder: PendingOrder | undefined
-      conciergeOptions: { id: string; name: string; sample: string; price: number }[]
-      conciergePendingOrder: {
-        restaurantId: string
-        restaurantName: string
-        itemsSummary: string
-        total: number
-        orderItems: { itemName: string; quantity: number }[]
-      }
-      lastQuery: string
-    }>,
-  ): void {
-    const key = this.getConversationKey(restaurantId, phoneNumber)
-    const current = this.metadata.get(key) || {}
-    this.metadata.set(key, { ...current, ...patch })
+  static async clearConversation(restaurantId: string, phoneNumber: string): Promise<void> {
+    const prisma = await getPrisma()
+    await prisma.conversation.deleteMany({
+      where: { restaurantId, phoneNumber }
+    })
   }
 }

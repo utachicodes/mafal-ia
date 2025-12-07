@@ -3,6 +3,8 @@ import { generate } from "@genkit-ai/ai"
 import { googleAI } from "@genkit-ai/googleai"
 import type { MenuItem } from "@/lib/data"
 import { z } from "zod"
+import Fuse from "fuse.js"
+import { searchMenuItems } from "@/src/lib/data-utils"
 
 interface MenuRetrievalInput {
   query: string
@@ -61,36 +63,37 @@ export const getMenuItemInformationFlow = defineFlow(
       }
     }
 
-    // First, find relevant menu items using semantic search
-    const searchPrompt = `
-Given this customer query: "${query}"
+    // Step 1: Intelligent filtering using Fuse.js (Fuzzy Search) + Simple Keyword Match
+    // This allows us to handle 1000+ items without blowing up the context window.
+    // Configure Fuse for name and description search
+    const fuse = new Fuse(menuItems, {
+      keys: [
+        { name: "name", weight: 0.7 },
+        { name: "category", weight: 0.2 },
+        { name: "description", weight: 0.1 }
+      ],
+      threshold: 0.4, // Lower is stricter
+      includeScore: true
+    })
 
-Find the most relevant menu items from this list:
-${menuItems.map((item, index) => `${index + 1}. ${item.name}: ${item.description} - ${item.price} FCFA`).join("\n")}
+    const fuseResults = fuse.search(query)
+    let relevantItems = fuseResults.map((r: any) => r.item).slice(0, 5) // Take top 5
 
-Return the numbers of the most relevant items (1-3 items max), separated by commas.
-If no items are relevant, return "none".
-    `
+    // Fallback: If fuzzy search failed (e.g. general query like "drinks"), try category filter
+    if (relevantItems.length === 0) {
+      relevantItems = searchMenuItems(menuItems, query).slice(0, 5)
+    }
 
-    const searchResult = await genAny({ model: modelAny, prompt: searchPrompt })
-
-    const relevantIndexes = getText(searchResult)
-    let relevantItems: MenuItem[] = []
-
-    if (relevantIndexes !== "none") {
-      const indexes = relevantIndexes
-        .split(",")
-        .map((idx) => Number.parseInt(idx.trim()) - 1)
-        .filter((idx) => idx >= 0 && idx < menuItems.length)
-
-      relevantItems = indexes.map((idx) => menuItems[idx])
+    // If still no items, but the menu is small (<20 items), just use the whole menu
+    if (relevantItems.length === 0 && menuItems.length < 20) {
+      relevantItems = menuItems
     }
 
     // Generate detailed information about the relevant items
     if (relevantItems.length === 0) {
       return {
         information:
-          "I couldn't find any menu items matching your query. Please ask about specific dishes or browse our full menu.",
+          "I couldn't find any menu items matching your specific query. Could you please check the spelling or ask about a different dish?",
         relevantItems: [],
       }
     }
@@ -98,8 +101,8 @@ If no items are relevant, return "none".
     const informationPrompt = `
 Customer query: "${query}"
 
-Relevant menu items:
-${relevantItems.map((item) => `- ${item.name}: ${item.description} (${item.price} FCFA)${item.category ? ` [${item.category}]` : ""}`).join("\n")}
+Relevant menu items (Filtered from full menu):
+${relevantItems.map((item: MenuItem) => `- ${item.name}: ${item.description} (${item.price} FCFA)${item.category ? ` [${item.category}]` : ""}`).join("\n")}
 
 Provide helpful information about these items in response to the customer's query. Include:
 - Item names and descriptions
@@ -107,7 +110,7 @@ Provide helpful information about these items in response to the customer's quer
 - Any dietary information you can infer from descriptions
 - Recommendations if appropriate
 
-Be concise but informative.
+Be concise but informative. Speak naturally.
     `
 
     const informationResult = await genAny({ model: modelAny, prompt: informationPrompt })
