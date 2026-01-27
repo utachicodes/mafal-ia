@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -9,6 +10,7 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Loader2 } from "lucide-react"
+import { Logo } from "@/src/components/logo"
 
 export default function RegisterPage() {
   const router = useRouter()
@@ -93,128 +95,152 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-muted/30 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md mx-auto">
-        <CardHeader>
-          <CardTitle>
-            {step === 5 ? "Verify your number" : "Create your account"}
-          </CardTitle>
-          <CardDescription>
-            {step === 5 ? "Enter the code sent to your WhatsApp" : `Step ${step} of 4`}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {error && (
-            <div className="bg-red-50 text-red-600 p-3 rounded-md text-sm border border-red-200">
-              {error}
-            </div>
-          )}
+    <div className="min-h-screen bg-gradient-to-b from-background to-muted/40 relative overflow-hidden flex flex-col">
+      {/* Background Blobs */}
+      <div className="absolute inset-0 pointer-events-none z-0">
+        <div className="blob-base blob-float blob-pulse top-[-8rem] right-[-8rem] h-[22rem] w-[22rem] bg-primary/20 animate-pulse" />
+        <div className="blob-base blob-float-slow top-[20%] left-[-6rem] h-[18rem] w-[18rem] bg-emerald-500/15 animate-bounce" style={{animationDuration: '3s'}} />
+        <div className="blob-base blob-float bottom-[-10rem] right-[10%] h-[20rem] w-[20rem] bg-fuchsia-500/10 animate-pulse" style={{animationDelay: '1s'}} />
+      </div>
 
-          {step === 1 && (
-            <div className="space-y-2">
-              <Label htmlFor="name">Establishment Name</Label>
-              <Input
-                id="name"
-                placeholder="e.g. Chez Fatou"
-                value={formData.name}
-                onChange={(e) => handleChange("name", e.target.value)}
-              />
-            </div>
-          )}
+      {/* Nav / Logo */}
+      <nav className="relative z-10 p-6">
+        <Link href="/">
+          <Logo className="h-12" />
+        </Link>
+      </nav>
 
-          {step === 2 && (
-            <div className="space-y-2">
-              <Label htmlFor="phone">Commercial WhatsApp Number</Label>
-              <Input
-                id="phone"
-                placeholder="e.g. 221770000000"
-                type="tel"
-                value={formData.whatsappNumber}
-                onChange={(e) => handleChange("whatsappNumber", e.target.value)}
-              />
-              <p className="text-xs text-muted-foreground">Include country code without +</p>
-            </div>
-          )}
+      {/* Main Content */}
+      <div className="relative z-10 flex-1 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md mx-auto bg-card/80 backdrop-blur border-0 shadow-lg hover:shadow-xl transition-all duration-300 animate-in fade-in-50 zoom-in-95">
+          <CardHeader>
+            <CardTitle className="text-2xl font-bold text-center">
+              {step === 5 ? "Verify your number" : "Create your account"}
+            </CardTitle>
+            <CardDescription className="text-center">
+              {step === 5 ? "Enter the code sent to your WhatsApp" : `Step ${step} of 4`}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {error && (
+              <div className="bg-destructive/10 text-destructive p-3 rounded-md text-sm border border-destructive/20 text-center">
+                {error}
+              </div>
+            )}
 
-          {step === 3 && (
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label>Age Range</Label>
-                <Select value={formData.ownerAgeRange} onValueChange={(val) => handleChange("ownerAgeRange", val)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select age range" />
+            {step === 1 && (
+              <div className="space-y-2 animate-in slide-in-from-right-4 fade-in duration-300">
+                <Label htmlFor="name">Establishment Name</Label>
+                <Input
+                  id="name"
+                  placeholder="e.g. Chez Fatou"
+                  value={formData.name}
+                  onChange={(e) => handleChange("name", e.target.value)}
+                  className="bg-background/50"
+                  autoFocus
+                />
+              </div>
+            )}
+
+            {step === 2 && (
+              <div className="space-y-2 animate-in slide-in-from-right-4 fade-in duration-300">
+                <Label htmlFor="phone">Commercial WhatsApp Number</Label>
+                <Input
+                  id="phone"
+                  placeholder="e.g. 221770000000"
+                  type="tel"
+                  value={formData.whatsappNumber}
+                  onChange={(e) => handleChange("whatsappNumber", e.target.value)}
+                  className="bg-background/50"
+                  autoFocus
+                />
+                <p className="text-xs text-muted-foreground">Include country code without +</p>
+              </div>
+            )}
+
+            {step === 3 && (
+              <div className="space-y-4 animate-in slide-in-from-right-4 fade-in duration-300">
+                <div className="space-y-2">
+                  <Label>Age Range</Label>
+                  <Select value={formData.ownerAgeRange} onValueChange={(val) => handleChange("ownerAgeRange", val)}>
+                    <SelectTrigger className="bg-background/50">
+                      <SelectValue placeholder="Select age range" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="18-25">18 - 25</SelectItem>
+                      <SelectItem value="26-35">26 - 35</SelectItem>
+                      <SelectItem value="36-45">36 - 45</SelectItem>
+                      <SelectItem value="46+">46+</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Sex</Label>
+                  <RadioGroup value={formData.ownerSex} onValueChange={(val) => handleChange("ownerSex", val)}>
+                    <div className="flex items-center space-x-2 p-2 rounded-md hover:bg-muted/50 transition-colors">
+                      <RadioGroupItem value="M" id="sex-m" />
+                      <Label htmlFor="sex-m" className="cursor-pointer flex-1">Male</Label>
+                    </div>
+                    <div className="flex items-center space-x-2 p-2 rounded-md hover:bg-muted/50 transition-colors">
+                      <RadioGroupItem value="F" id="sex-f" />
+                      <Label htmlFor="sex-f" className="cursor-pointer flex-1">Female</Label>
+                    </div>
+                  </RadioGroup>
+                </div>
+              </div>
+            )}
+
+            {step === 4 && (
+              <div className="space-y-2 animate-in slide-in-from-right-4 fade-in duration-300">
+                <Label htmlFor="country">Country</Label>
+                <Select value={formData.country} onValueChange={(val) => handleChange("country", val)}>
+                  <SelectTrigger className="bg-background/50">
+                    <SelectValue placeholder="Select country" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="18-25">18 - 25</SelectItem>
-                    <SelectItem value="26-35">26 - 35</SelectItem>
-                    <SelectItem value="36-45">36 - 45</SelectItem>
-                    <SelectItem value="46+">46+</SelectItem>
+                    <SelectItem value="Senegal">Senegal</SelectItem>
+                    <SelectItem value="Ivory Coast">Ivory Coast</SelectItem>
+                    <SelectItem value="Nigeria">Nigeria</SelectItem>
+                    <SelectItem value="Other">Other</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
-              <div className="space-y-2">
-                <Label>Sex</Label>
-                <RadioGroup value={formData.ownerSex} onValueChange={(val) => handleChange("ownerSex", val)}>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="M" id="sex-m" />
-                    <Label htmlFor="sex-m">Male</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="F" id="sex-f" />
-                    <Label htmlFor="sex-f">Female</Label>
-                  </div>
-                </RadioGroup>
-              </div>
-            </div>
-          )}
-
-          {step === 4 && (
-            <div className="space-y-2">
-              <Label htmlFor="country">Country</Label>
-              <Select value={formData.country} onValueChange={(val) => handleChange("country", val)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select country" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Senegal">Senegal</SelectItem>
-                  <SelectItem value="Ivory Coast">Ivory Coast</SelectItem>
-                  <SelectItem value="Nigeria">Nigeria</SelectItem>
-                  <SelectItem value="Other">Other</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          )}
-
-          {step === 5 && (
-            <div className="space-y-2">
-              <Label htmlFor="otp">Verification Code</Label>
-              <Input
-                id="otp"
-                placeholder="123456"
-                maxLength={6}
-                value={otp}
-                onChange={(e) => setOtp(e.target.value)}
-              />
-            </div>
-          )}
-
-          <div className="flex justify-between pt-4">
-            {step > 1 && step < 5 && (
-              <Button variant="outline" onClick={() => setStep(step - 1)} disabled={loading}>
-                Back
-              </Button>
             )}
-            <Button
-              className={step === 1 ? "w-full" : "ml-auto"}
-              onClick={step === 5 ? verifyOtp : handleNext}
-              disabled={!isStepValid() || loading}
-            >
-              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {step === 5 ? "Verify & Start" : (step === 4 ? "Send Code" : "Next")}
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+
+            {step === 5 && (
+              <div className="space-y-2 animate-in slide-in-from-right-4 fade-in duration-300">
+                <Label htmlFor="otp">Verification Code</Label>
+                <Input
+                  id="otp"
+                  placeholder="123456"
+                  maxLength={6}
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value)}
+                  className="text-center text-lg tracking-widest bg-background/50"
+                  autoFocus
+                />
+              </div>
+            )}
+
+            <div className="flex justify-between pt-2">
+              {step > 1 && step < 5 && (
+                <Button variant="ghost" onClick={() => setStep(step - 1)} disabled={loading}>
+                  Back
+                </Button>
+              )}
+              <Button
+                className={step === 1 ? "w-full shadow-lg" : "ml-auto shadow-lg"}
+                onClick={step === 5 ? verifyOtp : handleNext}
+                disabled={!isStepValid() || loading}
+                size="lg"
+              >
+                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {step === 5 ? "Verify & Start" : (step === 4 ? "Send Code" : "Next")}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   )
 }
