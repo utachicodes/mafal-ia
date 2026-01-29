@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Logo } from "@/src/components/logo";
 import { SimpleThemeToggle } from "@/src/components/simple-theme-toggle";
-import { MessageSquare, Bot, Globe, Zap, CheckCircle2, Shield, Phone, Layers, Rocket, ArrowRight, Star } from "lucide-react";
+import { MessageSquare, Bot, Globe, Zap, ArrowRight, Store, Smartphone, TrendingUp } from "lucide-react";
 
 export default function HomeClient() {
   return (
@@ -30,11 +30,10 @@ export default function HomeClient() {
             <div className="hidden md:flex items-center gap-8">
               <a href="#features" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Features</a>
               <a href="#how" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">How it works</a>
-              {/* Removed provider-specific nav */}
               <SimpleThemeToggle />
-              <Link href="/restaurants">
+              <Link href="/onboarding">
                 <Button size="sm" className="shadow-sm">
-                  Get started
+                  Start Selling
                 </Button>
               </Link>
             </div>
@@ -52,29 +51,24 @@ export default function HomeClient() {
             </div>
             
             <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold text-foreground mb-8 leading-[0.9] tracking-tight animate-in fade-in-50 delay-100">
-              Build Chatbot endpoints
+              Automatisez vos ventes
               <br />
               <span className="relative inline-block">
-                for your restaurants
+                sur WhatsApp
                 <div className="absolute -bottom-2 left-0 w-full h-1 bg-primary rounded-full animate-in slide-in-from-left-full duration-1000 delay-700"></div>
               </span>
             </h1>
             
             <p className="text-xl md:text-2xl text-muted-foreground max-w-4xl mx-auto mb-12 leading-relaxed animate-in fade-in-50 delay-200">
-              Create your restaurant, add your menu, and get a chatbot API endpoint you can plug into any webhook.
-              AI answers in French, English, Wolof, or Arabic.
+              Restaurants, boutiques, commerces : ne perdez plus de clients.
+              Laissez notre IA prendre les commandes et répondre aux questions 24/7.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center animate-in zoom-in-50 delay-300">
-              <Link href="/restaurants">
+              <Link href="/onboarding">
                 <Button size="lg" className="px-10 py-4 text-lg font-semibold shadow-lg hover:shadow-xl transition-all hover:scale-[1.05] animate-pulse hover:animate-none group">
-                  Create your agent
+                  Commencer maintenant
                   <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                </Button>
-              </Link>
-              <Link href="/dashboard">
-                <Button size="lg" variant="outline" className="px-10 py-4 text-lg font-semibold hover:scale-[1.05] transition-all hover:bg-primary hover:text-primary-foreground">
-                  View dashboard
                 </Button>
               </Link>
             </div>
@@ -87,44 +81,44 @@ export default function HomeClient() {
         <div className="container mx-auto px-6">
           <div className="text-center mb-20">
             <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
-              Everything you need to launch
+              Tout ce qu'il faut pour vendre
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Purpose-built for restaurants with intelligent AI that understands your menu and customers
+              Conçu pour le commerce informel et moderne en Afrique.
             </p>
           </div>
           
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             <Card className="bg-card/80 backdrop-blur border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.05] hover:rotate-1 p-8 animate-in fade-in-50 group">
               <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-primary/20 transition-colors">
-                <Bot className="h-8 w-8 text-primary group-hover:scale-110 transition-transform" />
+                <Store className="h-8 w-8 text-primary group-hover:scale-110 transition-transform" />
               </div>
-              <h3 className="text-xl font-semibold text-foreground mb-3 group-hover:text-primary transition-colors">Menu‑aware AI</h3>
-              <p className="text-muted-foreground leading-relaxed">Understands intent and your menu to answer questions and take orders accurately.</p>
+              <h3 className="text-xl font-semibold text-foreground mb-3 group-hover:text-primary transition-colors">Vente Automatique</h3>
+              <p className="text-muted-foreground leading-relaxed">L'IA présente vos produits et prend les commandes directement dans WhatsApp.</p>
             </Card>
             
             <Card className="bg-card/80 backdrop-blur border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.05] hover:-rotate-1 p-8 animate-in fade-in-50 delay-100 group">
               <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-primary/20 transition-colors">
                 <Globe className="h-8 w-8 text-primary group-hover:scale-110 transition-transform animate-spin" style={{ animationDuration: '8s' }} />
               </div>
-              <h3 className="text-xl font-semibold text-foreground mb-3 group-hover:text-primary transition-colors">Multilingual</h3>
-              <p className="text-muted-foreground leading-relaxed">French, English, Wolof, Arabic automatically detected and supported.</p>
+              <h3 className="text-xl font-semibold text-foreground mb-3 group-hover:text-primary transition-colors">Multilingue</h3>
+              <p className="text-muted-foreground leading-relaxed">Français, Anglais, Wolof, Arabe. Parlez la langue de vos clients.</p>
             </Card>
             
             <Card className="bg-card/80 backdrop-blur border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.05] hover:-rotate-1 p-8 animate-in fade-in-50 delay-150 group">
               <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-primary/20 transition-colors">
-                <MessageSquare className="h-8 w-8 text-primary group-hover:scale-110 transition-transform animate-bounce" style={{animationDuration: '2s'}} />
+                <Smartphone className="h-8 w-8 text-primary group-hover:scale-110 transition-transform animate-bounce" style={{animationDuration: '2s'}} />
               </div>
-              <h3 className="text-xl font-semibold text-foreground mb-3 group-hover:text-primary transition-colors">Channel-agnostic</h3>
-              <p className="text-muted-foreground leading-relaxed">Integrate your chatbot endpoint with any provider that can POST messages.</p>
+              <h3 className="text-xl font-semibold text-foreground mb-3 group-hover:text-primary transition-colors">100% Mobile</h3>
+              <p className="text-muted-foreground leading-relaxed">Gérez tout depuis votre téléphone. Pas besoin d'ordinateur.</p>
             </Card>
             
             <Card className="bg-card/80 backdrop-blur border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.05] hover:-rotate-1 p-8 animate-in fade-in-50 delay-200 group">
               <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-primary/20 transition-colors">
-                <Zap className="h-8 w-8 text-primary group-hover:scale-110 transition-transform animate-pulse" />
+                <TrendingUp className="h-8 w-8 text-primary group-hover:scale-110 transition-transform animate-pulse" />
               </div>
-              <h3 className="text-xl font-semibold text-foreground mb-3 group-hover:text-primary transition-colors">Fast setup</h3>
-              <p className="text-muted-foreground leading-relaxed">Go from menu to live agent in under 15 minutes with guided setup.</p>
+              <h3 className="text-xl font-semibold text-foreground mb-3 group-hover:text-primary transition-colors">Croissance</h3>
+              <p className="text-muted-foreground leading-relaxed">Augmentez vos revenus en ne ratant jamais une vente, même la nuit.</p>
             </Card>
           </div>
         </div>
@@ -134,16 +128,15 @@ export default function HomeClient() {
       <section id="how" className="relative z-10 py-32">
         <div className="container mx-auto px-6">
           <div className="text-center mb-20">
-            <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6">How it works</h2>
-            <p className="text-xl text-muted-foreground">Four simple steps to your chatbot endpoint</p>
+            <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6">Comment ça marche ?</h2>
+            <p className="text-xl text-muted-foreground">3 étapes simples pour vendre plus</p>
           </div>
 
-          <div className="grid md:grid-cols-5 gap-6">
+          <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
             {[
-              { step: "1", title: "Restaurant", desc: "Add name, description, and operating hours" },
-              { step: "2", title: "Menu", desc: "Paste JSON, CSV, or text—we auto-structure it" },
-              { step: "3", title: "Endpoint", desc: "Copy your /api/chatbots/[id]/messages endpoint" },
-              { step: "4", title: "Integrate", desc: "Point your external webhook to POST {from,text}" }
+              { step: "1", title: "Inscrivez-vous", desc: "Créez votre profil commercial en 2 minutes." },
+              { step: "2", title: "Ajoutez vos produits", desc: "Prenez une photo ou listez vos articles." },
+              { step: "3", title: "Automatisez", desc: "Connectez votre WhatsApp et laissez l'IA gérer." },
             ].map((item, index) => (
               <Card key={index} className="bg-card border-border/50 p-6 text-center hover:shadow-lg hover:scale-[1.03] hover:-translate-y-2 transition-all duration-300 group">
                 <div className="w-12 h-12 bg-primary text-primary-foreground rounded-full flex items-center justify-center font-bold text-lg mx-auto mb-4 group-hover:animate-bounce group-hover:bg-primary/80">
@@ -157,28 +150,21 @@ export default function HomeClient() {
         </div>
       </section>
 
-      {/* Provider-specific integration section removed */}
-
       {/* CTA Section */}
       <section className="relative z-10 py-32">
         <div className="container mx-auto px-6">
           <Card className="bg-gradient-to-r from-primary to-primary/90 border-0 text-primary-foreground text-center p-16 max-w-5xl mx-auto shadow-2xl hover:shadow-3xl hover:scale-[1.02] transition-all duration-500 animate-pulse hover:animate-none">
             <h2 className="text-4xl md:text-5xl font-bold mb-6 animate-in fade-in-50">
-              Ready to launch your chatbot endpoint?
+              Prêt à booster vos ventes ?
             </h2>
             <p className="text-xl opacity-90 mb-12 max-w-3xl mx-auto animate-in slide-in-from-bottom-4 delay-200">
-              Create your first restaurant and start taking orders via your own channel.
+              Rejoignez les commerçants qui utilisent Mafal-ia pour grandir.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center animate-in zoom-in-50 delay-400">
-              <Link href="/restaurants">
+              <Link href="/onboarding">
                 <Button size="lg" className="bg-background text-foreground hover:bg-background/90 px-10 py-4 text-lg font-semibold shadow-lg hover:shadow-xl hover:scale-[1.05] transition-all group">
-                  Get started now
+                  Créer mon compte
                   <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-2 transition-transform" />
-                </Button>
-              </Link>
-              <Link href="/dashboard">
-                <Button size="lg" variant="outline" className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 px-10 py-4 text-lg font-semibold hover:scale-[1.05] transition-all">
-                  View dashboard
                 </Button>
               </Link>
             </div>
