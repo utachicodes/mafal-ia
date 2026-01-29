@@ -1,51 +1,169 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Logo } from "@/src/components/logo";
 import { SimpleThemeToggle } from "@/src/components/simple-theme-toggle";
-import { MessageSquare, Bot, Globe, Zap, ArrowRight, Store, Smartphone, TrendingUp, Users, Clock, Award, CheckCircle } from "lucide-react";
+import {
+  Bot,
+  Zap,
+  Globe,
+  Clock,
+  TrendingUp,
+  ShoppingCart,
+  MessageSquare,
+  BarChart3,
+  Bell,
+  Smartphone,
+  DollarSign,
+  Users,
+  Package,
+  Target,
+  Award,
+  CheckCircle2
+} from "lucide-react";
+
+const fadeInUp = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 }
+};
+
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1
+    }
+  }
+};
+
+const scaleIn = {
+  hidden: { scale: 0.8, opacity: 0 },
+  visible: {
+    scale: 1,
+    opacity: 1,
+    transition: {
+      type: "spring",
+      stiffness: 100
+    }
+  }
+};
 
 export default function HomeClient() {
+  const features = [
+    {
+      icon: <Bot className="h-6 w-6" />,
+      title: "Vente Automatique",
+      desc: "IA intelligente qui présente vos produits et prend les commandes"
+    },
+    {
+      icon: <Globe className="h-6 w-6" />,
+      title: "Multilingue",
+      desc: "Français, Anglais, Wolof, Arabe - parlez toutes les langues"
+    },
+    {
+      icon: <Package className="h-6 w-6" />,
+      title: "Catalogue Produits",
+      desc: "Gérez facilement vos produits avec photos et prix"
+    },
+    {
+      icon: <ShoppingCart className="h-6 w-6" />,
+      title: "Gestion Commandes",
+      desc: "Suivez et gérez toutes vos commandes en temps réel"
+    },
+    {
+      icon: <Bell className="h-6 w-6" />,
+      title: "Notifications",
+      desc: "Recevez instantanément chaque nouvelle commande"
+    },
+    {
+      icon: <BarChart3 className="h-6 w-6" />,
+      title: "Analytics",
+      desc: "Tableaux de bord détaillés sur vos ventes et performances"
+    },
+    {
+      icon: <Clock className="h-6 w-6" />,
+      title: "Support 24/7",
+      desc: "Votre IA travaille jour et nuit sans interruption"
+    },
+    {
+      icon: <MessageSquare className="h-6 w-6" />,
+      title: "Intégration WhatsApp",
+      desc: "Connexion directe à votre compte WhatsApp Business"
+    },
+    {
+      icon: <DollarSign className="h-6 w-6" />,
+      title: "Paiements Mobile",
+      desc: "Acceptez Wave, Orange Money, Free Money"
+    },
+    {
+      icon: <Smartphone className="h-6 w-6" />,
+      title: "100% Mobile",
+      desc: "Gérez tout depuis votre smartphone, où que vous soyez"
+    },
+    {
+      icon: <Users className="h-6 w-6" />,
+      title: "CRM Client",
+      desc: "Conservez l'historique et les préférences de vos clients"
+    },
+    {
+      icon: <Target className="h-6 w-6" />,
+      title: "Marketing",
+      desc: "Envoyez des promotions ciblées à vos clients"
+    },
+  ];
+
   const stats = [
     { value: "98%", label: "Taux de satisfaction client" },
-    { value: "24/7", label: "Support disponible" },
-    { value: "500+", label: "Commerces actifs" }
+    { value: "3h", label: "Temps économisé par jour" },
+    { value: "+45%", label: "Croissance moyenne des ventes" }
   ];
 
   const testimonials = [
-    { name: "Restaurant Le Dakar", type: "Restaurant traditionnel", quote: "GëstuSaDine a révolutionné notre façon de gérer les commandes WhatsApp. Plus aucune commande perdue!" },
-    { name: "Boutique Fatou", type: "Commerce alimentaire", quote: "L'IA répond à mes clients même quand je dors. Mes ventes ont augmenté de 40%!" },
-    { name: "Café Teranga", type: "Coffee Shop & Snack", quote: "Très simple à utiliser, mes clients adorent commander directement via WhatsApp." }
+    {
+      name: "Aminata Diallo",
+      business: "Restaurant Le Dakar",
+      quote: "Depuis que j'utilise GëstuSaDine, je ne perds plus aucune commande. Mes clients adorent commander sur WhatsApp !",
+      avatar: "👩🏾‍🍳"
+    },
+    {
+      name: "Moussa Sow",
+      business: "Boutique Fatou",
+      quote: "Mon chiffre d'affaires a augmenté de 50% en 2 mois. L'IA répond même quand je dors.",
+      avatar: "👨🏿‍💼"
+    },
+    {
+      name: "Khady Ndiaye",
+      business: "Café Teranga",
+      quote: "Configuration en 10 minutes, résultats immédiats. Exactement ce dont j'avais besoin !",
+      avatar: "👩🏾‍💼"
+    }
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted/40 relative overflow-hidden">
-      {/* Enhanced animated background blobs with continuous movement */}
-      <div className="blob-base blob-float blob-pulse top-[-8rem] right-[-8rem] h-[22rem] w-[22rem] bg-primary/20 animate-pulse" />
-      <div className="blob-base blob-float-slow top-[20%] left-[-6rem] h-[18rem] w-[18rem] bg-emerald-500/15 animate-bounce" style={{ animationDuration: '3s' }} />
-      <div className="blob-base blob-float bottom-[-10rem] right-[10%] h-[20rem] w-[20rem] bg-fuchsia-500/10 animate-pulse" style={{ animationDelay: '1s' }} />
-
-      {/* Additional floating elements */}
-      <div className="absolute top-1/4 left-1/4 w-4 h-4 bg-primary/30 rounded-full animate-ping" style={{ animationDuration: '2s' }} />
-      <div className="absolute top-3/4 right-1/4 w-6 h-6 bg-primary/20 rounded-full animate-ping" style={{ animationDuration: '3s', animationDelay: '0.5s' }} />
-      <div className="absolute top-1/2 left-3/4 w-3 h-3 bg-primary/40 rounded-full animate-ping" style={{ animationDuration: '2.5s', animationDelay: '1s' }} />
-
+    <div className="min-h-screen bg-white">
       {/* Navigation */}
-      <nav className="relative z-10 border-b border-border/10 backdrop-blur-sm bg-background/80">
+      <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-100">
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Logo className="h-12" />
-            </div>
+            <Logo className="h-10" />
             <div className="hidden md:flex items-center gap-8">
-              <a href="#features" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Fonctionnalités</a>
-              <a href="#how" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Comment ça marche</a>
-              <a href="#testimonials" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Témoignages</a>
+              <a href="#features" className="text-sm font-medium text-gray-600 hover:text-red-500 transition-colors">
+                Fonctionnalités
+              </a>
+              <a href="#how" className="text-sm font-medium text-gray-600 hover:text-red-500 transition-colors">
+                Comment ça marche
+              </a>
+              <a href="#testimonials" className="text-sm font-medium text-gray-600 hover:text-red-500 transition-colors">
+                Témoignages
+              </a>
               <SimpleThemeToggle />
               <Link href="/onboarding">
-                <Button size="sm" className="shadow-sm">
+                <Button className="bg-red-500 hover:bg-red-600 text-white px-6 shadow-md hover:shadow-lg transition-all">
                   Démarrer
                 </Button>
               </Link>
@@ -55,181 +173,436 @@ export default function HomeClient() {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative z-10 pt-20 pb-32">
+      <section className="pt-20 pb-32 bg-gradient-to-b from-red-50/30 to-white">
         <div className="container mx-auto px-6">
-          <div className="max-w-5xl mx-auto text-center">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            {/* Left: Text */}
+            <motion.div
+              initial="hidden"
+              animate="visible"
+              variants={staggerContainer}
+              className="space-y-8"
+            >
+              <motion.div variants={fadeInUp}>
+                <h1 className="text-5xl lg:text-6xl xl:text-7xl font-bold text-gray-900 leading-tight">
+                  Automatisez vos ventes sur{" "}
+                  <span className="text-red-500">WhatsApp</span> avec l'IA
+                </h1>
+              </motion.div>
 
-            <div className="text-lg font-medium text-primary mb-6 animate-in slide-in-from-bottom-2 hover:scale-105 transition-transform duration-300">
-              La solution IA tout-en-un pour votre commerce
-            </div>
+              <motion.p
+                variants={fadeInUp}
+                className="text-xl text-gray-600 leading-relaxed"
+              >
+                Restaurants, boutiques, commerces : ne perdez plus jamais un client.
+                Votre assistant IA répond, présente vos produits et prend les commandes 24/7 sur WhatsApp.
+              </motion.p>
 
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold text-foreground mb-8 leading-[0.9] tracking-tight animate-in fade-in-50 delay-100">
-              Automatisez vos ventes
-              <br />
-              <span className="relative inline-block">
-                sur WhatsApp
-                <div className="absolute -bottom-2 left-0 w-full h-1 bg-primary rounded-full animate-in slide-in-from-left-full duration-1000 delay-700"></div>
-              </span>
-            </h1>
-
-            <p className="text-xl md:text-2xl text-muted-foreground max-w-4xl mx-auto mb-12 leading-relaxed animate-in fade-in-50 delay-200">
-              Restaurants, boutiques, commerces : ne perdez plus de clients.
-              Laissez notre IA prendre les commandes et répondre aux questions 24/7.
-            </p>
-
-            <div className="flex flex-col sm:flex-row gap-4 justify-center animate-in zoom-in-50 delay-300">
-              <Link href="/onboarding">
-                <Button size="lg" className="px-10 py-4 text-lg font-semibold shadow-lg hover:shadow-xl transition-all hover:scale-[1.05] animate-pulse hover:animate-none group">
-                  Commencez en 15 minutes
-                  <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+              <motion.div
+                variants={fadeInUp}
+                className="flex flex-col sm:flex-row gap-4"
+              >
+                <Link href="/onboarding">
+                  <Button size="lg" className="bg-red-500 hover:bg-red-600 text-white px-8 py-6 text-lg font-semibold shadow-lg hover:shadow-xl transition-all">
+                    Commencer maintenant
+                  </Button>
+                </Link>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="border-2 border-red-500 text-red-500 hover:bg-red-50 px-8 py-6 text-lg font-semibold transition-all"
+                >
+                  Voir la démo
                 </Button>
-              </Link>
-            </div>
+              </motion.div>
+
+              <motion.div variants={fadeInUp} className="flex items-center gap-6 pt-4">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="h-5 w-5 text-green-500" />
+                  <span className="text-sm text-gray-600">Configuration en 15 min</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="h-5 w-5 text-green-500" />
+                  <span className="text-sm text-gray-600">Sans engagement</span>
+                </div>
+              </motion.div>
+            </motion.div>
+
+            {/* Right: Hero Image */}
+            <motion.div
+              initial={{ opacity: 0, x: 50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="relative"
+            >
+              <div className="relative w-full h-[600px] flex items-center justify-center">
+                <Image
+                  src="/brain/9d162907-a90e-4ddb-a59d-16b4495d8349/whatsapp_mockup_hero_1769711297049.png"
+                  alt="WhatsApp automation interface"
+                  width={400}
+                  height={600}
+                  className="object-contain drop-shadow-2xl"
+                />
+                {/* Floating elements for visual interest */}
+                <motion.div
+                  animate={{
+                    y: [0, -20, 0],
+                  }}
+                  transition={{
+                    duration: 3,
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                  }}
+                  className="absolute top-10 -left-10 bg-white p-4 rounded-2xl shadow-xl"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                      <MessageSquare className="h-6 w-6 text-green-600" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-gray-900">+40% ventes</p>
+                      <p className="text-xs text-gray-500">Ce mois</p>
+                    </div>
+                  </div>
+                </motion.div>
+
+                <motion.div
+                  animate={{
+                    y: [0, 20, 0],
+                  }}
+                  transition={{
+                    duration: 3,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                    delay: 1.5
+                  }}
+                  className="absolute bottom-10 -right-10 bg-white p-4 rounded-2xl shadow-xl"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                      <Bot className="h-6 w-6 text-red-600" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-gray-900">IA Active</p>
+                      <p className="text-xs text-gray-500">24/7</p>
+                    </div>
+                  </div>
+                </motion.div>
+              </div>
+            </motion.div>
           </div>
         </div>
       </section>
 
-      {/* Statistics Section */}
-      <section className="relative z-10 py-16 bg-muted/50">
+      {/* Trust Badge Section */}
+      <section className="py-16 bg-gray-50">
         <div className="container mx-auto px-6">
-          <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-            {stats.map((stat, index) => (
-              <div key={index} className="text-center animate-in fade-in-50" style={{ animationDelay: `${index * 100}ms` }}>
-                <div className="text-4xl md:text-5xl font-bold text-primary mb-2">{stat.value}</div>
-                <div className="text-sm text-muted-foreground">{stat.label}</div>
-              </div>
+          <motion.p
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            className="text-center text-sm font-semibold text-gray-500 uppercase tracking-wider mb-12"
+          >
+            Reconnu par les commerces les plus dynamiques du Sénégal
+          </motion.p>
+
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={staggerContainer}
+            className="grid grid-cols-3 md:grid-cols-6 gap-8 items-center opacity-60"
+          >
+            {["Restaurant", "Boutique", "Café", "Boulangerie", "Superette", "Fast Food"].map((type, i) => (
+              <motion.div
+                key={i}
+                variants={fadeInUp}
+                className="text-center"
+              >
+                <div className="w-20 h-20 mx-auto bg-white rounded-xl shadow-sm flex items-center justify-center">
+                  <span className="text-2xl">{["🍽️", "🛍️", "☕", "🥖", "🏪", "🍔"][i]}</span>
+                </div>
+                <p className="text-xs text-gray-600 mt-2 font-medium">{type}</p>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Value Proposition */}
+      <section className="py-24">
+        <div className="container mx-auto px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center max-w-3xl mx-auto mb-16"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+              Avec <span className="text-red-500">GëstuSaDine</span>, passez à la vitesse supérieure
+            </h2>
+            <p className="text-xl text-gray-600">
+              Une plateforme complète pour automatiser vos ventes, gérer vos commandes et faire grandir votre commerce
+            </p>
+          </motion.div>
+
+          {/* Stats */}
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={staggerContainer}
+            className="grid md:grid-cols-3 gap-8 mb-16"
+          >
+            {stats.map((stat, i) => (
+              <motion.div
+                key={i}
+                variants={scaleIn}
+                className="bg-gradient-to-br from-red-50 to-white p-8 rounded-2xl text-center border border-red-100"
+              >
+                <div className="text-5xl font-bold text-red-500 mb-2">{stat.value}</div>
+                <div className="text-sm text-gray-600 font-medium">{stat.label}</div>
+              </motion.div>
+            ))}
+          </motion.div>
         </div>
       </section>
 
       {/* Features Grid */}
-      <section id="features" className="relative z-10 py-32 bg-muted/30">
+      <section id="features" className="py-24 bg-gray-50">
         <div className="container mx-auto px-6">
-          <div className="text-center mb-20">
-            <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center max-w-3xl mx-auto mb-16"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
               Tout ce qu'il faut pour réussir
             </h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Une plateforme complète conçue pour le commerce moderne en Afrique
+            <p className="text-xl text-gray-600">
+              Une solution complète pensée pour les commerçants africains
             </p>
-          </div>
+          </motion.div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <Card className="bg-card/80 backdrop-blur border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.05] hover:rotate-1 p-8 animate-in fade-in-50 group">
-              <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-primary/20 transition-colors">
-                <Store className="h-8 w-8 text-primary group-hover:scale-110 transition-transform" />
-              </div>
-              <h3 className="text-xl font-semibold text-foreground mb-3 group-hover:text-primary transition-colors">Vente Automatique</h3>
-              <p className="text-muted-foreground leading-relaxed">L'IA présente vos produits et prend les commandes directement dans WhatsApp.</p>
-            </Card>
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={staggerContainer}
+            className="grid md:grid-cols-3 lg:grid-cols-4 gap-6"
+          >
+            {features.map((feature, i) => (
+              <motion.div
+                key={i}
+                variants={fadeInUp}
+                whileHover={{ y: -8, transition: { duration: 0.2 } }}
+              >
+                <Card className="p-6 h-full bg-white border border-gray-200 hover:border-red-200 hover:shadow-lg transition-all duration-300">
+                  <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center text-red-500 mb-4">
+                    {feature.icon}
+                  </div>
+                  <h3 className="font-semibold text-gray-900 mb-2">{feature.title}</h3>
+                  <p className="text-sm text-gray-600 leading-relaxed">{feature.desc}</p>
+                </Card>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+      </section>
 
-            <Card className="bg-card/80 backdrop-blur border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.05] hover:-rotate-1 p-8 animate-in fade-in-50 delay-100 group">
-              <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-primary/20 transition-colors">
-                <Globe className="h-8 w-8 text-primary group-hover:scale-110 transition-transform animate-spin" style={{ animationDuration: '8s' }} />
-              </div>
-              <h3 className="text-xl font-semibold text-foreground mb-3 group-hover:text-primary transition-colors">Multilingue</h3>
-              <p className="text-muted-foreground leading-relaxed">Français, Anglais, Wolof, Arabe. Parlez la langue de vos clients.</p>
-            </Card>
+      {/* How it Works */}
+      <section id="how" className="py-24">
+        <div className="container mx-auto px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center max-w-3xl mx-auto mb-16"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+              Commencez à automatiser vos ventes en 15 min
+            </h2>
+            <p className="text-xl text-gray-600">
+              3 étapes simples pour transformer votre business
+            </p>
+          </motion.div>
 
-            <Card className="bg-card/80 backdrop-blur border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.05] hover:-rotate-1 p-8 animate-in fade-in-50 delay-150 group">
-              <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-primary/20 transition-colors">
-                <Smartphone className="h-8 w-8 text-primary group-hover:scale-110 transition-transform animate-bounce" style={{ animationDuration: '2s' }} />
-              </div>
-              <h3 className="text-xl font-semibold text-foreground mb-3 group-hover:text-primary transition-colors">100% Mobile</h3>
-              <p className="text-muted-foreground leading-relaxed">Gérez tout depuis votre téléphone. Pas besoin d'ordinateur.</p>
-            </Card>
-
-            <Card className="bg-card/80 backdrop-blur border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.05] hover:-rotate-1 p-8 animate-in fade-in-50 delay-200 group">
-              <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-primary/20 transition-colors">
-                <TrendingUp className="h-8 w-8 text-primary group-hover:scale-110 transition-transform animate-pulse" />
-              </div>
-              <h3 className="text-xl font-semibold text-foreground mb-3 group-hover:text-primary transition-colors">Croissance</h3>
-              <p className="text-muted-foreground leading-relaxed">Augmentez vos revenus en ne ratant jamais une vente, même la nuit.</p>
-            </Card>
-          </div>
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={staggerContainer}
+            className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto"
+          >
+            {[
+              {
+                step: "1",
+                title: "Créez votre compte",
+                desc: "Inscrivez-vous en 2 minutes avec votre email",
+                icon: <Users className="h-8 w-8" />
+              },
+              {
+                step: "2",
+                title: "Ajoutez vos produits",
+                desc: "Importez votre catalogue avec photos et prix",
+                icon: <Package className="h-8 w-8" />
+              },
+              {
+                step: "3",
+                title: "Connectez WhatsApp",
+                desc: "Liez votre compte et laissez l'IA gérer",
+                icon: <Zap className="h-8 w-8" />
+              },
+            ].map((item, i) => (
+              <motion.div
+                key={i}
+                variants={fadeInUp}
+                className="relative"
+              >
+                <Card className="p-8 bg-white border-2 border-gray-200 hover:border-red-300 transition-all duration-300 h-full">
+                  <div className="absolute -top-6 left-8 w-12 h-12 bg-red-500 text-white rounded-full flex items-center justify-center font-bold text-xl shadow-lg">
+                    {item.step}
+                  </div>
+                  <div className="mt-4 mb-4 text-red-500">
+                    {item.icon}
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-3">{item.title}</h3>
+                  <p className="text-gray-600">{item.desc}</p>
+                </Card>
+              </motion.div>
+            ))}
+          </motion.div>
         </div>
       </section>
 
       {/* Testimonials */}
-      <section id="testimonials" className="relative z-10 py-32">
+      <section id="testimonials" className="py-24 bg-gradient-to-b from-gray-50 to-white">
         <div className="container mx-auto px-6">
-          <div className="text-center mb-20">
-            <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center max-w-3xl mx-auto mb-16"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
               Découvrez ce que nos clients disent
             </h2>
-            <p className="text-xl text-muted-foreground">
+            <p className="text-xl text-gray-600">
               Rejoignez des centaines de commerces qui font confiance à GëstuSaDine
             </p>
-          </div>
+          </motion.div>
 
-          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {testimonials.map((testimonial, index) => (
-              <Card key={index} className="bg-card border-border/50 p-8 hover:shadow-lg hover:scale-[1.03] transition-all duration-300 animate-in fade-in-50" style={{ animationDelay: `${index * 100}ms` }}>
-                <div className="mb-4">
-                  <Award className="h-8 w-8 text-primary mb-2" />
-                  <h4 className="font-semibold text-foreground text-lg">{testimonial.name}</h4>
-                  <p className="text-sm text-muted-foreground">{testimonial.type}</p>
-                </div>
-                <p className="text-muted-foreground italic leading-relaxed">
-                  "{testimonial.quote}"
-                </p>
-              </Card>
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={staggerContainer}
+            className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto"
+          >
+            {testimonials.map((testimonial, i) => (
+              <motion.div
+                key={i}
+                variants={fadeInUp}
+                whileHover={{ y: -8 }}
+              >
+                <Card className="p-8 bg-white border border-gray-200 hover:shadow-xl transition-all duration-300 h-full">
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="w-14 h-14 bg-red-100 rounded-full flex items-center justify-center text-2xl">
+                      {testimonial.avatar}
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-gray-900">{testimonial.name}</h4>
+                      <p className="text-sm text-gray-500">{testimonial.business}</p>
+                    </div>
+                  </div>
+                  <p className="text-gray-600 italic leading-relaxed">
+                    "{testimonial.quote}"
+                  </p>
+                  <div className="flex gap-1 mt-6">
+                    {[...Array(5)].map((_, i) => (
+                      <Award key={i} className="h-5 w-5 text-yellow-400 fill-yellow-400" />
+                    ))}
+                  </div>
+                </Card>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
-      {/* How it works */}
-      <section id="how" className="relative z-10 py-32 bg-muted/30">
+      {/* Final CTA */}
+      <section className="py-24">
         <div className="container mx-auto px-6">
-          <div className="text-center mb-20">
-            <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6">Comment ça marche ?</h2>
-            <p className="text-xl text-muted-foreground">3 étapes simples pour commencer à vendre plus</p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-            {[
-              { step: "1", title: "Inscrivez-vous", desc: "Créez votre profil commercial en 2 minutes seulement.", icon: Users },
-              { step: "2", title: "Ajoutez vos produits", desc: "Prenez une photo ou listez vos articles rapidement.", icon: Store },
-              { step: "3", title: "Automatisez", desc: "Connectez WhatsApp et laissez l'IA gérer 24/7.", icon: Bot },
-            ].map((item, index) => (
-              <Card key={index} className="bg-card border-border/50 p-6 text-center hover:shadow-lg hover:scale-[1.03] hover:-translate-y-2 transition-all duration-300 group">
-                <div className="w-16 h-16 bg-primary text-primary-foreground rounded-full flex items-center justify-center font-bold text-2xl mx-auto mb-4 group-hover:animate-bounce group-hover:bg-primary/80">
-                  {item.step}
-                </div>
-                <div className="w-12 h-12 mx-auto mb-4">
-                  <item.icon className="w-full h-full text-primary" />
-                </div>
-                <h3 className="font-semibold text-foreground mb-2 text-lg group-hover:text-primary transition-colors">{item.title}</h3>
-                <p className="text-sm text-muted-foreground">{item.desc}</p>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="relative z-10 py-32">
-        <div className="container mx-auto px-6">
-          <Card className="bg-gradient-to-r from-primary to-primary/90 border-0 text-primary-foreground text-center p-16 max-w-5xl mx-auto shadow-2xl hover:shadow-3xl hover:scale-[1.02] transition-all duration-500 animate-pulse hover:animate-none">
-            <h2 className="text-4xl md:text-5xl font-bold mb-6 animate-in fade-in-50">
-              Prêt à booster vos ventes ?
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            className="bg-gradient-to-r from-red-500 to-red-600 rounded-3xl p-12 md:p-16 text-center text-white shadow-2xl"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              Prêt à transformer votre business ?
             </h2>
-            <p className="text-xl opacity-90 mb-12 max-w-3xl mx-auto animate-in slide-in-from-bottom-4 delay-200">
-              Rejoignez les commerçants qui utilisent GëstuSaDine pour grandir. Configuration simple en 15 minutes.
+            <p className="text-xl mb-10 opacity-90 max-w-2xl mx-auto">
+              Rejoignez les commerçants qui utilisent GëstuSaDine pour automatiser leurs ventes et grandir. Configuration simple en 15 minutes.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center animate-in zoom-in-50 delay-400">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/onboarding">
-                <Button size="lg" className="bg-background text-foreground hover:bg-background/90 px-10 py-4 text-lg font-semibold shadow-lg hover:shadow-xl hover:scale-[1.05] transition-all group">
+                <Button size="lg" className="bg-white text-red-500 hover:bg-gray-100 px-10 py-6 text-lg font-semibold shadow-lg hover:shadow-xl transition-all">
                   Créer mon compte gratuitement
-                  <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-2 transition-transform" />
                 </Button>
               </Link>
+              <Button
+                size="lg"
+                variant="outline"
+                className="border-2 border-white text-white hover:bg-white/10 px-10 py-6 text-lg font-semibold transition-all"
+              >
+                Parler à un conseiller
+              </Button>
             </div>
-          </Card>
+          </motion.div>
         </div>
       </section>
+
+      {/* Footer */}
+      <footer className="py-12 bg-gray-900 text-white">
+        <div className="container mx-auto px-6">
+          <div className="grid md:grid-cols-4 gap-8">
+            <div>
+              <Logo className="h-10 mb-4 brightness-0 invert" />
+              <p className="text-sm text-gray-400">
+                Automatisez vos ventes sur WhatsApp avec l'intelligence artificielle.
+              </p>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-4">Produit</h4>
+              <ul className="space-y-2 text-sm text-gray-400">
+                <li><a href="#features" className="hover:text-white transition-colors">Fonctionnalités</a></li>
+                <li><a href="#how" className="hover:text-white transition-colors">Comment ça marche</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Tarifs</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-4">Entreprise</h4>
+              <ul className="space-y-2 text-sm text-gray-400">
+                <li><a href="#" className="hover:text-white transition-colors">À propos</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Blog</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Contact</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-4">Légal</h4>
+              <ul className="space-y-2 text-sm text-gray-400">
+                <li><a href="#" className="hover:text-white transition-colors">Confidentialité</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Conditions</a></li>
+              </ul>
+            </div>
+          </div>
+          <div className="mt-12 pt-8 border-t border-gray-800 text-center text-sm text-gray-400">
+            <p>© 2026 GëstuSaDine. Tous droits réservés.</p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
