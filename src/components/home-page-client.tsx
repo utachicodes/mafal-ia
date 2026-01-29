@@ -32,7 +32,7 @@ export default function HomeClient() {
               <a href="#how" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">How it works</a>
               {/* Removed provider-specific nav */}
               <SimpleThemeToggle />
-              <Link href="/restaurants">
+              <Link href="/register">
                 <Button size="sm" className="shadow-sm">
                   Get started
                 </Button>
@@ -66,9 +66,9 @@ export default function HomeClient() {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center animate-in zoom-in-50 delay-300">
-              <Link href="/restaurants">
+              <Link href="/register">
                 <Button size="lg" className="px-10 py-4 text-lg font-semibold shadow-lg hover:shadow-xl transition-all hover:scale-[1.05] animate-pulse hover:animate-none group">
-                  Create your agent
+                  Start Automating
                   <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </Link>
@@ -170,7 +170,7 @@ export default function HomeClient() {
               Create your first restaurant and start taking orders via your own channel.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center animate-in zoom-in-50 delay-400">
-              <Link href="/restaurants">
+              <Link href="/register">
                 <Button size="lg" className="bg-background text-foreground hover:bg-background/90 px-10 py-4 text-lg font-semibold shadow-lg hover:shadow-xl hover:scale-[1.05] transition-all group">
                   Get started now
                   <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-2 transition-transform" />

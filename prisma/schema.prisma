@@ -37,6 +37,11 @@ model Restaurant {
   specialInstructions   String         @default("")
   orderingEnabled       Boolean        @default(true)
   deliveryInfo          String         @default("")
+  ownerAgeRange         String?
+  ownerSex              String?
+  country               String?
+  verificationCode      String?
+  isVerified            Boolean        @default(false)
   createdAt             DateTime       @default(now())
   updatedAt             DateTime       @updatedAt
   apiKeyCreatedAt       DateTime?
