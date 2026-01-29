@@ -5,9 +5,21 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Logo } from "@/src/components/logo";
 import { SimpleThemeToggle } from "@/src/components/simple-theme-toggle";
-import { MessageSquare, Bot, Globe, Zap, ArrowRight, Store, Smartphone, TrendingUp } from "lucide-react";
+import { MessageSquare, Bot, Globe, Zap, ArrowRight, Store, Smartphone, TrendingUp, Users, Clock, Award, CheckCircle } from "lucide-react";
 
 export default function HomeClient() {
+  const stats = [
+    { value: "98%", label: "Taux de satisfaction client" },
+    { value: "24/7", label: "Support disponible" },
+    { value: "500+", label: "Commerces actifs" }
+  ];
+
+  const testimonials = [
+    { name: "Restaurant Le Dakar", type: "Restaurant traditionnel", quote: "GëstuSaDine a révolutionné notre façon de gérer les commandes WhatsApp. Plus aucune commande perdue!" },
+    { name: "Boutique Fatou", type: "Commerce alimentaire", quote: "L'IA répond à mes clients même quand je dors. Mes ventes ont augmenté de 40%!" },
+    { name: "Café Teranga", type: "Coffee Shop & Snack", quote: "Très simple à utiliser, mes clients adorent commander directement via WhatsApp." }
+  ];
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/40 relative overflow-hidden">
       {/* Enhanced animated background blobs with continuous movement */}
@@ -28,12 +40,13 @@ export default function HomeClient() {
               <Logo className="h-12" />
             </div>
             <div className="hidden md:flex items-center gap-8">
-              <a href="#features" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Features</a>
-              <a href="#how" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">How it works</a>
+              <a href="#features" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Fonctionnalités</a>
+              <a href="#how" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Comment ça marche</a>
+              <a href="#testimonials" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Témoignages</a>
               <SimpleThemeToggle />
               <Link href="/onboarding">
                 <Button size="sm" className="shadow-sm">
-                  Start Selling
+                  Démarrer
                 </Button>
               </Link>
             </div>
@@ -47,7 +60,7 @@ export default function HomeClient() {
           <div className="max-w-5xl mx-auto text-center">
 
             <div className="text-lg font-medium text-primary mb-6 animate-in slide-in-from-bottom-2 hover:scale-105 transition-transform duration-300">
-              Noo ngi fi pour jàppal
+              La solution IA tout-en-un pour votre commerce
             </div>
 
             <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold text-foreground mb-8 leading-[0.9] tracking-tight animate-in fade-in-50 delay-100">
@@ -67,11 +80,25 @@ export default function HomeClient() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center animate-in zoom-in-50 delay-300">
               <Link href="/onboarding">
                 <Button size="lg" className="px-10 py-4 text-lg font-semibold shadow-lg hover:shadow-xl transition-all hover:scale-[1.05] animate-pulse hover:animate-none group">
-                  Commencer maintenant
+                  Commencez en 15 minutes
                   <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </Link>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Statistics Section */}
+      <section className="relative z-10 py-16 bg-muted/50">
+        <div className="container mx-auto px-6">
+          <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+            {stats.map((stat, index) => (
+              <div key={index} className="text-center animate-in fade-in-50" style={{ animationDelay: `${index * 100}ms` }}>
+                <div className="text-4xl md:text-5xl font-bold text-primary mb-2">{stat.value}</div>
+                <div className="text-sm text-muted-foreground">{stat.label}</div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -81,10 +108,10 @@ export default function HomeClient() {
         <div className="container mx-auto px-6">
           <div className="text-center mb-20">
             <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
-              Tout ce qu'il faut pour vendre
+              Tout ce qu'il faut pour réussir
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Conçu pour le commerce informel et moderne en Afrique.
+              Une plateforme complète conçue pour le commerce moderne en Afrique
             </p>
           </div>
 
@@ -124,25 +151,57 @@ export default function HomeClient() {
         </div>
       </section>
 
+      {/* Testimonials */}
+      <section id="testimonials" className="relative z-10 py-32">
+        <div className="container mx-auto px-6">
+          <div className="text-center mb-20">
+            <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
+              Découvrez ce que nos clients disent
+            </h2>
+            <p className="text-xl text-muted-foreground">
+              Rejoignez des centaines de commerces qui font confiance à GëstuSaDine
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            {testimonials.map((testimonial, index) => (
+              <Card key={index} className="bg-card border-border/50 p-8 hover:shadow-lg hover:scale-[1.03] transition-all duration-300 animate-in fade-in-50" style={{ animationDelay: `${index * 100}ms` }}>
+                <div className="mb-4">
+                  <Award className="h-8 w-8 text-primary mb-2" />
+                  <h4 className="font-semibold text-foreground text-lg">{testimonial.name}</h4>
+                  <p className="text-sm text-muted-foreground">{testimonial.type}</p>
+                </div>
+                <p className="text-muted-foreground italic leading-relaxed">
+                  "{testimonial.quote}"
+                </p>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* How it works */}
-      <section id="how" className="relative z-10 py-32">
+      <section id="how" className="relative z-10 py-32 bg-muted/30">
         <div className="container mx-auto px-6">
           <div className="text-center mb-20">
             <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6">Comment ça marche ?</h2>
-            <p className="text-xl text-muted-foreground">3 étapes simples pour vendre plus</p>
+            <p className="text-xl text-muted-foreground">3 étapes simples pour commencer à vendre plus</p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
             {[
-              { step: "1", title: "Inscrivez-vous", desc: "Créez votre profil commercial en 2 minutes." },
-              { step: "2", title: "Ajoutez vos produits", desc: "Prenez une photo ou listez vos articles." },
-              { step: "3", title: "Automatisez", desc: "Connectez votre WhatsApp et laissez l'IA gérer." },
+              { step: "1", title: "Inscrivez-vous", desc: "Créez votre profil commercial en 2 minutes seulement.", icon: Users },
+              { step: "2", title: "Ajoutez vos produits", desc: "Prenez une photo ou listez vos articles rapidement.", icon: Store },
+              { step: "3", title: "Automatisez", desc: "Connectez WhatsApp et laissez l'IA gérer 24/7.", icon: Bot },
             ].map((item, index) => (
               <Card key={index} className="bg-card border-border/50 p-6 text-center hover:shadow-lg hover:scale-[1.03] hover:-translate-y-2 transition-all duration-300 group">
-                <div className="w-12 h-12 bg-primary text-primary-foreground rounded-full flex items-center justify-center font-bold text-lg mx-auto mb-4 group-hover:animate-bounce group-hover:bg-primary/80">
+                <div className="w-16 h-16 bg-primary text-primary-foreground rounded-full flex items-center justify-center font-bold text-2xl mx-auto mb-4 group-hover:animate-bounce group-hover:bg-primary/80">
                   {item.step}
                 </div>
-                <h3 className="font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">{item.title}</h3>
+                <div className="w-12 h-12 mx-auto mb-4">
+                  <item.icon className="w-full h-full text-primary" />
+                </div>
+                <h3 className="font-semibold text-foreground mb-2 text-lg group-hover:text-primary transition-colors">{item.title}</h3>
                 <p className="text-sm text-muted-foreground">{item.desc}</p>
               </Card>
             ))}
@@ -158,12 +217,12 @@ export default function HomeClient() {
               Prêt à booster vos ventes ?
             </h2>
             <p className="text-xl opacity-90 mb-12 max-w-3xl mx-auto animate-in slide-in-from-bottom-4 delay-200">
-              Rejoignez les commerçants qui utilisent Mafal-ia pour grandir.
+              Rejoignez les commerçants qui utilisent GëstuSaDine pour grandir. Configuration simple en 15 minutes.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center animate-in zoom-in-50 delay-400">
               <Link href="/onboarding">
                 <Button size="lg" className="bg-background text-foreground hover:bg-background/90 px-10 py-4 text-lg font-semibold shadow-lg hover:shadow-xl hover:scale-[1.05] transition-all group">
-                  Créer mon compte
+                  Créer mon compte gratuitement
                   <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-2 transition-transform" />
                 </Button>
               </Link>
