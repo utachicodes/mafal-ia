@@ -127,7 +127,7 @@ export default function HomeClient() {
     {
       name: "Aminata Diallo",
       business: "Restaurant Le Dakar",
-      quote: "Depuis que j'utilise GëstuSaDine, je ne perds plus aucune commande. Mes clients adorent commander sur WhatsApp !",
+      quote: "Depuis que j'utilise Mafal-IA, je ne perds plus aucune commande. Mes clients adorent commander sur WhatsApp !",
       avatar: "👩🏾‍🍳"
     },
     {
@@ -339,7 +339,7 @@ export default function HomeClient() {
             className="text-center max-w-3xl mx-auto mb-16"
           >
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-              Avec <span className="text-red-500">GëstuSaDine</span>, passez à la vitesse supérieure
+              Avec <span className="text-red-500">Mafal-IA</span>, passez à la vitesse supérieure
             </h2>
             <p className="text-xl text-gray-600">
               Une plateforme complète pour automatiser vos ventes, gérer vos commandes et faire grandir votre commerce
@@ -489,7 +489,7 @@ export default function HomeClient() {
               Découvrez ce que nos clients disent
             </h2>
             <p className="text-xl text-gray-600">
-              Rejoignez des centaines de commerces qui font confiance à GëstuSaDine
+              Rejoignez des centaines de commerces qui font confiance à Mafal-IA
             </p>
           </motion.div>
 
@@ -544,7 +544,7 @@ export default function HomeClient() {
               Prêt à transformer votre business ?
             </h2>
             <p className="text-xl mb-10 opacity-90 max-w-2xl mx-auto">
-              Rejoignez les commerçants qui utilisent GëstuSaDine pour automatiser leurs ventes et grandir. Configuration simple en 15 minutes.
+              Rejoignez les commerçants qui utilisent Mafal-IA pour automatiser leurs ventes et grandir. Configuration simple en 15 minutes.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/onboarding">
@@ -599,7 +599,7 @@ export default function HomeClient() {
             </div>
           </div>
           <div className="mt-12 pt-8 border-t border-gray-800 text-center text-sm text-gray-400">
-            <p>© 2026 GëstuSaDine. Tous droits réservés.</p>
+            <p>© 2026 Mafal-IA. Tous droits réservés.</p>
           </div>
         </div>
       </footer>
