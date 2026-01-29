@@ -24,20 +24,12 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
         welcomeMessage: true,
         businessHours: true,
         deliveryInfo: true,
-        location: true,
         description: true,
         cuisine: true,
         orderingEnabled: true,
         // location not in schema; keep from registry only
       },
     })
-    const dbMenu = await prisma.menuItem.findMany({
-      where: { restaurantId },
-      select: { name: true, price: true, description: true, category: true, isAvailable: true },
-      orderBy: { name: "asc" },
-      take: 50,
-    })
-
     const reg = Registry.get(restaurantId)
     const cfg = dbRestaurant
       ? {
@@ -46,10 +38,9 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
           cuisine: dbRestaurant.cuisine,
           businessHours: dbRestaurant.businessHours,
           deliveryInfo: dbRestaurant.deliveryInfo,
-          location: dbRestaurant.location,
+          location: reg?.location, // location not in schema; keep from registry only
           welcomeMessage: dbRestaurant.welcomeMessage,
           orderingEnabled: dbRestaurant.orderingEnabled,
-          menu: dbMenu?.map((m) => ({ name: m.name, price: m.price, description: m.description, category: m.category, isAvailable: m.isAvailable })),
         }
       : reg
     let reply: string
