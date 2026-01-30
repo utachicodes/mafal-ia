@@ -71,14 +71,14 @@
     "react": "^19",
     "react-day-picker": "9.8.0",
     "react-dom": "^19",
-    "react-hook-form": "^7.60.0",
+    "react-hook-form": "^7.71.1",
     "react-is": "^19.1.1",
     "react-resizable-panels": "^2.1.7",
     "recharts": "latest",
     "sonner": "^1.7.4",
     "tailwind-merge": "^2.5.5",
     "tailwindcss-animate": "^1.0.7",
-    "zod": "3.25.67",
+    "zod": "^3.25.67",
     "zustand": "^5.0.10"
   },
   "devDependencies": {
