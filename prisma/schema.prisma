@@ -8,6 +8,29 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+// B2B2C User Management
+model User {
+  id            String       @id @default(cuid())
+  email         String       @unique
+  name          String?
+  role          UserRole     @default(RESTAURANT_OWNER)
+  passwordHash  String
+  
+  // Relations
+  ownedRestaurants Restaurant[] @relation("RestaurantOwner")
+  createdRestaurants Restaurant[] @relation("RestaurantCreator")
+  
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  
+  @@index([email])
+}
+
+enum UserRole {
+  ADMIN              // Mafalia employees - full access
+  RESTAURANT_OWNER   // Restaurant clients - read-only dashboard
+}
+
 model users_sync {
   id         String    @id
   name       String?
@@ -42,6 +65,13 @@ model Restaurant {
   country               String?
   verificationCode      String?
   isVerified            Boolean        @default(false)
+  
+  // B2B2C Fields
+  ownerId               String?        // Restaurant owner (client) - read-only access
+  owner                 User?          @relation("RestaurantOwner", fields: [ownerId], references: [id])
+  createdById           String?        // Mafalia employee who onboarded this restaurant
+  createdBy             User?          @relation("RestaurantCreator", fields: [createdById], references: [id])
+  
   createdAt             DateTime       @default(now())
   updatedAt             DateTime       @updatedAt
   apiKeyCreatedAt       DateTime?
@@ -53,6 +83,8 @@ model Restaurant {
   orders                Order[]
 
   @@index([userId])
+  @@index([ownerId])
+  @@index([createdById])
 }
 
 model MenuItem {
