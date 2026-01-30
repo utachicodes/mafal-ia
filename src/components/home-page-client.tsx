@@ -130,11 +130,7 @@ export default function HomeClient() {
     },
   ];
 
-  const stats = [
-    { value: "98%", label: t.value.stat1Label },
-    { value: "3h", label: t.value.stat2Label },
-    { value: "+45%", label: t.value.stat3Label }
-  ];
+  // Stats are now in t.hero.stats array directly
 
   const testimonials = [
     {
@@ -222,9 +218,9 @@ export default function HomeClient() {
                 variants={fadeInUp}
                 className="flex flex-col sm:flex-row gap-4"
               >
-                <Link href="/onboarding">
+                <Link href="#contact">
                   <Button size="lg" className="bg-red-500 hover:bg-red-600 text-white px-8 py-6 text-lg font-semibold shadow-lg hover:shadow-xl transition-all">
-                    {t.hero.ctaPrimary}
+                    {t.hero.cta}
                   </Button>
                 </Link>
                 <Button
@@ -236,15 +232,13 @@ export default function HomeClient() {
                 </Button>
               </motion.div>
 
-              <motion.div variants={fadeInUp} className="flex items-center gap-6 pt-4">
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="h-5 w-5 text-green-500" />
-                  <span className="text-sm text-gray-600 dark:text-gray-400">{t.hero.benefit1}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="h-5 w-5 text-green-500" />
-                  <span className="text-sm text-gray-600 dark:text-gray-400">{t.hero.benefit2}</span>
-                </div>
+              <motion.div variants={fadeInUp} className="grid grid-cols-3 gap-8 pt-4">
+                {t.hero.stats.map((stat, i) => (
+                  <div key={i} className="text-center">
+                    <div className="text-2xl font-bold text-red-500">{stat.value}</div>
+                    <div className="text-sm text-gray-600 dark:text-gray-400">{stat.label}</div>
+                  </div>
+                ))}
               </motion.div>
             </motion.div>
 
@@ -359,29 +353,29 @@ export default function HomeClient() {
             className="text-center max-w-3xl mx-auto mb-16"
           >
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6">
-              {t.value.title} <span className="text-red-500">{t.value.titleHighlight}</span>{t.value.titleEnd}
+              {t.value.title}
             </h2>
             <p className="text-xl text-gray-600 dark:text-gray-300">
-              {t.value.description}
+              {t.value.subtitle}
             </p>
           </motion.div>
 
-          {/* Stats */}
+          {/* Service Items */}
           <motion.div
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
             variants={staggerContainer}
-            className="grid md:grid-cols-3 gap-8 mb-16"
+            className="grid md:grid-cols-3 gap-8"
           >
-            {stats.map((stat, i) => (
+            {t.value.items.map((item, i) => (
               <motion.div
                 key={i}
-                variants={scaleIn}
-                className="bg-gradient-to-br from-red-50 to-white dark:from-red-950/20 dark:to-gray-900 p-8 rounded-2xl text-center border border-red-100 dark:border-red-900/30"
+                variants={fadeInUp}
+                className="bg-white dark:bg-gray-900 p-8 rounded-2xl border border-gray-200 dark:border-gray-800 hover:border-red-500 dark:hover:border-red-500 transition-all"
               >
-                <div className="text-5xl font-bold text-red-500 mb-2">{stat.value}</div>
-                <div className="text-sm text-gray-600 dark:text-gray-400 font-medium">{stat.label}</div>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">{item.title}</h3>
+                <p className="text-gray-600 dark:text-gray-400">{item.description}</p>
               </motion.div>
             ))}
           </motion.div>

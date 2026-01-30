@@ -29,33 +29,44 @@ export const translations = {
             cta: 'Get Started',
         },
         hero: {
-            tagline: 'The all-in-one AI solution for your business',
-            headline: 'Automate your sales on',
-            headlineHighlight: 'WhatsApp',
-            headlineEnd: 'with AI',
-            description: 'Restaurants, shops, businesses: never lose a customer again. Your AI assistant answers, presents your products, and takes orders 24/7 on WhatsApp.',
-            ctaPrimary: 'Start in 15 minutes',
-            ctaSecondary: 'View demo',
-            benefit1: '15-minute setup',
-            benefit2: 'No commitment',
+            headline: "Professional WhatsApp Automation",
+            headlineHighlight: "for Restaurants",
+            headlineEnd: "",
+            description: "Fully managed AI service - we handle setup, training & ongoing support for your WhatsApp customer service.",
+            cta: "Request Demo",
+            ctaSecondary: "Contact Sales",
+            stats: [
+                { value: "15min", label: "Average Response Time" },
+                { value: "24/7", label: "Always Available" },
+                { value: "90%+", label: "Order Accuracy" }
+            ]
         },
         trust: {
-            title: 'TRUSTED BY THE MOST DYNAMIC BUSINESSES IN SENEGAL',
-            restaurant: 'Restaurant',
-            shop: 'Shop',
-            cafe: 'Café',
-            bakery: 'Bakery',
-            groceryStore: 'Grocery',
-            fastFood: 'Fast Food',
+            title: "Trusted by businesses across Africa",
+            restaurant: "Restaurants",
+            shop: "Retail Shops",
+            cafe: "Cafés",
+            bakery: "Bakeries",
+            groceryStore: "Grocery Stores",
+            fastFood: "Fast Food"
         },
         value: {
-            title: 'With',
-            titleHighlight: 'Mafal-IA',
-            titleEnd: ', shift into high gear',
-            description: 'A complete platform to automate your sales, manage your orders, and grow your business',
-            stat1Label: 'Customer satisfaction rate',
-            stat2Label: 'Time saved per day',
-            stat3Label: 'Average sales growth',
+            title: "White-Glove Service",
+            subtitle: "We Handle Everything - You Focus on Your Business",
+            items: [
+                {
+                    title: "Dedicated Onboarding",
+                    description: "Our team configures your chatbot, uploads your menu, and handles all technical setup"
+                },
+                {
+                    title: "Custom AI Training",
+                    description: "We train the AI specifically on your menu, policies, and business requirements"
+                },
+                {
+                    title: "Ongoing Support",
+                    description: "Dedicated account manager ensures your chatbot delivers perfect responses"
+                }
+            ]
         },
         features: {
             title: 'Everything you need to succeed',
@@ -144,33 +155,44 @@ export const translations = {
             cta: 'Démarrer',
         },
         hero: {
-            tagline: 'La solution IA tout-en-un pour votre commerce',
-            headline: 'Automatisez vos ventes sur',
-            headlineHighlight: 'WhatsApp',
-            headlineEnd: 'avec l\'IA',
-            description: 'Restaurants, boutiques, commerces : ne perdez plus jamais un client. Votre assistant IA répond, présente vos produits et prend les commandes 24/7 sur WhatsApp.',
-            ctaPrimary: 'Commencer en 15 minutes',
-            ctaSecondary: 'Voir la démo',
-            benefit1: 'Configuration en 15 min',
-            benefit2: 'Sans engagement',
+            headline: "Automatisation WhatsApp Professionnelle",
+            headlineHighlight: "pour Restaurants",
+            headlineEnd: "",
+            description: "Service IA entièrement géré - nous nous occupons de la configuration, de la formation et du support continu pour votre service client WhatsApp.",
+            cta: "Demander une démo",
+            ctaSecondary: "Contacter les ventes",
+            stats: [
+                { value: "15min", label: "Temps de réponse moyen" },
+                { value: "24/7", label: "Toujours disponible" },
+                { value: "90%+", label: "Précision des commandes" }
+            ]
         },
         trust: {
-            title: 'RECONNU PAR LES COMMERCES LES PLUS DYNAMIQUES DU SÉNÉGAL',
-            restaurant: 'Restaurant',
-            shop: 'Boutique',
-            cafe: 'Café',
-            bakery: 'Boulangerie',
-            groceryStore: 'Superette',
-            fastFood: 'Fast Food',
+            title: "Approuvé par des entreprises à travers l'Afrique",
+            restaurant: "Restaurants",
+            shop: "Boutiques",
+            cafe: "Cafés",
+            bakery: "Boulangeries",
+            groceryStore: "Épiceries",
+            fastFood: "Fast Food"
         },
         value: {
-            title: 'Avec',
-            titleHighlight: 'Mafal-IA',
-            titleEnd: ', passez à la vitesse supérieure',
-            description: 'Une plateforme complète pour automatiser vos ventes, gérer vos commandes et faire grandir votre commerce',
-            stat1Label: 'Taux de satisfaction client',
-            stat2Label: 'Temps économisé par jour',
-            stat3Label: 'Croissance moyenne des ventes',
+            title: "Service Clé en Main",
+            subtitle: "Nous gérons tout - Vous vous concentrez sur votre entreprise",
+            items: [
+                {
+                    title: "Intégration Dédicacée",
+                    description: "Notre équipe configure votre chatbot, télécharge votre menu et gère toute la configuration technique"
+                },
+                {
+                    title: "Formation IA Personnalisée",
+                    description: "Nous entraînons l'IA spécifiquement sur votre menu, vos politiques et vos exigences commerciales"
+                },
+                {
+                    title: "Support Continu",
+                    description: "Un gestionnaire de compte dédié s'assure que votre chatbot fournit des réponses parfaites"
+                }
+            ]
         },
         features: {
             title: 'Tout ce qu\'il faut pour réussir',
@@ -259,33 +281,44 @@ export const translations = {
             cta: 'ابدأ الآن',
         },
         hero: {
-            tagline: 'الحل الشامل بالذكاء الاصطناعي لعملك',
-            headline: 'قم بأتمتة مبيعاتك على',
-            headlineHighlight: 'واتساب',
-            headlineEnd: 'بالذكاء الاصطناعي',
-            description: 'المطاعم، المتاجر، الأعمال التجارية: لا تفقد أي عميل بعد الآن. يرد مساعدك بالذكاء الاصطناعي، ويعرض منتجاتك ويأخذ الطلبات على مدار الساعة على واتساب.',
-            ctaPrimary: 'ابدأ في 15 دقيقة',
-            ctaSecondary: 'شاهد العرض التوضيحي',
-            benefit1: 'إعداد في 15 دقيقة',
-            benefit2: 'بدون التزام',
+            headline: "أتمتة واتساب احترافية",
+            headlineHighlight: "للمطاعم",
+            headlineEnd: "",
+            description: "خدمة ذكاء اصطناعي مُدارة بالكامل - نحن نتولى الإعداد والتدريب والدعم المستمر لخدمة عملاء واتساب الخاصة بك.",
+            cta: "طلب عرض تجريبي",
+            ctaSecondary: "اتصل بالمبيعات",
+            stats: [
+                { value: "15 دقيقة", label: "متوسط وقت الاستجابة" },
+                { value: "24/7", label: "متاح دائمًا" },
+                { value: "+90%", label: "دقة الطلبات" }
+            ]
         },
         trust: {
-            title: 'موثوق به من قبل أكثر الشركات ديناميكية في السنغال',
-            restaurant: 'مطعم',
-            shop: 'متجر',
-            cafe: 'مقهى',
-            bakery: 'مخبز',
-            groceryStore: 'بقالة',
-            fastFood: 'وجبات سريعة',
+            title: "موثوق به من قبل الشركات في جميع أنحاء أفريقيا",
+            restaurant: "المطاعم",
+            shop: "متاجر التجزئة",
+            cafe: "المقاهي",
+            bakery: "المخابز",
+            groceryStore: "محلات البقالة",
+            fastFood: "الوجبات السريعة"
         },
         value: {
-            title: 'مع',
-            titleHighlight: 'Mafal-IA',
-            titleEnd: '، انتقل إلى السرعة العالية',
-            description: 'منصة شاملة لأتمتة مبيعاتك، وإدارة طلباتك، وتنمية أعمالك',
-            stat1Label: 'معدل رضا العملاء',
-            stat2Label: 'الوقت المحفوظ يوميًا',
-            stat3Label: 'متوسط نمو المبيعات',
+            title: "خدمة متكاملة",
+            subtitle: "نحن نتولى كل شيء - أنت تركز على عملك",
+            items: [
+                {
+                    title: "تأهيل مخصص",
+                    description: "يقوم فريقنا بتكوين روبوت الدردشة الخاص بك، ورفع قائمتك، والتعامل مع جميع الإعدادات التقنية"
+                },
+                {
+                    title: "تدريب مخصص للذكاء الاصطناعي",
+                    description: "نقوم بتدريب الذكاء الاصطناعي خصيصًا على قائمتك وسياساتك ومتطلبات عملك"
+                },
+                {
+                    title: "دعم مستمر",
+                    description: "يضمن مدير الحساب المخصص أن يقدم روبوت الدردشة الخاص بك إجابات مثالية"
+                }
+            ]
         },
         features: {
             title: 'كل ما تحتاجه للنجاح',
