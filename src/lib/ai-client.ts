@@ -50,20 +50,34 @@ export class AIClient {
     }
   }
 
-  static async getMenuInformation(query: string, menuItems: MenuItem[]) {
-    if (typeof window !== "undefined") {
-      const match = menuItems.find((m) => m.name.toLowerCase().includes(query.toLowerCase()))
-      return match ? { name: match.name, price: match.price, description: match.description } : null
+  static async getMenuInformation(query: string, menuItems: MenuItem[], restaurantId?: string) {
+    // If we have a restaurantId, try a vector search for better semantic matching
+    if (restaurantId && typeof window === "undefined") {
+      try {
+        const { searchMenuItemsByVector } = await import("@/src/lib/embeddings")
+        const results = await searchMenuItemsByVector(restaurantId, query, 3)
+        if (results && results.length > 0) {
+          // Return the top result or a formatted summary
+          const best = results[0]
+          return {
+            name: best.name,
+            price: best.price,
+            description: best.description,
+            matches: results // keep pure logic
+          }
+        }
+      } catch (err) {
+        console.warn("[AIClient] Vector search failed, falling back to local filter", err)
+      }
     }
-    try {
-      const { getMenuItemInformationFlow } = await import("@/src/ai")
-      const { runFlow } = await import("@genkit-ai/flow")
-      const result = await runFlow(getMenuItemInformationFlow as any, { query, menuItems })
-      return result as any
-    } catch (error) {
-      console.error("Error getting menu information:", error)
-      throw new Error("Failed to get menu information")
-    }
+
+    // Fallback: Client-side or naive filter
+    const lower = query.toLowerCase()
+    const match = menuItems.find((m) =>
+      m.name.toLowerCase().includes(lower) ||
+      (m.description && m.description.toLowerCase().includes(lower))
+    )
+    return match ? { name: match.name, price: match.price, description: match.description } : null
   }
 
   static async calculateOrder(orderText: string, menuItems: MenuItem[]) {

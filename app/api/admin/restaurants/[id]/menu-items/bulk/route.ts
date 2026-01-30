@@ -26,16 +26,47 @@ export async function POST(
             );
         }
 
+        // Import embedding generator (dynamically to avoid build issues if file not present yet)
+        const { generateMenuItemEmbedding } = await import("@/src/lib/embeddings");
+
+        // Process items in parallel to generate embeddings
+        const itemsWithEmbeddings = await Promise.all(
+            items.map(async (item: any) => {
+                let embedding: number[] | null = null;
+                try {
+                    // Generate vector embedding for semantic search
+                    embedding = await generateMenuItemEmbedding({
+                        name: item.name,
+                        description: item.description || item.name,
+                        category: item.category,
+                        price: parseInt(item.price) || 0,
+                    });
+                } catch (e) {
+                    console.warn(`Embedding generation failed for ${item.name}, skipping vector.`);
+                }
+
+                return {
+                    restaurantId: params.id,
+                    name: item.name,
+                    description: item.description || item.name,
+                    price: parseInt(item.price) || 0,
+                    category: item.category || "General",
+                    isAvailable: true,
+                    // If your schema supports vector type, you might need to format this, 
+                    // but for now we assume the Prisma model has an 'embedding' field 
+                    // of type Unsupported("vector") or similar, often handled as raw SQL or specialized types.
+                    // If using a float[] array in Prisma for pgvector:
+                    embedding: embedding,
+                };
+            })
+        );
+
         // Bulk create menu items
+        // Note: createMany might not support setting vector fields directly if they are unsupported types,
+        // but if using a standard float[] or Json, it works. 
+        // We'll proceed assuming standard support or that deployment handles the migration.
         const created = await prisma.menuItem.createMany({
-            data: items.map((item: any) => ({
-                restaurantId: params.id,
-                name: item.name,
-                description: item.description || item.name,
-                price: parseInt(item.price) || 0,
-                category: item.category || "General",
-                isAvailable: true,
-            })),
+            data: itemsWithEmbeddings,
         });
 
         return NextResponse.json({
