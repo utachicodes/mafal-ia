@@ -1,5 +1,11 @@
-// Embedding utilities: uses Genkit in production (placeholder hook),
-// falls back to a deterministic lexical embedding locally.
+// Production embedding utilities using Genkit Google AI
+import { genkit } from "genkit";
+import { googleAI, textEmbedding004 } from "@genkit-ai/googleai";
+
+// Initialize Genkit
+const ai = genkit({
+  plugins: [googleAI()],
+});
 
 // Cosine similarity between two numeric vectors
 export function cosineSim(a: number[], b: number[]): number {
@@ -34,9 +40,90 @@ export function fallbackEmbed(text: string, dims = 128): number[] {
   return vec.map((v) => v / norm)
 }
 
-// Main embedding function. Hook Genkit here in production.
+/**
+ * Generate embedding using Google AI textEmbedding004
+ * Falls back to deterministic embedding if Genkit fails
+ */
 export async function getEmbedding(text: string): Promise<number[]> {
-  // TODO: Integrate Genkit Google AI embeddings here when available in runtime.
-  // For now, always fallback to deterministic embedding so local/dev works.
-  return fallbackEmbed(text)
+  // Client-side: use fallback
+  if (typeof window !== "undefined") {
+    return fallbackEmbed(text);
+  }
+
+  try {
+    const { embedding } = await ai.embed({
+      embedder: textEmbedding004,
+      content: text,
+    });
+    return embedding;
+  } catch (error) {
+    console.warn("Genkit embedding failed, using fallback:", error);
+    return fallbackEmbed(text);
+  }
+}
+
+/**
+ * Generate embedding for a menu item
+ */
+export async function generateMenuItemEmbedding(item: {
+  name: string;
+  description: string;
+  category?: string;
+  price: number;
+}): Promise<number[]> {
+  const embeddingText = `${item.name}. ${item.description}. ${item.category || ""}. Price: ${item.price} FCFA.`;
+  return getEmbedding(embeddingText);
+}
+
+/**
+ * Semantic search using vector similarity (requires pgvector extension)
+ */
+export async function searchMenuItemsByVector(
+  restaurantId: string,
+  query: string,
+  limit: number = 5
+): Promise<any[]> {
+  const { getPrisma } = await import("@/src/lib/db");
+  const prisma = await getPrisma();
+
+  try {
+    const queryEmbedding = await getEmbedding(query);
+
+    // PostgreSQL vector similarity search
+    const results = await prisma.$queryRaw`
+      SELECT 
+        id, 
+        name, 
+        description, 
+        price, 
+        category,
+        "isAvailable",
+        1 - (embedding::vector <=> ${JSON.stringify(queryEmbedding)}::vector) AS similarity
+      FROM "MenuItem"
+      WHERE "restaurantId" = ${restaurantId}
+        AND "isAvailable" = true
+        AND embedding IS NOT NULL
+      ORDER BY embedding::vector <=> ${JSON.stringify(queryEmbedding)}::vector
+      LIMIT ${limit}
+    `;
+
+    return results as any[];
+  } catch (error) {
+    console.error("Vector search error:", error);
+
+    // Fallback to text search
+    const fallback = await prisma.menuItem.findMany({
+      where: {
+        restaurantId,
+        isAvailable: true,
+        OR: [
+          { name: { contains: query, mode: "insensitive" } },
+          { description: { contains: query, mode: "insensitive" } },
+        ],
+      },
+      take: limit,
+    });
+
+    return fallback.map((item) => ({ ...item, similarity: 0.5 }));
+  }
 }
