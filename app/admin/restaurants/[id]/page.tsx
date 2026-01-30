@@ -11,6 +11,7 @@ import Link from "next/link";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import ChatSimulator from "@/src/components/admin/chat-simulator";
 
 export default function RestaurantDetailsPage() {
     const params = useParams();
@@ -91,8 +92,8 @@ export default function RestaurantDetailsPage() {
                             <div className="flex items-center gap-2 mt-1">
                                 <span className="text-sm text-gray-500">{restaurant.cuisine} • {restaurant.whatsappNumber}</span>
                                 <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${restaurant.isActive
-                                        ? "bg-green-100 text-green-700"
-                                        : "bg-yellow-100 text-yellow-700"
+                                    ? "bg-green-100 text-green-700"
+                                    : "bg-yellow-100 text-yellow-700"
                                     }`}>
                                     {restaurant.isActive ? "Active" : "Paused"}
                                 </span>
@@ -123,6 +124,7 @@ export default function RestaurantDetailsPage() {
                         <TabsTrigger value="menu">Menu Items</TabsTrigger>
                         <TabsTrigger value="configuration">Configuration</TabsTrigger>
                         <TabsTrigger value="logs">Chat Logs</TabsTrigger>
+                        <TabsTrigger value="chat">Simulator</TabsTrigger>
                     </TabsList>
 
                     <TabsContent value="overview">
@@ -220,6 +222,30 @@ export default function RestaurantDetailsPage() {
                                 <Button>Save Configuration</Button>
                             </CardContent>
                         </Card>
+                    </TabsContent>
+
+                    <TabsContent value="chat">
+                        <div className="grid md:grid-cols-3 gap-6">
+                            <div className="md:col-span-2">
+                                <ChatSimulator restaurantId={id} restaurantName={restaurant.name} />
+                            </div>
+                            <div className="space-y-6">
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle>Simulator Guide</CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="text-sm space-y-2 text-gray-500">
+                                        <p>This simulator runs the <strong>exact same AI</strong> as WhatsApp.</p>
+                                        <ul className="list-disc leading-relaxed pl-4">
+                                            <li>Test menu queries ("Show me the burger")</li>
+                                            <li>Test language detection (Try "Bonjour")</li>
+                                            <li>Test ordering flow</li>
+                                        </ul>
+                                        <p className="mt-4 text-xs">Note: Chats here are logged as "SIMULATOR" user.</p>
+                                    </CardContent>
+                                </Card>
+                            </div>
+                        </div>
                     </TabsContent>
                 </Tabs>
             </div>
