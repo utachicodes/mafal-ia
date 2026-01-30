@@ -95,6 +95,7 @@ model MenuItem {
   price        Int
   category     String?
   isAvailable  Boolean    @default(true)
+  imageUrl     String?
   embedding    Json?
   restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
 }

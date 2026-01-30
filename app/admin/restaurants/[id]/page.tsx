@@ -11,6 +11,9 @@ import Link from "next/link";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { Trash2 } from "lucide-react";
 import ChatSimulator from "@/src/components/admin/chat-simulator";
 
 export default function RestaurantDetailsPage() {
@@ -21,6 +24,10 @@ export default function RestaurantDetailsPage() {
 
     const [restaurant, setRestaurant] = useState<any>(null);
     const [loading, setLoading] = useState(true);
+
+    // Edit Menu State
+    const [editingItem, setEditingItem] = useState<any>(null);
+    const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
     useEffect(() => {
         fetchRestaurant();
@@ -38,6 +45,54 @@ export default function RestaurantDetailsPage() {
             setLoading(false);
         }
     };
+
+    const handleUpdateMenuItem = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!editingItem) return;
+
+        try {
+            const res = await fetch(`/api/admin/menu-items/${editingItem.id}`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    name: editingItem.name,
+                    description: editingItem.description,
+                    price: editingItem.price,
+                    imageUrl: editingItem.imageUrl
+                }),
+            });
+
+            if (!res.ok) throw new Error("Failed to update item");
+
+            // Refresh local state
+            const updatedItems = restaurant.menuItems.map((item: any) =>
+                item.id === editingItem.id ? { ...item, ...editingItem } : item
+            );
+            setRestaurant({ ...restaurant, menuItems: updatedItems });
+            setIsEditDialogOpen(false);
+            toast.success("Menu item updated");
+        } catch (error) {
+            toast.error("Failed to update menu item");
+        }
+    }
+
+    const handleDeleteMenuItem = async (itemId: string) => {
+        if (!confirm("Are you sure you want to delete this item?")) return;
+
+        try {
+            const res = await fetch(`/api/admin/menu-items/${itemId}`, {
+                method: "DELETE",
+            });
+
+            if (!res.ok) throw new Error("Failed to delete item");
+
+            const updatedItems = restaurant.menuItems.filter((item: any) => item.id !== itemId);
+            setRestaurant({ ...restaurant, menuItems: updatedItems });
+            toast.success("Menu item deleted");
+        } catch (error) {
+            toast.error("Failed to delete item");
+        }
+    }
 
     const handleStatusToggle = async () => {
         if (!restaurant) return;
@@ -124,7 +179,6 @@ export default function RestaurantDetailsPage() {
                         <TabsTrigger value="menu">Menu Items</TabsTrigger>
                         <TabsTrigger value="configuration">Configuration</TabsTrigger>
                         <TabsTrigger value="logs">Chat Logs</TabsTrigger>
-                        <TabsTrigger value="chat">Simulator</TabsTrigger>
                     </TabsList>
 
                     <TabsContent value="overview">
@@ -190,18 +244,102 @@ export default function RestaurantDetailsPage() {
                                         <div className="p-8 text-center text-gray-500">No menu items yet. Upload a menu to get started.</div>
                                     ) : (
                                         restaurant.menuItems?.map((item: any) => (
-                                            <div key={item.id} className="p-4 flex justify-between items-center hover:bg-gray-50">
-                                                <div>
-                                                    <div className="font-medium">{item.name}</div>
-                                                    <div className="text-sm text-gray-500">{item.description}</div>
+                                            <div key={item.id} className="p-4 flex justify-between items-center hover:bg-gray-50 group">
+                                                <div className="flex gap-4 items-center">
+                                                    {item.imageUrl && (
+                                                        <img src={item.imageUrl} alt={item.name} className="h-12 w-12 rounded object-cover border" />
+                                                    )}
+                                                    <div>
+                                                        <div className="font-medium">{item.name}</div>
+                                                        <div className="text-sm text-gray-500 max-w-md line-clamp-1">{item.description}</div>
+                                                    </div>
                                                 </div>
-                                                <div className="font-bold">{item.price.toLocaleString()} FCFA</div>
+                                                <div className="flex items-center gap-4">
+                                                    <div className="font-bold">{item.price.toLocaleString()} FCFA</div>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        onClick={() => {
+                                                            setEditingItem(item);
+                                                            setIsEditDialogOpen(true);
+                                                        }}
+                                                    >
+                                                        <Edit className="h-4 w-4 text-gray-400 group-hover:text-blue-600" />
+                                                    </Button>
+                                                </div>
                                             </div>
                                         ))
                                     )}
                                 </div>
                             </CardContent>
                         </Card>
+
+                        <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+                            <DialogContent>
+                                <DialogHeader>
+                                    <DialogTitle>Edit Menu Item</DialogTitle>
+                                </DialogHeader>
+                                {editingItem && (
+                                    <form onSubmit={handleUpdateMenuItem} className="space-y-4">
+                                        <div className="space-y-2">
+                                            <Label>Name</Label>
+                                            <Input
+                                                value={editingItem.name}
+                                                onChange={(e) => setEditingItem({ ...editingItem, name: e.target.value })}
+                                                required
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label>Price (FCFA)</Label>
+                                            <Input
+                                                type="number"
+                                                value={editingItem.price}
+                                                onChange={(e) => setEditingItem({ ...editingItem, price: parseInt(e.target.value) })}
+                                                required
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label>Description</Label>
+                                            <Textarea
+                                                value={editingItem.description}
+                                                onChange={(e) => setEditingItem({ ...editingItem, description: e.target.value })}
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label>Image URL</Label>
+                                            <Input
+                                                value={editingItem.imageUrl || ""}
+                                                onChange={(e) => setEditingItem({ ...editingItem, imageUrl: e.target.value })}
+                                                placeholder="https://example.com/image.jpg"
+                                            />
+                                            {editingItem.imageUrl && (
+                                                <div className="mt-2 text-xs text-gray-500">
+                                                    <p className="mb-1">Preview:</p>
+                                                    <img src={editingItem.imageUrl} alt="Preview" className="h-20 w-20 rounded object-cover border" />
+                                                </div>
+                                            )}
+                                        </div>
+                                        <DialogFooter className="flex justify-between items-center sm:justify-between w-full">
+                                            <Button
+                                                type="button"
+                                                variant="destructive"
+                                                onClick={() => {
+                                                    setIsEditDialogOpen(false); // Close dialog first to avoid flicker?
+                                                    handleDeleteMenuItem(editingItem.id);
+                                                }}
+                                            >
+                                                <Trash2 className="h-4 w-4 mr-2" />
+                                                Delete Item
+                                            </Button>
+                                            <div className="flex gap-2">
+                                                <Button type="button" variant="outline" onClick={() => setIsEditDialogOpen(false)}>Cancel</Button>
+                                                <Button type="submit">Save Changes</Button>
+                                            </div>
+                                        </DialogFooter>
+                                    </form>
+                                )}
+                            </DialogContent>
+                        </Dialog>
                     </TabsContent>
 
                     <TabsContent value="configuration">
@@ -223,32 +361,8 @@ export default function RestaurantDetailsPage() {
                             </CardContent>
                         </Card>
                     </TabsContent>
-
-                    <TabsContent value="chat">
-                        <div className="grid md:grid-cols-3 gap-6">
-                            <div className="md:col-span-2">
-                                <ChatSimulator restaurantId={id} restaurantName={restaurant.name} />
-                            </div>
-                            <div className="space-y-6">
-                                <Card>
-                                    <CardHeader>
-                                        <CardTitle>Simulator Guide</CardTitle>
-                                    </CardHeader>
-                                    <CardContent className="text-sm space-y-2 text-gray-500">
-                                        <p>This simulator runs the <strong>exact same AI</strong> as WhatsApp.</p>
-                                        <ul className="list-disc leading-relaxed pl-4">
-                                            <li>Test menu queries ("Show me the burger")</li>
-                                            <li>Test language detection (Try "Bonjour")</li>
-                                            <li>Test ordering flow</li>
-                                        </ul>
-                                        <p className="mt-4 text-xs">Note: Chats here are logged as "SIMULATOR" user.</p>
-                                    </CardContent>
-                                </Card>
-                            </div>
-                        </div>
-                    </TabsContent>
                 </Tabs>
             </div>
-        </div>
+        </div >
     );
 }
