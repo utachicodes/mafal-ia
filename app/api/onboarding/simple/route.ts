@@ -52,21 +52,25 @@ export async function POST(req: Request) {
 
     // Persist menu items if provided (with embeddings)
     if (menu && menu.length > 0) {
-      for (const m of menu) {
-        const text = [m.name, m.description, m.category].filter(Boolean).join(" \n")
-        const embedding = await getEmbedding(text)
-        await prisma.menuItem.create({
-          data: {
+      const menuItemsData = await Promise.all(
+        menu.map(async (m) => {
+          const text = [m.name, m.description, m.category].filter(Boolean).join(" \n")
+          const embedding = await getEmbedding(text)
+          return {
             restaurantId: id,
             name: m.name,
             description: m.description ?? "",
             price: Number.isFinite(m.price as any) ? Number(m.price) : 0,
             category: m.category,
             isAvailable: m.isAvailable ?? true,
-            embedding,
-          },
+            embedding: embedding,
+          }
         })
-      }
+      )
+
+      await prisma.menuItem.createMany({
+        data: menuItemsData,
+      })
     }
 
     // Also store in memory for immediate use
