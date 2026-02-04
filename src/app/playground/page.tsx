@@ -1,6 +1,8 @@
 import { ChatSimulator } from "@/src/components/chat-simulator"
 import { RestaurantService } from "@/src/lib/restaurant-service"
 
+export const dynamic = "force-dynamic"
+
 export default async function PlaygroundPage() {
   const restaurants = await RestaurantService.getAllRestaurants()
   const simpleRestaurants = restaurants.map(r => ({ id: r.id, name: r.name }))
