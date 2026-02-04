@@ -4,16 +4,16 @@ const globalForPrisma = globalThis as unknown as { prisma?: PrismaClientType }
 
 const isProd = process.env.NODE_ENV === 'production'
 
-// Decide database URL: REQUIRE DATABASE_URL
-let resolvedDbUrl = process.env.DATABASE_URL
-if (!resolvedDbUrl || resolvedDbUrl.length === 0) {
-  throw new Error(
-    'DATABASE_URL is not set. Please configure a Postgres connection string in your .env file or environment variables.'
-  )
-}
-process.env.DATABASE_URL = resolvedDbUrl
+// Database URL validation delayed until access
+
 
 export async function getPrisma(): Promise<PrismaClientType> {
+  // Validate env var now
+  const url = process.env.DATABASE_URL
+  if (!url || url.length === 0) {
+    throw new Error('DATABASE_URL is not set. Please configure a Postgres connection string in your .env file.')
+  }
+
   if (globalForPrisma.prisma) return globalForPrisma.prisma!
 
   console.log(`Connecting to database at: ${process.env.DATABASE_URL}`);
