@@ -37,7 +37,7 @@ export function IntegrationTestPanel() {
       name: "Menu Item Validation",
       test: async () => {
         const mockRestaurant = TestUtils.createMockRestaurant()
-        for (const item of mockRestaurant.menuItems) {
+        for (const item of mockRestaurant.menu) {
           if (!TestUtils.validateMenuItem(item)) {
             throw new Error(`Menu item validation failed: ${item.name}`)
           }

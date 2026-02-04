@@ -51,11 +51,11 @@ export async function getEmbedding(text: string): Promise<number[]> {
   }
 
   try {
-    const { embedding } = await ai.embed({
+    const result = await ai.embed({
       embedder: textEmbedding004,
       content: text,
     });
-    return embedding;
+    return result[0].embedding;
   } catch (error) {
     console.warn("Genkit embedding failed, using fallback:", error);
     return fallbackEmbed(text);
@@ -124,6 +124,6 @@ export async function searchMenuItemsByVector(
       take: limit,
     });
 
-    return fallback.map((item) => ({ ...item, similarity: 0.5 }));
+    return fallback.map((item: any) => ({ ...item, similarity: 0.5 }));
   }
 }

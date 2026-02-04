@@ -34,7 +34,7 @@ export async function POST(req: NextRequest, ctx: { params: { id: string } }) {
     }
 
     // Prepare conversation context
-    const meta = ConversationManager.getMetadata(restaurant.id, from)
+    const meta = await ConversationManager.getMetadata(restaurant.id, from)
     const deliveryLine = meta.delivery ? `Delivery: ${formatEstimate(meta.delivery)}` : "Delivery: unknown"
     const customerLine = `Customer: ${meta?.name ?? "unknown"} (${from})${meta?.locationText ? `, Location: ${meta.locationText}` : ""}`
 
@@ -57,7 +57,7 @@ ${customerLine}
 Ordering Enabled: ${restaurant.chatbotContext.orderingEnabled ? "Yes" : "No"}
     `.trim()
 
-    const history = ConversationManager.getConversation(restaurant.id, from)
+    const history = await ConversationManager.getConversation(restaurant.id, from)
     const messages = [
       ...history,
       { id: `u_${Date.now()}`, role: "user" as const, content: text, timestamp: new Date() },

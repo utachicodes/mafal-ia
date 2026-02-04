@@ -1,6 +1,4 @@
 import { defineFlow } from "@genkit-ai/flow"
-import { generate } from "@genkit-ai/ai"
-import { googleAI } from "@genkit-ai/googleai"
 import type { MenuItem } from "@/lib/data"
 import { z } from "zod"
 import Fuse from "fuse.js"
@@ -49,47 +47,30 @@ export const getMenuItemInformationFlow = defineFlow(
   },
   async (input: MenuRetrievalInput): Promise<MenuRetrievalOutput> => {
     const { query, menuItems } = input
-    const genAny: any = generate as any
-    const modelAny: any = (googleAI as any)("gemini-1.5-flash")
-    const getText = (res: any): string => {
-      try {
-        if (!res) return ""
-        if (typeof res.text === "function") return String(res.text()).trim()
-        if (typeof res.text === "string") return res.text.trim()
-        if (typeof res.output === "string") return res.output.trim()
-        return String(res).trim()
-      } catch {
-        return ""
-      }
-    }
+    const { llm } = await import("@/src/lib/llm")
 
-    // Step 1: Intelligent filtering using Fuse.js (Fuzzy Search) + Simple Keyword Match
-    // This allows us to handle 1000+ items without blowing up the context window.
-    // Configure Fuse for name and description search
+    // Step 1: Intelligent filtering using Fuse.js (Fuzzy Search)
     const fuse = new Fuse(menuItems, {
       keys: [
         { name: "name", weight: 0.7 },
         { name: "category", weight: 0.2 },
         { name: "description", weight: 0.1 }
       ],
-      threshold: 0.4, // Lower is stricter
+      threshold: 0.4,
       includeScore: true
     })
 
     const fuseResults = fuse.search(query)
-    let relevantItems = fuseResults.map((r: any) => r.item).slice(0, 5) // Take top 5
+    let relevantItems = fuseResults.map((r: any) => r.item).slice(0, 5)
 
-    // Fallback: If fuzzy search failed (e.g. general query like "drinks"), try category filter
     if (relevantItems.length === 0) {
       relevantItems = searchMenuItems(menuItems, query).slice(0, 5)
     }
 
-    // If still no items, but the menu is small (<20 items), just use the whole menu
     if (relevantItems.length === 0 && menuItems.length < 20) {
       relevantItems = menuItems
     }
 
-    // Generate detailed information about the relevant items
     if (relevantItems.length === 0) {
       return {
         information:
@@ -113,10 +94,10 @@ Provide helpful information about these items in response to the customer's quer
 Be concise but informative. Speak naturally.
     `
 
-    const informationResult = await genAny({ model: modelAny, prompt: informationPrompt })
+    const informationResult = await llm.generate(informationPrompt, { model: "llama-3.1-8b-instant" })
 
     return {
-      information: getText(informationResult),
+      information: informationResult.trim(),
       relevantItems,
     }
   },

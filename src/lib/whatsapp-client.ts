@@ -27,16 +27,49 @@ export class WhatsAppClient {
     throw lastError
   }
 
-  // Send a text message via WhatsApp Business API
+  // Send a text message via WhatsApp Business API or LAM
   static async sendMessage(
     businessPhoneNumberId: string,
     to: string,
     message: string,
-    accessTokenOverride?: string,
+    options?: {
+      accessTokenOverride?: string
+      lamApiKey?: string
+      lamBaseUrl?: string
+    }
   ): Promise<{ success: boolean; messageId?: string; raw?: any; errorText?: string; status?: number }> {
     try {
-      const url = `${this.BASE_URL}/${businessPhoneNumberId}/messages`
+      if (options?.lamApiKey) {
+        const baseUrl = options.lamBaseUrl || "https://waba.lafricamobile.com"
+        const url = `${baseUrl}/messages`
+        const payload = {
+          recipient_type: "individual",
+          to: to,
+          type: "text",
+          text: { body: message }
+        }
 
+        console.log("[LAM API] Sending text message to:", to)
+        const response = await fetch(url, {
+          method: "POST",
+          headers: {
+            "LAM-API-KEY": options.lamApiKey,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        })
+
+        if (!response.ok) {
+          const errorText = await response.text()
+          return { success: false, errorText, status: response.status }
+        }
+
+        const result = await response.json()
+        return { success: true, messageId: result?.messages?.[0]?.id, raw: result }
+      }
+
+      // Default Meta/WhatsApp Cloud API logic
+      const url = `${this.BASE_URL}/${businessPhoneNumberId}/messages`
       const payload = {
         messaging_product: "whatsapp",
         to: to,
@@ -51,7 +84,7 @@ export class WhatsAppClient {
         message: message.substring(0, 100) + (message.length > 100 ? "..." : ""),
       })
 
-      const token = accessTokenOverride || env.WHATSAPP_ACCESS_TOKEN
+      const token = options?.accessTokenOverride || env.WHATSAPP_ACCESS_TOKEN
       const response = await this.fetchWithRetry(url, {
         method: "POST",
         headers: {
@@ -81,6 +114,86 @@ export class WhatsAppClient {
     }
   }
 
+  // Send an image message
+  static async sendImage(
+    businessPhoneNumberId: string,
+    to: string,
+    imageUrl: string,
+    caption?: string,
+    options?: {
+      accessTokenOverride?: string
+      lamApiKey?: string
+      lamBaseUrl?: string
+    }
+  ): Promise<{ success: boolean; messageId?: string; raw?: any; errorText?: string; status?: number }> {
+    try {
+      if (options?.lamApiKey) {
+        const baseUrl = options.lamBaseUrl || "https://waba.lafricamobile.com"
+        const url = `${baseUrl}/messages`
+        const payload = {
+          recipient_type: "individual",
+          to: to,
+          type: "image",
+          image: {
+            link: imageUrl,
+            caption: caption
+          }
+        }
+
+        console.log("[LAM API] Sending image to:", to)
+        const response = await fetch(url, {
+          method: "POST",
+          headers: {
+            "LAM-API-KEY": options.lamApiKey,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        })
+
+        if (!response.ok) {
+          const errorText = await response.text()
+          return { success: false, errorText, status: response.status }
+        }
+
+        const result = await response.json()
+        return { success: true, messageId: result?.messages?.[0]?.id, raw: result }
+      }
+
+      // Meta Cloud API Image
+      const url = `${this.BASE_URL}/${businessPhoneNumberId}/messages`
+      const payload = {
+        messaging_product: "whatsapp",
+        to: to,
+        type: "image",
+        image: {
+          link: imageUrl,
+          caption: caption
+        },
+      }
+
+      const token = options?.accessTokenOverride || env.WHATSAPP_ACCESS_TOKEN
+      const response = await this.fetchWithRetry(url, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      })
+
+      if (!response.ok) {
+        const errorText = await response.text()
+        return { success: false, errorText, status: response.status }
+      }
+
+      const result = await response.json()
+      return { success: true, messageId: result?.messages?.[0]?.id, raw: result }
+    } catch (error) {
+      console.error("[WhatsApp API] Error sending image:", error)
+      return { success: false, errorText: String(error) }
+    }
+  }
+
   // Send a template message (for notifications, confirmations, etc.)
   static async sendTemplateMessage(
     businessPhoneNumberId: string,
@@ -104,14 +217,14 @@ export class WhatsAppClient {
           },
           components: parameters.length
             ? [
-                {
-                  type: "body",
-                  parameters: parameters.map((param) => ({
-                    type: "text",
-                    text: param,
-                  })),
-                },
-              ]
+              {
+                type: "body",
+                parameters: parameters.map((param) => ({
+                  type: "text",
+                  text: param,
+                })),
+              },
+            ]
             : undefined,
         },
       }

@@ -26,6 +26,7 @@ export class RestaurantService {
       name: m.name,
       description: m.description,
       price: m.price,
+      imageUrl: m.imageUrl ?? undefined,
       category: m.category ?? undefined,
       isAvailable: m.isAvailable,
     }))
@@ -52,12 +53,15 @@ export class RestaurantService {
         deliveryInfo: p.deliveryInfo ?? defaults.deliveryInfo,
       },
       apiCredentials: {
-        whatsappAccessToken: "", // intentionally not exposing tokens via API
+        whatsappAccessToken: p.whatsappAccessToken || "",
         whatsappPhoneNumberId: p.whatsappPhoneNumberId ?? "",
-        webhookVerifyToken: "", // intentionally not exposing tokens via API
+        webhookVerifyToken: p.webhookVerifyToken || "",
+        whatsappAppSecret: p.whatsappAppSecret || "",
+        lamApiKey: p.lamApiKey || "",
+        lamBaseUrl: p.lamBaseUrl || "",
       },
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      createdAt: p.createdAt || new Date(),
+      updatedAt: p.updatedAt || new Date(),
     }
   }
 
@@ -133,7 +137,7 @@ export class RestaurantService {
     let menuArray: any[] = []
     if (Array.isArray(r.menu)) menuArray = r.menu
     else if (typeof r.menu === 'string') {
-      try { const parsed = JSON.parse(r.menu); if (Array.isArray(parsed)) menuArray = parsed } catch {}
+      try { const parsed = JSON.parse(r.menu); if (Array.isArray(parsed)) menuArray = parsed } catch { }
     }
 
     const createdPrismaRestaurant = await prisma.restaurant.create({

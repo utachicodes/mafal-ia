@@ -22,9 +22,28 @@
         "name": "next"
       }
     ],
+    "baseUrl": ".",
     "paths": {
       "@/*": [
         "./*"
+      ],
+      "@/lib/*": [
+        "src/lib/*"
+      ],
+      "@/components/*": [
+        "src/components/*"
+      ],
+      "@/ai/*": [
+        "src/ai/*"
+      ],
+      "@/app/*": [
+        "src/app/*"
+      ],
+      "@/hooks/*": [
+        "src/hooks/*"
+      ],
+      "@/context/*": [
+        "src/context/*"
       ]
     }
   },

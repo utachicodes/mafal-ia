@@ -5,6 +5,7 @@ export interface MenuItem {
   price: number
   category?: string
   isAvailable?: boolean
+  imageUrl?: string
 }
 
 export interface OrderItem {
@@ -17,6 +18,7 @@ export interface ChatMessage {
   role: "user" | "assistant"
   content: string
   timestamp: Date
+  imageUrl?: string
 }
 
 export interface ChatbotContext {
@@ -32,6 +34,8 @@ export interface ApiCredentials {
   whatsappPhoneNumberId: string
   webhookVerifyToken?: string
   whatsappAppSecret?: string
+  lamApiKey?: string
+  lamBaseUrl?: string
 }
 
 export interface Restaurant {

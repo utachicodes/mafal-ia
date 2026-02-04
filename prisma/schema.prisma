@@ -66,6 +66,10 @@ model Restaurant {
   verificationCode      String?
   isVerified            Boolean        @default(false)
   
+  // LAM Integration
+  lamApiKey             String?        // L'Africa Mobile API Key
+  lamBaseUrl            String?        @default("https://waba.lafricamobile.com")
+  
   // B2B2C Fields
   ownerId               String?        // Restaurant owner (client) - read-only access
   owner                 User?          @relation("RestaurantOwner", fields: [ownerId], references: [id])

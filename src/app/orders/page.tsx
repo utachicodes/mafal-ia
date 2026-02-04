@@ -52,7 +52,7 @@ export default async function OrdersPage() {
                   </tr>
                 </thead>
                 <tbody className="[&_tr:last-child]:border-0 bg-white/40 dark:bg-black/20 backdrop-blur-sm">
-                  {orders.map((order) => (
+                  {orders.map((order: any) => (
                     <tr key={order.id} className="border-b transition-colors hover:bg-primary/5">
                       <td className="p-6 align-middle font-mono text-xs text-muted-foreground">#{order.id.slice(-6)}</td>
                       <td className="p-6 align-middle">{format(order.createdAt, "MMM d, HH:mm")}</td>

@@ -1,6 +1,4 @@
 import { defineFlow, runFlow } from "@genkit-ai/flow"
-import { generate } from "@genkit-ai/ai"
-import { googleAI } from "@genkit-ai/googleai"
 import type { MenuItem, ChatMessage } from "@/lib/data"
 import { getMenuItemInformationFlow } from "./smart-menu-retrieval"
 import { calculateOrderTotalFlow } from "./calculate-order-total"
@@ -48,6 +46,7 @@ export const generateResponseFlow = defineFlow(
           name: z.string(),
           description: z.string(),
           price: z.number(),
+          imageUrl: z.string().optional(),
           category: z.string().optional(),
           isAvailable: z.boolean().optional(),
         }),
@@ -58,39 +57,26 @@ export const generateResponseFlow = defineFlow(
       response: z.string(),
       detectedLanguage: z.string(),
       usedTools: z.array(z.string()),
+      imageUrl: z.string().optional(),
     }),
   },
-  async (input: any): Promise<GenerateResponseOutput> => {
+  async (input: any): Promise<GenerateResponseOutput & { imageUrl?: string }> => {
     const { messages, restaurantContext, menuItems, restaurantName } = input
     const messagesTyped = messages as ChatMessage[]
     const menuItemsTyped = menuItems as MenuItem[]
     const lastMessage = messagesTyped[messagesTyped.length - 1]?.content || ""
     const usedTools: string[] = []
 
-    // Helper to normalize text output across Genkit versions
-    const getText = (res: any): string => {
-      try {
-        if (!res) return ""
-        // function style
-        if (typeof res.text === "function") return String(res.text()).trim()
-        // property style
-        if (typeof res.text === "string") return res.text.trim()
-        if (typeof res.output === "string") return res.output.trim()
-        return String(res).trim()
-      } catch {
-        return ""
-      }
-    }
 
-    // Detect language from the last user message
-    const genAny: any = generate as any
-    const modelAny: any = (googleAI as any)("gemini-1.5-flash")
-    const languageDetection = await genAny({
-      model: modelAny,
-      prompt: `Detect the language of this message and respond with just the language code (en, fr, wo, ar, etc.): "${lastMessage}"`,
-    })
+    // Detect language from the last user message using Groq (Fast model)
+    const { llm } = await import("@/src/lib/llm")
 
-    // Normalize language detection to robustly handle variants like "fr-FR", "Français", etc.
+    const languageDetectionResponse = await llm.generate(
+      `Detect the language of this message and respond with just the language code (en, fr, wo, ar, etc.): "${lastMessage}"`,
+      { model: "llama-3.1-8b-instant" }
+    )
+
+    // Normalize language detection
     const normalizeLang = (s: string): "en" | "fr" | "wo" | "ar" => {
       const x = (s || "").toLowerCase().trim()
       if (x.startsWith("fr") || x.includes("fran") || x.includes("french")) return "fr"
@@ -99,12 +85,11 @@ export const generateResponseFlow = defineFlow(
       return "en"
     }
 
-    const detectedLanguage = normalizeLang(getText(languageDetection))
+    const detectedLanguage = normalizeLang(languageDetectionResponse)
 
-    // Analyze intent to determine if tools are needed
-    const intentAnalysis = await genAny({
-      model: modelAny,
-      prompt: `
+    // Analyze intent using Groq
+    const intentAnalysisResponse = await llm.generate(
+      `
         Analyze this customer message and determine the intent:
         Message: "${lastMessage}"
         
@@ -116,9 +101,10 @@ export const generateResponseFlow = defineFlow(
         
         Respond with just the intent category.
       `,
-    })
+      { model: "llama-3.1-8b-instant" }
+    )
 
-    const intent = getText(intentAnalysis).toLowerCase()
+    const intent = intentAnalysisResponse.toLowerCase()
     let toolResponse = ""
     let orderQuote: GenerateResponseOutput["orderQuote"] | undefined
 
@@ -142,7 +128,7 @@ export const generateResponseFlow = defineFlow(
         })
         // Try to infer delivery zone from message; if present, include delivery fee in total
         const deliveryEst = estimateDelivery(lastMessage)
-        const baseToolLine = `Order Subtotal: ${orderCalc.total} FCFA` 
+        const baseToolLine = `Order Subtotal: ${orderCalc.total} FCFA`
         const itemsLine = `Items: ${orderCalc.itemsSummary}`
         let deliveryLine = ""
         let finalTotal = orderCalc.total
@@ -172,8 +158,8 @@ export const generateResponseFlow = defineFlow(
       .join("\n")
 
     const menuSummary = menuItemsTyped
-      .slice(0, 10) // Show first 10 items as summary
-      .map((item: MenuItem) => `- ${item.name}: ${item.description} (${item.price} FCFA)`)
+      .slice(0, 15) // Show first 15 items as summary
+      .map((item: MenuItem) => `- ${item.name}: ${item.description} (${item.price} FCFA)${item.imageUrl ? " [PHOTO AVAILABLE]" : ""}`)
       .join("\n")
 
     const fullMenu =
@@ -193,12 +179,17 @@ CONTEXT: {{restaurantContext}}
 CONVERSATION HISTORY:
 {{conversationHistory}}
 
-MENU SUMMARY (first 10 items):
+MENU SUMMARY:
 {{menuSummary}}
 
 ${toolResponse ? `TOOL INFORMATION: ${toolResponse}` : ""}
 
 ${fullMenu ? `FULL MENU:\n${fullMenu}` : ""}
+
+IMAGE GUIDELINES:
+- If you recommend a specific dish and it has [PHOTO AVAILABLE], mention that a photo is available.
+- If you are describing a single dish that is the main focus of the user's query, you can "attach" it by including the tag "[IMAGE: dish_name]" at the very end of your response.
+- Only attach an image if the dish exists in the menu and has an imageUrl.
 
 INSTRUCTIONS:
 - Start by greeting the customer using the restaurant name. Offer to show the menu.
@@ -214,20 +205,34 @@ Current user message: "${lastMessage}"
 Respond naturally as the restaurant's AI assistant:
     `
 
-    const finalResponse = await genAny({
-      model: modelAny,
-      prompt: prompt
+    const finalResponseText = await llm.generate(
+      prompt
         .replace("{{restaurantName}}", restaurantName)
         .replace("{{restaurantContext}}", restaurantContext)
         .replace("{{conversationHistory}}", conversationHistory)
         .replace("{{menuSummary}}", menuSummary),
-    })
+      { model: "llama-3.3-70b-versatile" }
+    )
+
+    const responseText = finalResponseText.trim()
+
+    // Extract Image URL if Groq tagged it
+    let finalImageUrl: string | undefined
+    const imageMatch = responseText.match(/\[IMAGE:\s*(.*?)\]/)
+    if (imageMatch) {
+      const dishName = imageMatch[1].trim().toLowerCase()
+      const dish = menuItemsTyped.find(m => m.name.toLowerCase().includes(dishName) && m.imageUrl)
+      if (dish) {
+        finalImageUrl = dish.imageUrl || undefined
+      }
+    }
 
     return {
-      response: getText(finalResponse),
+      response: responseText.replace(/\[IMAGE:.*?\]/g, "").trim(),
       detectedLanguage,
       usedTools,
       orderQuote,
+      imageUrl: finalImageUrl
     }
   },
 )

@@ -9,6 +9,7 @@ import { Logo } from "@/src/components/logo";
 import { SimpleThemeToggle } from "@/src/components/simple-theme-toggle";
 import { LanguageSwitcher } from "@/src/components/language-switcher";
 import { useLanguage, translations } from "@/src/lib/i18n";
+import { useSession, signOut } from "next-auth/react";
 import {
   Bot,
   Zap,
@@ -26,8 +27,9 @@ import {
   Target,
   CheckCircle2,
   Star,
-  Store
+  Store,
 } from "lucide-react";
+import { WhatsAppMockup } from "@/src/components/whatsapp-mockup";
 import { useEffect } from "react";
 
 const fadeInUp = {
@@ -58,6 +60,7 @@ const scaleIn = {
 };
 
 export default function HomeClient() {
+  const { data: session } = useSession();
   const { language } = useLanguage();
   const t = translations[language];
 
@@ -178,11 +181,32 @@ export default function HomeClient() {
               </a>
               <LanguageSwitcher />
               <SimpleThemeToggle />
-              <Link href="/onboarding">
-                <Button className="bg-red-500 hover:bg-red-600 text-white px-6 shadow-md hover:shadow-lg transition-all">
-                  {t.nav.cta}
-                </Button>
-              </Link>
+
+              {session ? (
+                <div className="flex items-center gap-4">
+                  <Link href="/dashboard">
+                    <Button variant="outline" className="border-red-500 text-red-500 hover:bg-red-50">
+                      Dashboard
+                    </Button>
+                  </Link>
+                  <Button
+                    variant="ghost"
+                    onClick={() => signOut()}
+                    className="text-gray-600 hover:text-red-500"
+                  >
+                    Sign Out
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex items-center gap-4">
+
+                  <Link href="/register">
+                    <Button className="bg-red-500 hover:bg-red-600 text-white px-6 shadow-md hover:shadow-lg transition-all">
+                      {t.nav.cta}
+                    </Button>
+                  </Link>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -218,7 +242,7 @@ export default function HomeClient() {
                 variants={fadeInUp}
                 className="flex flex-col sm:flex-row gap-4"
               >
-                <Link href="#contact">
+                <Link href="/onboarding">
                   <Button size="lg" className="bg-red-500 hover:bg-red-600 text-white px-8 py-6 text-lg font-semibold shadow-lg hover:shadow-xl transition-all">
                     {t.hero.cta}
                   </Button>
@@ -247,62 +271,9 @@ export default function HomeClient() {
               initial={{ opacity: 0, x: 50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="relative"
+              className="relative flex justify-center"
             >
-              <div className="relative w-full h-[600px] flex items-center justify-center">
-                <Image
-                  src="/brain/9d162907-a90e-4ddb-a59d-16b4495d8349/whatsapp_mockup_hero_1769711297049.png"
-                  alt="WhatsApp automation interface"
-                  width={400}
-                  height={600}
-                  className="object-contain drop-shadow-2xl"
-                />
-                {/* Floating elements */}
-                <motion.div
-                  animate={{
-                    y: [0, -20, 0],
-                  }}
-                  transition={{
-                    duration: 3,
-                    repeat: Infinity,
-                    ease: "easeInOut"
-                  }}
-                  className="absolute top-10 -left-10 bg-white dark:bg-gray-900 p-4 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-800"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
-                      <MessageSquare className="h-6 w-6 text-green-600 dark:text-green-400" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-semibold text-gray-900 dark:text-white">+40% {language === 'fr' ? 'ventes' : language === 'ar' ? 'مبيعات' : 'sales'}</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">{language === 'fr' ? 'Ce mois' : language === 'ar' ? 'هذا الشهر' : 'This month'}</p>
-                    </div>
-                  </div>
-                </motion.div>
-
-                <motion.div
-                  animate={{
-                    y: [0, 20, 0],
-                  }}
-                  transition={{
-                    duration: 3,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                    delay: 1.5
-                  }}
-                  className="absolute bottom-10 -right-10 bg-white dark:bg-gray-900 p-4 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-800"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center">
-                      <Bot className="h-6 w-6 text-red-600 dark:text-red-400" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-semibold text-gray-900 dark:text-white">{language === 'fr' ? 'IA Active' : language === 'ar' ? 'الذكاء الاصطناعي نشط' : 'AI Active'}</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">24/7</p>
-                    </div>
-                  </div>
-                </motion.div>
-              </div>
+              <WhatsAppMockup />
             </motion.div>
           </div>
         </div>
@@ -569,7 +540,7 @@ export default function HomeClient() {
               <Button
                 size="lg"
                 variant="outline"
-                className="border-2 border-white text-white hover:bg-white/10 px-10 py-6 text-lg font-semibold transition-all"
+                className="bg-transparent border-2 border-white text-white hover:bg-white/10 px-10 py-6 text-lg font-semibold transition-all"
               >
                 {t.cta.ctaSecondary}
               </Button>
@@ -583,7 +554,7 @@ export default function HomeClient() {
         <div className="container mx-auto px-6">
           <div className="grid md:grid-cols-4 gap-8">
             <div>
-              <Logo className="h-10 mb-4 brightness-0 invert" />
+              <Logo className="h-10 mb-4" />
               <p className="text-sm text-gray-400">
                 {t.footer.tagline}
               </p>

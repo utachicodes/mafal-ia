@@ -1,6 +1,4 @@
 import { defineFlow } from "@genkit-ai/flow"
-import { generate } from "@genkit-ai/ai"
-import { googleAI } from "@genkit-ai/googleai"
 import type { MenuItem, OrderItem } from "@/lib/data"
 import { calculateOrderTotal } from "@/src/lib/data-utils"
 import { z } from "zod"
@@ -49,42 +47,32 @@ export const calculateOrderTotalFlow = defineFlow(
   async (input: any): Promise<OrderCalculationOutput> => {
     const { orderText, menuItems } = input
     const menuItemsTyped = menuItems as MenuItem[]
-    const genAny: any = generate as any
-    const modelAny: any = (googleAI as any)("gemini-1.5-flash")
-    const getText = (res: any): string => {
-      try {
-        if (!res) return ""
-        if (typeof res.text === "function") return String(res.text()).trim()
-        if (typeof res.text === "string") return res.text.trim()
-        if (typeof res.output === "string") return res.output.trim()
-        return String(res).trim()
-      } catch {
-        return ""
-      }
-    }
+    const { llm } = await import("@/src/lib/llm")
 
-    // Extract order items using AI
+    // Extract order items using AI (Fast model)
     const extractionPrompt = `
 Extract the order items and quantities from this customer message: "${orderText}"
 
 Available menu items:
 ${menuItemsTyped.map((item: MenuItem) => `- ${item.name}`).join("\n")}
 
-Return a JSON array of objects with "itemName" and "quantity" fields.
+Respond with a JSON object containing "items" as an array of objects with "itemName" and "quantity" fields.
 Match item names as closely as possible to the available menu items.
-If no clear order is found, return an empty array.
+If no clear order is found, return an empty array for "items".
 
-Example format: [{"itemName": "Thieboudienne", "quantity": 2}]
-
-Return only the JSON array, no other text.
+Example: {"items": [{"itemName": "Dish Name", "quantity": 1}]}
     `
 
-    const extractionResult = await genAny({ model: modelAny, prompt: extractionPrompt })
+    const extractionResult = await llm.generate(extractionPrompt, {
+      model: "llama-3.1-8b-instant",
+      json: true
+    })
 
     let orderItems: OrderItem[] = []
 
     try {
-      const extracted = JSON.parse(getText(extractionResult))
+      const parsed = JSON.parse(extractionResult)
+      const extracted = parsed.items || parsed
       if (Array.isArray(extracted)) {
         orderItems = extracted.filter((item) => item.itemName && typeof item.quantity === "number" && item.quantity > 0)
       }
