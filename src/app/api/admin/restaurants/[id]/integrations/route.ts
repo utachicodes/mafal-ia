@@ -1,15 +1,15 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/src/lib/auth";
-import { PrismaClient } from "@prisma/client";
+import { getPrisma } from "@/src/lib/db";
 
-const prisma = new PrismaClient();
 
 export async function PATCH(
     request: Request,
     { params }: { params: { id: string } }
 ) {
     try {
+        const prisma = await getPrisma();
         const session = await getServerSession(authOptions);
         if (!session || (session.user as any).role !== "ADMIN") {
             return NextResponse.json({ error: "Unauthorized" }, { status: 403 });

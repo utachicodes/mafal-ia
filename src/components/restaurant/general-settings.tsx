@@ -37,6 +37,8 @@ export function GeneralSettings({ restaurant }: GeneralSettingsProps) {
   const [description, setDescription] = useState(restaurant.description)
   const [cuisine, setCuisine] = useState(restaurant.cuisine || "")
   const [whatsappNumber, setWhatsappNumber] = useState(restaurant.whatsappNumber || "")
+  const [businessHours, setBusinessHours] = useState(restaurant.chatbotContext?.businessHours || "")
+  const [specialInstructions, setSpecialInstructions] = useState(restaurant.chatbotContext?.specialInstructions || "")
   const [supportedLanguages, setSupportedLanguages] = useState(restaurant.supportedLanguages || ["English"])
   const [isActive, setIsActive] = useState(restaurant.isActive || false)
   const [isLoading, setIsLoading] = useState(false)
@@ -55,6 +57,11 @@ export function GeneralSettings({ restaurant }: GeneralSettingsProps) {
         whatsappNumber: whatsappNumber.trim(),
         supportedLanguages,
         isActive,
+        chatbotContext: {
+          ...restaurant.chatbotContext,
+          businessHours: businessHours.trim(),
+          specialInstructions: specialInstructions.trim(),
+        },
       })
 
       toast({
@@ -87,6 +94,8 @@ export function GeneralSettings({ restaurant }: GeneralSettingsProps) {
     description !== restaurant.description ||
     cuisine !== (restaurant.cuisine || "") ||
     whatsappNumber !== (restaurant.whatsappNumber || "") ||
+    businessHours !== (restaurant.chatbotContext?.businessHours || "") ||
+    specialInstructions !== (restaurant.chatbotContext?.specialInstructions || "") ||
     JSON.stringify(supportedLanguages) !== JSON.stringify(restaurant.supportedLanguages || ["English"]) ||
     isActive !== (restaurant.isActive || false)
 
@@ -133,15 +142,38 @@ export function GeneralSettings({ restaurant }: GeneralSettingsProps) {
             />
           </div>
 
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="whatsapp">WhatsApp Number</Label>
+              <Input
+                id="whatsapp"
+                value={whatsappNumber}
+                onChange={(e) => setWhatsappNumber(e.target.value)}
+                placeholder="+1234567890"
+                type="tel"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="hours">Business Hours</Label>
+              <Input
+                id="hours"
+                value={businessHours}
+                onChange={(e) => setBusinessHours(e.target.value)}
+                placeholder="e.g., 10:00 AM - 10:00 PM"
+              />
+            </div>
+          </div>
+
           <div className="space-y-2">
-            <Label htmlFor="whatsapp">WhatsApp Number</Label>
-            <Input
-              id="whatsapp"
-              value={whatsappNumber}
-              onChange={(e) => setWhatsappNumber(e.target.value)}
-              placeholder="+1234567890"
-              type="tel"
+            <Label htmlFor="special-instructions">Specialties & Policy Instructions</Label>
+            <Textarea
+              id="special-instructions"
+              value={specialInstructions}
+              onChange={(e) => setSpecialInstructions(e.target.value)}
+              placeholder="E.g., We are famous for our spicy wings. No deliveries after 9 PM. Be polite."
+              rows={3}
             />
+            <p className="text-xs text-muted-foreground">These instructions help the AI understand your specific rules and specialties.</p>
           </div>
 
           <div className="space-y-2">

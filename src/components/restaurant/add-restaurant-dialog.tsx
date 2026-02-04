@@ -38,9 +38,9 @@ export function AddRestaurantDialog({ open, onOpenChange }: AddRestaurantDialogP
     e.preventDefault()
 
     const newRestaurant = {
-      id: Date.now().toString(),
       ...formData,
       isActive: false,
+      isConcierge: false,
       menu: [],
       chatbotContext: {
         welcomeMessage: `Welcome to ${formData.name}! How can I help you today?`,
@@ -53,6 +53,7 @@ export function AddRestaurantDialog({ open, onOpenChange }: AddRestaurantDialogP
         whatsappAccessToken: "",
         whatsappPhoneNumberId: "",
         webhookVerifyToken: "",
+        whatsappAppSecret: "",
       },
     }
 

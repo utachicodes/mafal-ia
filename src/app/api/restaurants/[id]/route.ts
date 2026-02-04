@@ -79,6 +79,21 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
       }
     }
 
+
+    if (body?.menu) {
+      // Validate menu items loosely (just check it's an array)
+      if (Array.isArray(body.menu)) {
+        updates.menu = body.menu.map((m: any) => ({
+          name: String(m.name ?? ""),
+          description: String(m.description ?? ""),
+          price: Number(m.price ?? 0),
+          category: String(m.category ?? ""),
+          imageUrl: m.imageUrl,
+          isAvailable: m.isAvailable ?? true,
+        }))
+      }
+    }
+
     const ok = await RestaurantService.updateRestaurant(id, updates)
     if (!ok) return NextResponse.json({ error: "Restaurant not found" }, { status: 404 })
 

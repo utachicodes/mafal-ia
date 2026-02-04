@@ -93,28 +93,65 @@ export class RestaurantService {
   static async updateRestaurant(id: string, updates: Partial<Restaurant>): Promise<boolean> {
     await this.ensureSeeded()
     const prisma = await getPrisma()
-    await prisma.restaurant.update({
+
+    const data: any = {
+      name: updates.name,
+      description: updates.description,
+      cuisine: updates.cuisine,
+      whatsappNumber: updates.whatsappNumber,
+      whatsappPhoneNumberId: updates.apiCredentials?.whatsappPhoneNumberId,
+      whatsappAccessToken: updates.apiCredentials?.whatsappAccessToken,
+      whatsappAppSecret: (updates as any)?.apiCredentials?.whatsappAppSecret,
+      webhookVerifyToken: updates.apiCredentials?.webhookVerifyToken,
+      supportedLanguages: updates.supportedLanguages,
+      isActive: updates.isActive,
+      isConcierge: updates.isConcierge,
+      welcomeMessage: updates.chatbotContext?.welcomeMessage,
+      businessHours: updates.chatbotContext?.businessHours,
+      specialInstructions: updates.chatbotContext?.specialInstructions,
+      orderingEnabled: updates.chatbotContext?.orderingEnabled,
+      deliveryInfo: updates.chatbotContext?.deliveryInfo,
+    }
+
+    // Prepare transaction operations
+    const ops = []
+
+    // 1. Update main restaurant fields
+    ops.push(prisma.restaurant.update({
       where: { id },
-      data: {
-        name: updates.name,
-        description: updates.description,
-        cuisine: updates.cuisine,
-        whatsappNumber: updates.whatsappNumber,
-        whatsappPhoneNumberId: updates.apiCredentials?.whatsappPhoneNumberId,
-        whatsappAccessToken: updates.apiCredentials?.whatsappAccessToken,
-        whatsappAppSecret: (updates as any)?.apiCredentials?.whatsappAppSecret,
-        webhookVerifyToken: updates.apiCredentials?.webhookVerifyToken,
-        supportedLanguages: updates.supportedLanguages,
-        isActive: updates.isActive,
-        isConcierge: updates.isConcierge,
-        welcomeMessage: updates.chatbotContext?.welcomeMessage,
-        businessHours: updates.chatbotContext?.businessHours,
-        specialInstructions: updates.chatbotContext?.specialInstructions,
-        orderingEnabled: updates.chatbotContext?.orderingEnabled,
-        deliveryInfo: updates.chatbotContext?.deliveryInfo,
-      },
-    })
-    return true
+      data,
+    }))
+
+    // 2. If menu is provided, replace all items
+    if (updates.menu) {
+      // Delete all existing items
+      ops.push(prisma.menuItem.deleteMany({
+        where: { restaurantId: id },
+      }))
+
+      // Create new items
+      if (updates.menu.length > 0) {
+        ops.push(prisma.menuItem.createMany({
+          data: updates.menu.map((m) => ({
+            restaurantId: id,
+            name: m.name,
+            description: m.description,
+            price: m.price,
+            category: m.category,
+            isAvailable: m.isAvailable ?? true,
+            imageUrl: m.imageUrl,
+          })),
+        }))
+      }
+    }
+
+    try {
+      await prisma.$transaction(ops)
+      return true
+    } catch (error) {
+      console.error("Failed to update restaurant:", error)
+      return false
+    }
   }
 
   static async createRestaurant(restaurantData: Omit<Restaurant, "id" | "createdAt" | "updatedAt">): Promise<Restaurant> {

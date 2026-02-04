@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/src/lib/auth";
-import { prisma } from "@/lib/prisma";
+import { getPrisma } from "@/src/lib/db";
 
 export async function PATCH(
     request: NextRequest,
     { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const prisma = await getPrisma();
         const session = await getServerSession(authOptions);
         if (!session || (session.user as any).role !== "ADMIN") {
             return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
@@ -46,6 +47,7 @@ export async function DELETE(
             return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
         }
 
+        const prisma = await getPrisma();
         const { id } = await params;
 
         await prisma.menuItem.delete({

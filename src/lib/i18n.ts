@@ -131,6 +131,22 @@ export const translations = {
             ctaPrimary: 'Create my free account',
             ctaSecondary: 'Talk to an advisor',
         },
+        pricingSection: {
+            title: 'Simple, Transparent Pricing',
+            description: 'No hidden fees. Just one simple monthly subscription.',
+            cardTitle: 'Standard Plan',
+            price: '5,000 FCFA',
+            period: '/month',
+            caption: 'Per restaurant chatbot',
+            features: [
+                'Unlimited WhatsApp Messages',
+                '24/7 AI Automation',
+                'Full Menu Management',
+                'Order Dashboard',
+                'Priority Support'
+            ],
+            cta: 'Start Free Trial'
+        },
         footer: {
             tagline: 'Automate your sales on WhatsApp with artificial intelligence.',
             product: 'Product',
@@ -257,6 +273,22 @@ export const translations = {
             ctaPrimary: 'Créer mon compte gratuitement',
             ctaSecondary: 'Parler à un conseiller',
         },
+        pricingSection: {
+            title: 'Tarification Simple et Transparente',
+            description: 'Pas de frais cachés. Juste un abonnement mensuel simple.',
+            cardTitle: 'Plan Standard',
+            price: '5 000 FCFA',
+            period: '/mois',
+            caption: 'Par chatbot restaurant',
+            features: [
+                'Messages WhatsApp Illimités',
+                'Automatisation IA 24/7',
+                'Gestion Complète du Menu',
+                'Tableau de Bord des Commandes',
+                'Support Prioritaire'
+            ],
+            cta: 'Essai Gratuit'
+        },
         footer: {
             tagline: 'Automatisez vos ventes sur WhatsApp avec l\'intelligence artificielle.',
             product: 'Produit',
@@ -382,6 +414,22 @@ export const translations = {
             description: 'انضم إلى التجار الذين يستخدمون Mafal-IA لأتمتة مبيعاتهم والنمو. إعداد بسيط في 15 دقيقة.',
             ctaPrimary: 'أنشئ حسابي مجانًا',
             ctaSecondary: 'تحدث إلى مستشار',
+        },
+        pricingSection: {
+            title: 'تسعير بسيط وشفاف',
+            description: 'لا توجد رسوم خفية. اشتراك شهري بسيط واحد.',
+            cardTitle: 'الخطة القياسية',
+            price: '5,000 FCFA',
+            period: '/شهر',
+            caption: 'لكل روبوت مطعم',
+            features: [
+                'رسائل واتساب غير محدودة',
+                'أتمتة الذكاء الاصطناعي 24/7',
+                'إدارة القائمة الكاملة',
+                'لوحة تحكم الطلبات',
+                'دعم ذو أولوية'
+            ],
+            cta: 'بدء التجربة المجانية'
         },
         footer: {
             tagline: 'قم بأتمتة مبيعاتك على واتساب بالذكاء الاصطناعي.',

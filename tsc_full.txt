@@ -1,0 +1,7 @@
+app/api/chatbots/[id]/messages/route.ts(3,24): error TS2307: Cannot find module '@/lib/prisma' or its corresponding type declarations.
+app/api/chatbots/[id]/messages/route.ts(73,20): error TS7006: Parameter 'm' implicitly has an 'any' type.
+app/api/onboarding/simple/route.ts(4,24): error TS2307: Cannot find module '@/lib/prisma' or its corresponding type declarations.
+src/app/api/admin/menu-items/[id]/route.ts(4,24): error TS2307: Cannot find module '@/lib/prisma' or its corresponding type declarations.
+src/app/api/admin/restaurants/[id]/integrations/route.ts(25,17): error TS2353: Object literal may only specify known properties, and 'lamApiKey' does not exist in type '(Without<RestaurantUpdateInput, RestaurantUncheckedUpdateInput> & RestaurantUncheckedUpdateInput) | (Without<...> & RestaurantUpdateInput)'.
+src/app/api/register/initiate/route.ts(2,24): error TS2307: Cannot find module '@/lib/prisma' or its corresponding type declarations.
+src/app/api/register/verify/route.ts(2,24): error TS2307: Cannot find module '@/lib/prisma' or its corresponding type declarations.

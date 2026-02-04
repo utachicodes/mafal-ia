@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { getPrisma } from "@/src/lib/db";
 import { WhatsAppClient } from "@/src/lib/whatsapp-client";
 import { randomInt } from "crypto";
 
 export async function POST(req: Request) {
   try {
+    const prisma = await getPrisma();
     const body = await req.json();
     const { name, whatsappNumber, ownerAgeRange, ownerSex, country } = body;
 
@@ -38,13 +39,13 @@ export async function POST(req: Request) {
     const businessPhoneNumberId = process.env.WHATSAPP_PHONE_NUMBER_ID;
 
     if (businessPhoneNumberId) {
-        await WhatsAppClient.sendMessage(
-            businessPhoneNumberId,
-            whatsappNumber,
-            `Your verification code is: ${otp}`
-        );
+      await WhatsAppClient.sendMessage(
+        businessPhoneNumberId,
+        whatsappNumber,
+        `Your verification code is: ${otp}`
+      );
     } else {
-        console.warn("WHATSAPP_PHONE_NUMBER_ID not set, logging OTP:", otp);
+      console.warn("WHATSAPP_PHONE_NUMBER_ID not set, logging OTP:", otp);
     }
 
     return NextResponse.json({ ok: true, restaurantId: restaurant.id });

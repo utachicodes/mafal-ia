@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/prisma"
+import { getPrisma } from "@/src/lib/db"
 import { getEmbedding, cosineSim, fallbackEmbed } from "@/src/lib/embeddings"
 
 export type RetrievedItem = {
@@ -22,6 +22,7 @@ function lexicalScore(query: string, text: string): number {
 }
 
 export async function retrieveMenuItems(restaurantId: string, query: string, k = 5): Promise<RetrievedItem[]> {
+  const prisma = await getPrisma()
   const items = await prisma.menuItem.findMany({
     where: { restaurantId, isAvailable: true },
     select: { id: true, name: true, description: true, price: true, category: true, isAvailable: true, embedding: true },
@@ -33,7 +34,7 @@ export async function retrieveMenuItems(restaurantId: string, query: string, k =
   // Attempt embedding retrieval
   const qVec = await getEmbedding(query)
 
-  const scored = items.map((m) => {
+  const scored = items.map((m: any) => {
     const text = [m.name, m.description, m.category].filter(Boolean).join(" \n")
     let score = 0
     if (Array.isArray(m.embedding)) {
@@ -53,6 +54,6 @@ export async function retrieveMenuItems(restaurantId: string, query: string, k =
     }
   })
 
-  scored.sort((a, b) => b.score - a.score)
+  scored.sort((a: any, b: any) => b.score - a.score)
   return scored.slice(0, k)
 }
