@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="public/mafalia-logo.svg" alt="Mafal-IA Logo" width="120" height="120" />
+  <img src="public/mafalia-logo-svg.svg" alt="Mafal-IA Logo" width="120" height="120" />
 </p>
 
 # Mafal-IA - Agentic WhatsApp Platform
