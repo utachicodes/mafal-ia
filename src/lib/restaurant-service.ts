@@ -197,6 +197,9 @@ export class RestaurantService {
         specialInstructions: r.chatbotContext?.specialInstructions || this.defaultChatbotContext().specialInstructions,
         orderingEnabled: r.chatbotContext?.orderingEnabled ?? this.defaultChatbotContext().orderingEnabled,
         deliveryInfo: r.chatbotContext?.deliveryInfo || this.defaultChatbotContext().deliveryInfo,
+        ownerAgeRange: r.ownerAgeRange ?? null,
+        ownerSex: r.ownerSex ?? null,
+        country: r.country ?? null,
         menuItems: {
           create: menuArray.map((m: any) => ({
             name: String(m.name ?? ""),

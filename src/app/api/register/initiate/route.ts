@@ -7,11 +7,39 @@ export async function POST(req: Request) {
   try {
     const prisma = await getPrisma();
     const body = await req.json();
-    const { name, whatsappNumber, ownerAgeRange, ownerSex, country } = body;
+    const { z } = await import("zod");
 
-    if (!name || !whatsappNumber) {
-      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    // Strict Validation Schema
+    const registerSchema = z.object({
+      name: z.string().min(2, "Name must be at least 2 characters"),
+      whatsappNumber: z.string()
+        .min(8, "Phone number too short")
+        .max(15, "Phone number too long")
+        .regex(/^\d+$/, "Phone number must contain only digits (no + or spaces)"),
+      ownerAgeRange: z.enum(["18-25", "26-35", "36-45", "46+"], {
+        errorMap: () => ({ message: "Invalid age range selection" })
+      }),
+      ownerSex: z.enum(["M", "F"], {
+        errorMap: () => ({ message: "Invalid sex selection (M/F)" })
+      }),
+      country: z.enum(["Senegal", "Ivory Coast", "Nigeria", "Other"], {
+        errorMap: () => ({ message: "Invalid country selection" })
+      })
+    });
+
+    // const body = await req.json(); // Removed duplicate
+
+
+    // Validate body
+    const validationResult = registerSchema.safeParse(body);
+    if (!validationResult.success) {
+      return NextResponse.json({
+        error: "Validation failed",
+        details: validationResult.error.format()
+      }, { status: 400 });
     }
+
+    const { name, whatsappNumber, ownerAgeRange, ownerSex, country } = validationResult.data;
 
     // Generate 6-digit OTP
     const otp = randomInt(100000, 999999).toString();
