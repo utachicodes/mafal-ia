@@ -97,11 +97,8 @@ export default function RegisterPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/40 relative overflow-hidden flex flex-col">
       {/* Background Blobs */}
-      <div className="absolute inset-0 pointer-events-none z-0">
-        <div className="blob-base blob-float blob-pulse top-[-8rem] right-[-8rem] h-[22rem] w-[22rem] bg-primary/20 animate-pulse" />
-        <div className="blob-base blob-float-slow top-[20%] left-[-6rem] h-[18rem] w-[18rem] bg-emerald-500/15 animate-bounce" style={{animationDuration: '3s'}} />
-        <div className="blob-base blob-float bottom-[-10rem] right-[10%] h-[20rem] w-[20rem] bg-fuchsia-500/10 animate-pulse" style={{animationDelay: '1s'}} />
-      </div>
+      {/* Background Blobs - Removed per user request */}
+      <div className="absolute inset-0 pointer-events-none z-0 bg-background" />
 
       {/* Nav / Logo */}
       <nav className="relative z-10 p-6">
