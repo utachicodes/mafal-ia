@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="public/logo.svg" alt="Mafal-IA Logo" width="120" height="120" />
+</p>
+
 # Mafal-IA - Agentic WhatsApp Platform
 
 <p align="center">
