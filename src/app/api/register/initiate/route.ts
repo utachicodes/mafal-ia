@@ -30,6 +30,11 @@ export async function POST(req: Request) {
     // const body = await req.json(); // Removed duplicate
 
 
+    // Sanitize phone number before validation
+    if (body.whatsappNumber) {
+      body.whatsappNumber = body.whatsappNumber.replace(/\D/g, "");
+    }
+
     // Validate body
     const validationResult = registerSchema.safeParse(body);
     if (!validationResult.success) {

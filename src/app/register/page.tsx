@@ -37,6 +37,9 @@ export default function RegisterPage() {
     if (step < 4) {
       setStep(step + 1)
     } else {
+      // Sanitize phone number: remove non-digits
+      const sanitizedPhone = formData.whatsappNumber.replace(/\D/g, "")
+      setFormData(prev => ({ ...prev, whatsappNumber: sanitizedPhone }))
       initiateRegistration()
     }
   }
@@ -45,10 +48,15 @@ export default function RegisterPage() {
     setLoading(true)
     setError("")
     try {
+      // Final sanitization check before sending
+      const payload = {
+        ...formData,
+        whatsappNumber: formData.whatsappNumber.replace(/\D/g, "")
+      }
       const res = await fetch("/api/register/initiate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || "Failed to initiate registration")
@@ -95,32 +103,41 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted/40 relative overflow-hidden flex flex-col">
-      {/* Background Blobs */}
-      {/* Background Blobs - Removed per user request */}
-      <div className="absolute inset-0 pointer-events-none z-0 bg-background" />
+    <div className="min-h-screen bg-background relative overflow-hidden flex flex-col">
+      {/* Ambient Background Glows */}
+      <div className="absolute top-0 left-0 w-full h-[500px] bg-primary/10 blur-[120px] rounded-full pointer-events-none" />
+      <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-accent/5 blur-[120px] rounded-full pointer-events-none" />
 
       {/* Nav / Logo */}
-      <nav className="relative z-10 p-6">
-        <Link href="/">
-          <Logo className="h-12" />
+      <nav className="relative z-10 p-8 flex justify-between items-center max-w-7xl mx-auto w-full">
+        <Link href="/" className="hover:opacity-80 transition-opacity">
+          <Logo className="h-10" />
         </Link>
+        <div className="text-sm text-muted-foreground hidden sm:block">
+          Step {step} of 5
+        </div>
       </nav>
 
       {/* Main Content */}
-      <div className="relative z-10 flex-1 flex items-center justify-center p-4">
-        <Card className="w-full max-w-md mx-auto bg-card/80 backdrop-blur border-0 shadow-lg hover:shadow-xl transition-all duration-300 animate-in fade-in-50 zoom-in-95">
-          <CardHeader>
-            <CardTitle className="text-2xl font-bold text-center">
-              {step === 5 ? "Verify your number" : "Create your account"}
+      <div className="relative z-10 flex-1 flex items-center justify-center p-6">
+        <Card className="w-full max-w-md mx-auto glass border-white/20 dark:border-white/10 shadow-2xl animate-in fade-in-50 zoom-in-95 duration-500 rounded-3xl overflow-hidden">
+          <div className="h-2 w-full bg-muted overflow-hidden">
+            <div
+              className="h-full bg-primary transition-all duration-500 ease-out"
+              style={{ width: `${(step / 5) * 100}%` }}
+            />
+          </div>
+          <CardHeader className="space-y-4 pb-8 pt-10 px-8">
+            <CardTitle className="text-3xl font-extrabold tracking-tight text-center">
+              {step === 5 ? "Verify your number" : "Join Mafal-IA"}
             </CardTitle>
-            <CardDescription className="text-center">
-              {step === 5 ? "Enter the code sent to your WhatsApp" : `Step ${step} of 4`}
+            <CardDescription className="text-center text-base">
+              {step === 5 ? "We've sent a 6-digit code to your WhatsApp" : "Transform your restaurant with intelligent automation."}
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6">
+          <CardContent className="space-y-8 px-8 pb-10">
             {error && (
-              <div className="bg-destructive/10 text-destructive p-3 rounded-md text-sm border border-destructive/20 text-center">
+              <div className="bg-destructive/10 text-destructive p-4 rounded-2xl text-sm border border-destructive/20 text-center animate-in slide-in-from-top-2">
                 {error}
               </div>
             )}
