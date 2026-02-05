@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent } from "@/components/ui/sheet"
-import { Home, Store, BarChart3, Settings, MessageSquare, Key, PanelLeftOpen, PanelLeftClose, Sparkles } from "lucide-react"
+import { Home, Store, BarChart3, Settings, MessageSquare, Key, PanelLeftOpen, PanelLeftClose, Sparkles, ShoppingBag } from "lucide-react"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
 import { Logo } from "./logo"
@@ -22,11 +22,9 @@ import { Skeleton } from "@/components/ui/skeleton"
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: Home },
-  { name: "Orders", href: "/orders", icon: BarChart3 },
+  { name: "Orders", href: "/orders", icon: ShoppingBag },
   { name: "Analytics", href: "/analytics", icon: BarChart3 },
   { name: "Restaurants", href: "/restaurants", icon: Store },
-  { name: "Playground", href: "/playground", icon: MessageSquare },
-  { name: "Onboarding", href: "/onboarding", icon: Key },
   { name: "Settings", href: "/settings", icon: Settings },
 ]
 
