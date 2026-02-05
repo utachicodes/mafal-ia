@@ -145,6 +145,16 @@ export const translations = {
                 'Order Dashboard',
                 'Priority Support'
             ],
+            premiumCardTitle: 'Premium Plan',
+            premiumPrice: '10,000 FCFA',
+            premiumFeatures: [
+                'Everything in Standard',
+                'Custom Landing Page',
+                'Facebook Integration',
+                'Instagram Integration',
+                'TikTok Integration',
+                'Advanced Analytics'
+            ],
             cta: 'Start Free Trial'
         },
         footer: {
@@ -287,6 +297,16 @@ export const translations = {
                 'Tableau de Bord des Commandes',
                 'Support Prioritaire'
             ],
+            premiumCardTitle: 'Plan Premium',
+            premiumPrice: '10 000 FCFA',
+            premiumFeatures: [
+                'Tout ce qui est dans le Standard',
+                'Page de Destination Personnalisée',
+                'Intégration Facebook',
+                'Intégration Instagram',
+                'Intégration TikTok',
+                'Analyses Avancées'
+            ],
             cta: 'Essai Gratuit'
         },
         footer: {
@@ -428,6 +448,16 @@ export const translations = {
                 'إدارة القائمة الكاملة',
                 'لوحة تحكم الطلبات',
                 'دعم ذو أولوية'
+            ],
+            premiumCardTitle: 'الخطة المميزة',
+            premiumPrice: '10,000 FCFA',
+            premiumFeatures: [
+                'كل شيء في الخطة القياسية',
+                'صفحة هبوط مخصصة',
+                'تكامل فيسبوك',
+                'تكامل إنستغرام',
+                'تكامل تيك توك',
+                'تحليلات متقدمة'
             ],
             cta: 'بدء التجربة المجانية'
         },

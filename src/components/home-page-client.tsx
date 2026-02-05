@@ -534,39 +534,72 @@ export default function HomeClient() {
           </motion.div>
 
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
+            initial="hidden"
+            whileInView="visible"
             viewport={{ once: true }}
-            className="max-w-md mx-auto"
+            variants={staggerContainer}
+            className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto"
           >
-            <Card className="p-8 bg-white dark:bg-gray-800 border-2 border-red-500 shadow-2xl relative overflow-hidden">
-              <div className="absolute top-0 right-0 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-bl-lg uppercase tracking-wider">
-                Popular
-              </div>
-              <div className="text-center mb-8">
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{t.pricingSection.cardTitle}</h3>
-                <div className="flex items-end justify-center gap-1 mb-2">
-                  <span className="text-5xl font-bold text-red-500">{t.pricingSection.price}</span>
-                  <span className="text-gray-500 dark:text-gray-400 mb-2">{t.pricingSection.period}</span>
+            {/* Standard Plan */}
+            <motion.div variants={fadeInUp}>
+              <Card className="p-8 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-xl h-full flex flex-col">
+                <div className="text-center mb-8">
+                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{t.pricingSection.cardTitle}</h3>
+                  <div className="flex items-end justify-center gap-1 mb-2">
+                    <span className="text-5xl font-bold text-red-500">{t.pricingSection.price}</span>
+                    <span className="text-gray-500 dark:text-gray-400 mb-2">{t.pricingSection.period}</span>
+                  </div>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">{t.pricingSection.caption}</p>
                 </div>
-                <p className="text-sm text-gray-500 dark:text-gray-400">{t.pricingSection.caption}</p>
-              </div>
 
-              <ul className="space-y-4 mb-8">
-                {t.pricingSection.features.map((feature, i) => (
-                  <li key={i} className="flex items-center gap-3 text-gray-700 dark:text-gray-300">
-                    <CheckCircle2 className="h-5 w-5 text-green-500 shrink-0" />
-                    <span>{feature}</span>
-                  </li>
-                ))}
-              </ul>
+                <ul className="space-y-4 mb-8 flex-grow">
+                  {t.pricingSection.features.map((feature, i) => (
+                    <li key={i} className="flex items-center gap-3 text-gray-700 dark:text-gray-300">
+                      <CheckCircle2 className="h-5 w-5 text-green-500 shrink-0" />
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
 
-              <Link href="/register">
-                <Button className="w-full bg-red-500 hover:bg-red-600 text-white py-6 text-lg font-semibold shadow-lg hover:shadow-xl transition-all">
-                  {t.pricingSection.cta}
-                </Button>
-              </Link>
-            </Card>
+                <Link href="/register">
+                  <Button className="w-full bg-red-500 hover:bg-red-600 text-white py-6 text-lg font-semibold shadow-lg hover:shadow-xl transition-all">
+                    {t.pricingSection.cta}
+                  </Button>
+                </Link>
+              </Card>
+            </motion.div>
+
+            {/* Premium Plan */}
+            <motion.div variants={fadeInUp}>
+              <Card className="p-8 bg-white dark:bg-gray-800 border-2 border-red-500 shadow-2xl relative overflow-hidden h-full flex flex-col">
+                <div className="absolute top-0 right-0 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-bl-lg uppercase tracking-wider">
+                  Popular
+                </div>
+                <div className="text-center mb-8">
+                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{t.pricingSection.premiumCardTitle}</h3>
+                  <div className="flex items-end justify-center gap-1 mb-2">
+                    <span className="text-5xl font-bold text-red-500">{t.pricingSection.premiumPrice}</span>
+                    <span className="text-gray-500 dark:text-gray-400 mb-2">{t.pricingSection.period}</span>
+                  </div>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">{t.pricingSection.caption}</p>
+                </div>
+
+                <ul className="space-y-4 mb-8 flex-grow">
+                  {t.pricingSection.premiumFeatures.map((feature, i) => (
+                    <li key={i} className="flex items-center gap-3 text-gray-700 dark:text-gray-300">
+                      <CheckCircle2 className="h-5 w-5 text-green-500 shrink-0" />
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                <Link href="/register">
+                  <Button className="w-full bg-red-500 hover:bg-red-600 text-white py-6 text-lg font-semibold shadow-lg hover:shadow-xl transition-all">
+                    {t.pricingSection.cta}
+                  </Button>
+                </Link>
+              </Card>
+            </motion.div>
           </motion.div>
         </div>
       </section>
