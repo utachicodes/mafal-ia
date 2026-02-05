@@ -8,51 +8,22 @@ export class AIClient {
     menuItems: MenuItem[],
     restaurantName: string,
   ) {
-    // If running in the browser, return a lightweight mock to avoid bundling server deps
-    if (typeof window !== "undefined") {
-      const lastUser = [...messages].reverse().find((m) => m.role === "user")
-      const sample = menuItems.slice(0, 3).map((m) => `${m.name} (${m.price} CFA)`).join(", ")
-      return {
-        response:
-          lastUser?.content?.toLowerCase().includes("menu") || lastUser?.content?.toLowerCase().includes("price")
-            ? `Welcome to ${restaurantName}! Here are a few items: ${sample}.`
-            : `Noo ngi fi pour jàppal! (${restaurantName})\n${restaurantContext?.slice(0, 140)}`,
-        detectedLanguage: "auto",
-        usedTools: [],
-      }
-    }
-
     // Server-side: dynamically import Genkit flow runner
-    try {
-      // Ensure flows are registered and get concrete flow refs
-      const { generateResponseFlow } = await import("@/src/ai")
-      const { runFlow } = await import("@genkit-ai/flow")
-      const result = await runFlow(generateResponseFlow as any, {
-        messages,
-        restaurantContext,
-        menuItems,
-        restaurantName,
-      })
-      return result as any
-    } catch (error) {
-      // Fallback: return a lightweight heuristic response so WhatsApp keeps working
-      console.warn("[AIClient] Genkit flow unavailable, using fallback response:", error)
-      const lastUser = [...messages].reverse().find((m) => m.role === "user")
-      const sample = menuItems.slice(0, 3).map((m) => `${m.name} (${m.price} CFA)`).join(", ")
-      return {
-        response:
-          lastUser?.content?.toLowerCase().includes("menu") || lastUser?.content?.toLowerCase().includes("price")
-            ? `Welcome to ${restaurantName}! Here are a few items: ${sample}.`
-            : `Noo ngi fi pour jàppal! (${restaurantName})\n${restaurantContext?.slice(0, 200)}`,
-        detectedLanguage: "auto",
-        usedTools: [],
-      }
-    }
+    // Ensure flows are registered and get concrete flow refs
+    const { generateResponseFlow } = await import("@/src/ai")
+    const { runFlow } = await import("@genkit-ai/flow")
+    const result = await runFlow(generateResponseFlow as any, {
+      messages,
+      restaurantContext,
+      menuItems,
+      restaurantName,
+    })
+    return result as any
   }
 
   static async getMenuInformation(query: string, menuItems: MenuItem[], restaurantId?: string) {
     // If we have a restaurantId, try a vector search for better semantic matching
-    if (restaurantId && typeof window === "undefined") {
+    if (restaurantId) {
       try {
         const { searchMenuItemsByVector } = await import("@/src/lib/embeddings")
         const results = await searchMenuItemsByVector(restaurantId, query, 3)
@@ -81,12 +52,6 @@ export class AIClient {
   }
 
   static async calculateOrder(orderText: string, menuItems: MenuItem[]) {
-    if (typeof window !== "undefined") {
-      // naive total: sum of any item names found
-      const lower = orderText.toLowerCase()
-      const total = menuItems.reduce((sum, m) => (lower.includes(m.name.toLowerCase()) ? sum + (m.price || 0) : sum), 0)
-      return { total }
-    }
     try {
       const { calculateOrderTotalFlow } = await import("@/src/ai")
       const { runFlow } = await import("@genkit-ai/flow")
@@ -99,15 +64,6 @@ export class AIClient {
   }
 
   static async processMenu(jsonString: string) {
-    if (typeof window !== "undefined") {
-      try {
-        const parsed = JSON.parse(jsonString)
-        const items: MenuItem[] = Array.isArray(parsed) ? parsed : parsed.items ?? []
-        return { items }
-      } catch {
-        throw new Error("Invalid JSON menu format")
-      }
-    }
     try {
       const { processMenuFlow } = await import("@/src/ai")
       const { runFlow } = await import("@genkit-ai/flow")

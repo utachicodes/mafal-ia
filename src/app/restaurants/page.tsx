@@ -5,6 +5,8 @@ import { Badge } from "@/components/ui/badge"
 import { Plus, Store, ExternalLink, Sparkles } from "lucide-react"
 import { RestaurantService } from "@/src/lib/restaurant-service"
 
+export const dynamic = "force-dynamic"
+
 export default async function RestaurantsPage() {
   const restaurants = await RestaurantService.getAllRestaurants()
 

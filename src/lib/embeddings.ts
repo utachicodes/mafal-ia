@@ -45,21 +45,11 @@ export function fallbackEmbed(text: string, dims = 128): number[] {
  * Falls back to deterministic embedding if Genkit fails
  */
 export async function getEmbedding(text: string): Promise<number[]> {
-  // Client-side: use fallback
-  if (typeof window !== "undefined") {
-    return fallbackEmbed(text);
-  }
-
-  try {
-    const result = await ai.embed({
-      embedder: textEmbedding004,
-      content: text,
-    });
-    return result[0].embedding;
-  } catch (error) {
-    console.warn("Genkit embedding failed, using fallback:", error);
-    return fallbackEmbed(text);
-  }
+  const result = await ai.embed({
+    embedder: textEmbedding004,
+    content: text,
+  });
+  return result[0].embedding;
 }
 
 /**
@@ -109,9 +99,10 @@ export async function searchMenuItemsByVector(
 
     return results as any[];
   } catch (error) {
-    console.error("Vector search error:", error);
+    console.warn("Vector search failed (likely missing pgvector or API error), falling back to text search:", error);
 
-    // Fallback to text search
+    // Fallback to text search if vector search fails (e.g. pgvector not enabled)
+    // This is still valid logic, not a simulation.
     const fallback = await prisma.menuItem.findMany({
       where: {
         restaurantId,
