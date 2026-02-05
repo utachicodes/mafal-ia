@@ -6,9 +6,19 @@ import { Button } from "@/components/ui/button"
 import {
   Filter,
   ShoppingBag,
-  User,
-  Hash
+  Download,
+  Search,
+  MoreHorizontal
 } from "lucide-react"
+import { Input } from "@/components/ui/input"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 export const dynamic = "force-dynamic"
 
@@ -22,103 +32,116 @@ export default async function OrdersPage() {
   })
 
   return (
-    <div className="space-y-12 py-8 px-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
-        <div className="space-y-3">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-black uppercase tracking-widest animate-pulse">
-            <Hash className="h-3 w-3" /> Live Flow
-          </div>
-          <h1 className="text-5xl font-black tracking-tighter text-gradient flex items-center gap-4">
-            Order History
+    <div className="space-y-6 py-6">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-gray-100 dark:border-gray-800 pb-6">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+            Orders
           </h1>
-          <p className="text-xl text-muted-foreground font-medium">
-            Monitor real-time transactions across your entire digital fleet.
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            Manage and track your restaurant orders
           </p>
         </div>
-        <div className="flex gap-3">
-          <Button variant="outline" className="rounded-2xl gap-2 font-bold hover:bg-primary/5 transition-all duration-300 group">
-            <Filter className="h-4 w-4 group-hover:rotate-12" />
-            Filter Feed
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" className="h-9 gap-2">
+            <Download className="h-4 w-4" />
+            Export
           </Button>
-          <Button className="rounded-2xl gap-2 font-black shadow-lg shadow-primary/20 transition-all duration-300 hover:scale-105 active:scale-95">
-            <ShoppingBag className="h-4 w-4" />
-            Export Data
+          <Button size="sm" className="h-9 bg-red-600 hover:bg-red-700 text-white gap-2">
+            <Filter className="h-4 w-4" />
+            Filter
           </Button>
         </div>
       </div>
 
-      <Card className="glass border-none shadow-3xl rounded-[32px] overflow-hidden">
-        <CardHeader className="border-b border-white/10 bg-white/40 dark:bg-black/20 p-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="text-2xl font-bold tracking-tight">Recent Transactions</CardTitle>
-              <CardDescription className="text-base">Latest 50 active orders from all integrated restaurants</CardDescription>
-            </div>
-            <Badge variant="secondary" className="rounded-xl px-4 py-2 text-sm font-black bg-white/50 dark:bg-black/40 backdrop-blur-xl border border-white/20">
-              {orders.length} ACTIVE ORDERS
-            </Badge>
+      <Card className="shadow-sm border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950">
+        <CardHeader className="p-4 border-b border-gray-100 dark:border-gray-800 flex flex-row items-center justify-between">
+          <div className="relative w-full max-w-sm">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+            <Input
+              type="search"
+              placeholder="Search orders..."
+              className="pl-9 h-9 border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900"
+            />
+          </div>
+          <div className="text-xs text-gray-500 font-medium">
+            Showing {orders.length} orders
           </div>
         </CardHeader>
         <CardContent className="p-0">
           {orders.length === 0 ? (
-            <div className="text-center py-32 text-muted-foreground bg-muted/5">
-              <div className="h-24 w-24 mx-auto mb-6 flex items-center justify-center rounded-3xl bg-primary/5 text-primary/20">
-                <ShoppingBag className="h-12 w-12 opacity-20" />
+            <div className="text-center py-20">
+              <div className="h-16 w-16 mx-auto mb-4 flex items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800 text-gray-400">
+                <ShoppingBag className="h-8 w-8" />
               </div>
-              <p className="text-2xl font-bold">Your order feed is empty</p>
-              <p className="text-sm font-medium mt-1">Connect your WhatsApp agents to start receiving real-time orders.</p>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">No orders yet</h3>
+              <p className="text-sm text-gray-500 max-w-sm mx-auto mt-1">
+                When customers place orders via WhatsApp, they will appear here automatically.
+              </p>
             </div>
           ) : (
             <div className="relative w-full overflow-auto">
-              <table className="w-full text-sm text-left border-collapse">
-                <thead>
-                  <tr className="bg-white/30 dark:bg-black/10 text-muted-foreground font-black uppercase tracking-[0.2em] text-[10px]">
-                    <th className="px-10 py-6">ID</th>
-                    <th className="px-8 py-6">Location</th>
-                    <th className="px-8 py-6">Contact</th>
-                    <th className="px-8 py-6 text-right">Value</th>
-                    <th className="px-8 py-6 text-center">Status</th>
-                    <th className="px-10 py-6 text-right">Timestamp</th>
+              <table className="w-full text-sm text-left">
+                <thead className="bg-gray-50 dark:bg-gray-900/50 text-gray-500 dark:text-gray-400 font-medium border-b border-gray-200 dark:border-gray-800">
+                  <tr>
+                    <th className="px-6 py-3 font-medium">Order ID</th>
+                    <th className="px-6 py-3 font-medium">Customer</th>
+                    <th className="px-6 py-3 font-medium">Location</th>
+                    <th className="px-6 py-3 font-medium text-right">Amount</th>
+                    <th className="px-6 py-3 font-medium text-center">Status</th>
+                    <th className="px-6 py-3 font-medium text-right">Date</th>
+                    <th className="px-6 py-3 font-medium text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-white/10">
+                <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
                   {orders.map((order) => (
-                    <tr key={order.id} className="hover:bg-primary/5 transition-all duration-300 group cursor-default">
-                      <td className="px-10 py-6 font-mono text-xs font-black text-primary group-hover:pl-12 transition-all">
-                        #{order.id.slice(-6).toUpperCase()}
+                    <tr key={order.id} className="hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors">
+                      <td className="px-6 py-4 font-mono text-xs font-medium text-gray-900 dark:text-white">
+                        #{order.id.slice(0, 8)}
                       </td>
-                      <td className="px-8 py-6">
-                        <Badge variant="outline" className="bg-primary/5 border-primary/20 text-primary font-black px-3 py-1 rounded-lg">
-                          {order.restaurant?.name || "General"}
-                        </Badge>
-                      </td>
-                      <td className="px-8 py-6">
-                        <div className="flex flex-col">
-                          <div className="font-bold flex items-center gap-2 group-hover:text-primary transition-colors hover:font-black cursor-pointer">
-                            <User className="h-3 w-3 text-muted-foreground" />
-                            {order.phoneNumber}
-                          </div>
-                          <span className="text-[10px] text-muted-foreground font-medium pl-5">Direct Reachout</span>
+                      <td className="px-6 py-4">
+                        <div className="font-medium text-gray-900 dark:text-white flex flex-col">
+                          <span>{order.phoneNumber}</span>
+                          <span className="text-xs text-gray-500 font-normal">WhatsApp</span>
                         </div>
                       </td>
-                      <td className="px-8 py-6 text-right">
-                        <div className="font-black text-lg tracking-tighter tabular-nums group-hover:scale-110 transition-transform origin-right">
-                          {new Intl.NumberFormat().format(order.total)}
-                          <span className="ml-1 text-[10px] font-bold text-muted-foreground uppercase opacity-50">FCFA</span>
-                        </div>
+                      <td className="px-6 py-4 text-gray-600 dark:text-gray-300">
+                        {order.restaurant?.name || "-"}
                       </td>
-                      <td className="px-8 py-6 text-center">
-                        <Badge className="bg-green-500/10 text-green-500 border-green-500/20 px-4 py-1.5 rounded-xl text-[10px] uppercase tracking-wider font-black shadow-lg shadow-green-500/5">
+                      <td className="px-6 py-4 text-right font-medium text-gray-900 dark:text-white tabular-nums">
+                        {new Intl.NumberFormat().format(order.total)} <span className="text-xs text-gray-500 font-normal">FCFA</span>
+                      </td>
+                      <td className="px-6 py-4 text-center">
+                        <Badge
+                          variant={order.status === 'completed' ? 'default' : order.status === 'processing' ? 'secondary' : 'outline'}
+                          className={
+                            order.status === 'completed' ? "bg-green-50 text-green-700 hover:bg-green-100 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-900/50" :
+                              order.status === 'processing' ? "bg-blue-50 text-blue-700 hover:bg-blue-100 border-blue-200 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-900/50" :
+                                "bg-gray-50 text-gray-600 border-gray-200 dark:bg-gray-900 dark:text-gray-400 dark:border-gray-800"
+                          }
+                        >
                           {order.status}
                         </Badge>
                       </td>
-                      <td className="px-10 py-6 text-right whitespace-nowrap">
-                        <div className="text-xs font-black text-foreground group-hover:text-primary transition-colors">
-                          {format(order.createdAt, "MMM d, HH:mm")}
-                        </div>
-                        <div className="text-[10px] font-bold text-muted-foreground opacity-60">
-                          {format(order.createdAt, "yyyy")}
-                        </div>
+                      <td className="px-6 py-4 text-right text-gray-500 dark:text-gray-400 whitespace-nowrap">
+                        {format(order.createdAt, "MMM d, HH:mm")}
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" className="h-8 w-8 p-0 text-gray-500 hover:text-gray-900 dark:hover:text-white">
+                              <span className="sr-only">Open menu</span>
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                            <DropdownMenuItem>View Details</DropdownMenuItem>
+                            <DropdownMenuItem>Print Receipt</DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem className="text-red-600">Cancel Order</DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </td>
                     </tr>
                   ))}

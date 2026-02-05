@@ -4,7 +4,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -103,84 +103,89 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background relative overflow-hidden flex flex-col">
-      {/* Ambient Background Glows */}
-      <div className="absolute top-0 left-0 w-full h-[500px] bg-primary/10 blur-[120px] rounded-full pointer-events-none" />
-      <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-accent/5 blur-[120px] rounded-full pointer-events-none" />
-
-      {/* Nav / Logo */}
-      <nav className="relative z-10 p-8 flex justify-between items-center max-w-7xl mx-auto w-full">
-        <Link href="/" className="hover:opacity-80 transition-opacity">
-          <Logo className="h-10" />
-        </Link>
-        <div className="text-sm text-muted-foreground hidden sm:block">
-          Step {step} of 5
+    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+      <div className="sm:mx-auto sm:w-full sm:max-w-md">
+        <div className="flex justify-center mb-6">
+          <Link href="/" className="hover:opacity-80 transition-opacity">
+            <Logo className="h-10" />
+          </Link>
         </div>
-      </nav>
+        <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+          Create your account
+        </h2>
+        <p className="mt-2 text-center text-sm text-gray-600">
+          Start automating your restaurant today.
+        </p>
+      </div>
 
-      {/* Main Content */}
-      <div className="relative z-10 flex-1 flex items-center justify-center p-6">
-        <Card className="w-full max-w-md mx-auto glass border-white/20 dark:border-white/10 shadow-2xl animate-in fade-in-50 zoom-in-95 duration-500 rounded-3xl overflow-hidden">
-          <div className="h-2 w-full bg-muted overflow-hidden">
+      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+        <Card className="shadow-lg border-gray-100 dark:border-gray-800">
+          <div className="h-1 w-full bg-gray-100 rounded-t-md overflow-hidden">
             <div
-              className="h-full bg-primary transition-all duration-500 ease-out"
+              className="h-full bg-primary transition-all duration-300 ease-out"
               style={{ width: `${(step / 5) * 100}%` }}
             />
           </div>
-          <CardHeader className="space-y-4 pb-8 pt-10 px-8">
-            <CardTitle className="text-3xl font-black tracking-tighter text-center text-gradient">
-              {step === 5 ? "Verify your number" : "Join Mafal-IA"}
+          <CardHeader>
+            <CardTitle>
+              {step === 1 && "Basic Information"}
+              {step === 2 && "WhatsApp Contact"}
+              {step === 3 && "Owner Details"}
+              {step === 4 && "Location"}
+              {step === 5 && "Verify your number"}
             </CardTitle>
-            <CardDescription className="text-center text-base font-medium">
-              {step === 5 ? "We've sent a 6-digit code to your WhatsApp" : "Transform your restaurant with intelligent automation."}
+            <CardDescription>
+              {step === 5 ? "Enter the 6-digit code sent to your WhatsApp." : "Please fill in the details below."}
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-8 px-8 pb-10">
+          <CardContent className="space-y-4">
             {error && (
-              <div className="bg-destructive/10 text-destructive p-4 rounded-2xl text-sm border border-destructive/20 text-center animate-in slide-in-from-top-2 font-bold">
+              <div className="bg-red-50 text-red-600 p-3 rounded-md text-sm border border-red-100">
                 {error}
               </div>
             )}
 
             {step === 1 && (
-              <div className="space-y-3 animate-in slide-in-from-right-4 fade-in duration-300">
-                <Label htmlFor="name" className="text-sm font-bold uppercase tracking-widest text-muted-foreground/70 ml-1">Establishment Name</Label>
-                <Input
-                  id="name"
-                  placeholder="e.g. Chez Fatou"
-                  value={formData.name}
-                  onChange={(e) => handleChange("name", e.target.value)}
-                  className="bg-white/50 dark:bg-black/20 border-border/10 h-12 rounded-xl focus:ring-primary/20"
-                  autoFocus
-                />
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="name">Establishment Name</Label>
+                  <Input
+                    id="name"
+                    placeholder="e.g. Chez Fatou"
+                    value={formData.name}
+                    onChange={(e) => handleChange("name", e.target.value)}
+                    autoFocus
+                  />
+                </div>
               </div>
             )}
 
             {step === 2 && (
-              <div className="space-y-3 animate-in slide-in-from-right-4 fade-in duration-300">
-                <Label htmlFor="phone" className="text-sm font-bold uppercase tracking-widest text-muted-foreground/70 ml-1">Commercial WhatsApp Number</Label>
-                <Input
-                  id="phone"
-                  placeholder="e.g. 221770000000"
-                  type="tel"
-                  value={formData.whatsappNumber}
-                  onChange={(e) => handleChange("whatsappNumber", e.target.value)}
-                  className="bg-white/50 dark:bg-black/20 border-border/10 h-12 rounded-xl focus:ring-primary/20"
-                  autoFocus
-                />
-                <p className="text-xs text-muted-foreground ml-1">Include country code without +</p>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="phone">Commercial WhatsApp Number</Label>
+                  <Input
+                    id="phone"
+                    placeholder="e.g. 221770000000"
+                    type="tel"
+                    value={formData.whatsappNumber}
+                    onChange={(e) => handleChange("whatsappNumber", e.target.value)}
+                    autoFocus
+                  />
+                  <p className="text-xs text-gray-500">Include country code without +</p>
+                </div>
               </div>
             )}
 
             {step === 3 && (
-              <div className="space-y-6 animate-in slide-in-from-right-4 fade-in duration-300">
-                <div className="space-y-3">
-                  <Label className="text-sm font-bold uppercase tracking-widest text-muted-foreground/70 ml-1">Age Range</Label>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Age Range</Label>
                   <Select value={formData.ownerAgeRange} onValueChange={(val) => handleChange("ownerAgeRange", val)}>
-                    <SelectTrigger className="bg-white/50 dark:bg-black/20 border-border/10 h-12 rounded-xl">
+                    <SelectTrigger>
                       <SelectValue placeholder="Select age range" />
                     </SelectTrigger>
-                    <SelectContent className="glass">
+                    <SelectContent>
                       <SelectItem value="18-25">18 - 25</SelectItem>
                       <SelectItem value="26-35">26 - 35</SelectItem>
                       <SelectItem value="36-45">36 - 45</SelectItem>
@@ -188,16 +193,16 @@ export default function RegisterPage() {
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="space-y-3">
-                  <Label className="text-sm font-bold uppercase tracking-widest text-muted-foreground/70 ml-1">Sex</Label>
-                  <RadioGroup value={formData.ownerSex} onValueChange={(val) => handleChange("ownerSex", val)} className="grid grid-cols-2 gap-4">
-                    <div className="flex items-center space-x-2 p-4 rounded-xl bg-white/50 dark:bg-black/20 border border-border/10 hover:border-primary/50 transition-colors cursor-pointer">
-                      <RadioGroupItem value="M" id="sex-m" className="text-primary border-primary/50" />
-                      <Label htmlFor="sex-m" className="cursor-pointer font-bold">Male</Label>
+                <div className="space-y-2">
+                  <Label>Sex</Label>
+                  <RadioGroup value={formData.ownerSex} onValueChange={(val) => handleChange("ownerSex", val)} className="flex gap-4">
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="M" id="sex-m" />
+                      <Label htmlFor="sex-m">Male</Label>
                     </div>
-                    <div className="flex items-center space-x-2 p-4 rounded-xl bg-white/50 dark:bg-black/20 border border-border/10 hover:border-primary/50 transition-colors cursor-pointer">
-                      <RadioGroupItem value="F" id="sex-f" className="text-primary border-primary/50" />
-                      <Label htmlFor="sex-f" className="cursor-pointer font-bold">Female</Label>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="F" id="sex-f" />
+                      <Label htmlFor="sex-f">Female</Label>
                     </div>
                   </RadioGroup>
                 </div>
@@ -205,52 +210,55 @@ export default function RegisterPage() {
             )}
 
             {step === 4 && (
-              <div className="space-y-3 animate-in slide-in-from-right-4 fade-in duration-300">
-                <Label htmlFor="country" className="text-sm font-bold uppercase tracking-widest text-muted-foreground/70 ml-1">Country</Label>
-                <Select value={formData.country} onValueChange={(val) => handleChange("country", val)}>
-                  <SelectTrigger className="bg-white/50 dark:bg-black/20 border-border/10 h-12 rounded-xl">
-                    <SelectValue placeholder="Select country" />
-                  </SelectTrigger>
-                  <SelectContent className="glass">
-                    <SelectItem value="Senegal">Senegal</SelectItem>
-                    <SelectItem value="Ivory Coast">Ivory Coast</SelectItem>
-                    <SelectItem value="Nigeria">Nigeria</SelectItem>
-                    <SelectItem value="Other">Other</SelectItem>
-                  </SelectContent>
-                </Select>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="country">Country</Label>
+                  <Select value={formData.country} onValueChange={(val) => handleChange("country", val)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select country" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Senegal">Senegal</SelectItem>
+                      <SelectItem value="Ivory Coast">Ivory Coast</SelectItem>
+                      <SelectItem value="Nigeria">Nigeria</SelectItem>
+                      <SelectItem value="Other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             )}
 
             {step === 5 && (
-              <div className="space-y-3 animate-in slide-in-from-right-4 fade-in duration-300">
-                <Label htmlFor="otp" className="text-sm font-bold uppercase tracking-widest text-muted-foreground/70 ml-1">Verification Code</Label>
-                <Input
-                  id="otp"
-                  placeholder="123456"
-                  maxLength={6}
-                  value={otp}
-                  onChange={(e) => setOtp(e.target.value)}
-                  className="text-center text-2xl font-black tracking-[0.5em] bg-white/50 dark:bg-black/20 border-border/10 h-16 rounded-xl focus:ring-primary/20"
-                  autoFocus
-                />
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="otp">Verification Code</Label>
+                  <Input
+                    id="otp"
+                    placeholder="123456"
+                    maxLength={6}
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value)}
+                    className="text-center text-lg tracking-widest"
+                    autoFocus
+                  />
+                </div>
               </div>
             )}
-
-            <div className="flex justify-between items-center pt-2">
-              {step > 1 && step < 5 && (
-                <Button variant="ghost" onClick={() => setStep(step - 1)} disabled={loading} className="rounded-full px-6 font-bold hover:bg-primary/5">
-                  Back
-                </Button>
-              )}
-              <Button
-                className={`${step === 1 ? "w-full" : "ml-auto"} rounded-full shadow-xl shadow-primary/20 hover:shadow-primary/40 transition-all font-bold px-8 py-6 h-auto text-lg bg-primary hover:bg-primary/90`}
-                onClick={step === 5 ? verifyOtp : handleNext}
-                disabled={!isStepValid() || loading}
-              >
-                {loading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : (step === 5 ? "Verify & Start" : (step === 4 ? "Send Code" : "Continue"))}
-              </Button>
-            </div>
           </CardContent>
+          <CardFooter className="flex justify-between border-t border-gray-100 dark:border-gray-800 pt-6">
+            {step > 1 && step < 5 && (
+              <Button variant="ghost" onClick={() => setStep(step - 1)} disabled={loading}>
+                Back
+              </Button>
+            )}
+            <Button
+              className={`${step === 1 ? "w-full" : "ml-auto"}`}
+              onClick={step === 5 ? verifyOtp : handleNext}
+              disabled={!isStepValid() || loading}
+            >
+              {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : (step === 5 ? "Verify & Start" : (step === 4 ? "Send Code" : "Continue"))}
+            </Button>
+          </CardFooter>
         </Card>
       </div>
     </div>

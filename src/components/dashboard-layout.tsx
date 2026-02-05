@@ -45,26 +45,19 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   }, [])
 
   if (!isMounted) {
-    return <div className="flex items-center justify-center min-h-screen bg-background">
-      <div className="flex flex-col items-center gap-4">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-        <p className="text-muted-foreground animate-pulse">Initializing Mafal-IA...</p>
-      </div>
-    </div>
+    return null // content fallback handled by layout or loading.tsx
   }
 
   const SidebarContent = () => (
-    <div className="flex flex-col h-full bg-card/50 backdrop-blur-xl md:bg-transparent">
-      {/* Premium Logo Area */}
-      <div className="px-6 pt-8 pb-6">
-        <Link href="/" className="group flex items-center gap-2 hover:opacity-80 transition-opacity">
-          <Logo className="h-8" />
+    <div className="flex flex-col h-full bg-white dark:bg-gray-950 border-r border-gray-200 dark:border-gray-800 transition-all duration-300">
+      {/* Logo Area */}
+      <div className={cn("flex items-center h-16 px-6 border-b border-gray-100 dark:border-gray-900", collapsed && "justify-center px-2")}>
+        <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+          <Logo className={cn("h-8", collapsed && "w-10 overflow-hidden")} />
         </Link>
       </div>
 
-      {!collapsed && <div className="px-6 mb-4"><div className="h-px w-full bg-gradient-to-r from-transparent via-border to-transparent" /></div>}
-
-      <nav className="flex-1 px-4 space-y-2">
+      <nav className="flex-1 px-3 py-6 space-y-1 overflow-y-auto custom-scrollbar">
         {navigation.map((item) => {
           const Icon = item.icon
           const isActive = pathname === item.href || pathname.startsWith(item.href + "/")
@@ -73,38 +66,39 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
             <Link
               key={item.name}
               href={item.href}
-              aria-current={isActive ? "page" : undefined}
               className={cn(
-                "group relative flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium transition-all duration-300",
+                "group flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition-colors duration-200",
                 isActive
-                  ? "bg-primary/10 text-primary shadow-[0_0_20px_-5px_var(--primary)]"
-                  : "text-muted-foreground hover:text-foreground hover:bg-neutral-100 dark:hover:bg-white/5"
+                  ? "bg-red-50 text-red-600 dark:bg-red-950/20 dark:text-red-400"
+                  : "text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-900 dark:hover:text-gray-200",
+                collapsed && "justify-center px-2"
               )}
               onClick={() => setSidebarOpen(false)}
+              title={collapsed ? item.name : undefined}
             >
-              {isActive && <div className="absolute inset-y-0 left-0 w-1 bg-primary rounded-r-full" />}
-              <Icon className={cn("h-5 w-5 transition-transform duration-300", isActive ? "scale-110" : "group-hover:scale-110")} />
-              {!collapsed && <span className="truncate">{item.name}</span>}
+              <Icon className={cn("h-5 w-5 shrink-0 transition-colors", isActive ? "text-red-500 dark:text-red-400" : "text-gray-400 group-hover:text-gray-600 dark:text-gray-500 dark:group-hover:text-gray-300")} />
+              {!collapsed && <span>{item.name}</span>}
             </Link>
           )
         })}
       </nav>
 
-      {/* User Mini Profile */}
-      <div className="p-4 mt-auto">
-        <div className={cn("rounded-xl border bg-card/50 p-3 flex items-center gap-3 backdrop-blur-sm", collapsed && "justify-center p-2")}>
-          <div className="h-8 w-8 rounded-full bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center text-white font-bold text-xs ring-2 ring-white/20">
-            {session?.user?.name?.[0] || "U"}
-          </div>
+      {/* User Profile */}
+      <div className="p-4 border-t border-gray-100 dark:border-gray-900">
+        <div className={cn("flex items-center gap-3", collapsed && "justify-center")}>
+          <Avatar className="h-9 w-9 border border-gray-200 dark:border-gray-800">
+            <AvatarFallback className="bg-red-50 text-red-600 dark:bg-red-950/30 dark:text-red-400 font-medium text-xs">
+              {session?.user?.name?.[0]?.toUpperCase() || "U"}
+            </AvatarFallback>
+          </Avatar>
           {!collapsed && (
-            <div className="flex-1 overflow-hidden">
-              <p className="text-sm font-bold truncate">{session?.user?.name || "User"}</p>
-              <div className="flex items-center gap-1.5">
-                <div className={cn("h-1.5 w-1.5 rounded-full", (session?.user as any)?.plan === "PREMIUM" ? "bg-amber-500" : "bg-muted-foreground")} />
-                <p className="text-[10px] font-black tracking-widest uppercase text-muted-foreground truncate">
-                  {(session?.user as any)?.plan || "STANDARD"}
-                </p>
-              </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                {session?.user?.name || "User"}
+              </p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 truncate capitalize">
+                {(session?.user as any)?.plan || "Standard"} Plan
+              </p>
             </div>
           )}
         </div>
@@ -113,58 +107,58 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   )
 
   return (
-    <div className="flex h-screen bg-background overflow-hidden relative">
-      {/* Ambient Background Glows */}
-      <div className="absolute top-0 left-0 w-full h-[500px] bg-primary/5 blur-[120px] rounded-full pointer-events-none" />
-      <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-accent/5 blur-[120px] rounded-full pointer-events-none" />
-
-      {/* Desktop Sidebar (Floating Glass) */}
-      <div className={cn(
-        "hidden md:flex md:flex-col md:fixed md:inset-y-4 md:left-4 z-50 transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]",
-        collapsed ? "md:w-20" : "md:w-72"
+    <div className="flex h-screen bg-gray-50 dark:bg-gray-900 overflow-hidden">
+      {/* Desktop Sidebar */}
+      <aside className={cn(
+        "hidden md:flex flex-col z-30 transition-all duration-300 ease-in-out",
+        collapsed ? "w-20" : "w-64"
       )}>
-        <div className="flex flex-col flex-grow rounded-2xl glass border-white/20 dark:border-white/10 overflow-hidden shadow-2xl">
-          <SidebarContent />
-        </div>
-      </div>
+        <SidebarContent />
+      </aside>
 
       {/* Mobile Sidebar */}
       <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
-        <SheetContent side="left" className="p-0 w-72 border-r-0 bg-background/80 backdrop-blur-xl">
+        <SheetContent side="left" className="p-0 w-72 border-r-0">
           <SidebarContent />
         </SheetContent>
       </Sheet>
 
-      {/* Main content */}
-      <div className={cn(
-        "flex-1 flex flex-col overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]",
-        collapsed ? "md:pl-28" : "md:pl-80"
-      )}>
-        {/* Top bar (Floating) */}
-        <div className="h-20 flex items-center px-8 sticky top-0 z-40">
-          <Button variant="ghost" size="icon" className="md:hidden mr-2" onClick={() => setSidebarOpen(true)}>
-            <PanelLeftOpen className="h-6 w-6" />
-          </Button>
-
-          <div className="hidden md:flex">
-            <Button variant="ghost" size="icon" onClick={() => setCollapsed(!collapsed)} className="opacity-50 hover:opacity-100 transition-opacity">
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        {/* Top Header */}
+        <header className="h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8 bg-white dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800 z-20">
+          <div className="flex items-center gap-4">
+            <Button variant="ghost" size="icon" className="md:hidden -ml-2 text-gray-500" onClick={() => setSidebarOpen(true)}>
+              <PanelLeftOpen className="h-6 w-6" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setCollapsed(!collapsed)}
+              className="hidden md:flex text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
+            >
               {collapsed ? <PanelLeftOpen className="h-5 w-5" /> : <PanelLeftClose className="h-5 w-5" />}
             </Button>
+            <h1 className="text-lg font-semibold text-gray-900 dark:text-white md:hidden">Mafalia</h1>
           </div>
 
-          <div className="ml-auto flex items-center gap-4">
-            <div className="glass px-2 py-1 rounded-full"><SimpleThemeToggle /></div>
-            <Button asChild variant="outline" className="rounded-full gap-2 hidden sm:flex border-primary/20 hover:bg-primary/5">
+          <div className="flex items-center gap-2 sm:gap-4">
+            <div className="flex items-center">
+              <SimpleThemeToggle />
+            </div>
+            <div className="h-8 w-px bg-gray-200 dark:bg-gray-800 hidden sm:block"></div>
+            <Button asChild variant="ghost" className="hidden sm:flex items-center gap-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-800">
               <Link href="/settings">
                 <Settings className="w-4 h-4" />
-                <span>System</span>
+                <span>Settings</span>
               </Link>
             </Button>
           </div>
-        </div>
+        </header>
 
-        <main className="flex-1 overflow-y-auto px-8 pb-8 scrollbar-hide">
-          <div className="max-w-7xl mx-auto animate-in fade-in-50 slide-in-from-bottom-5 duration-700">
+        {/* Page Content */}
+        <main className="flex-1 overflow-y-auto focus:outline-none scrollbar-hide custom-scrollbar">
+          <div className="py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
             {children}
           </div>
         </main>

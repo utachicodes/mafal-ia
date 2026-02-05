@@ -9,163 +9,130 @@ import {
   ShoppingBag,
   Activity,
   ArrowUpRight,
-  Zap,
-  Globe,
-  Crown
+  TrendingUp,
+  Users,
+  CreditCard,
+  Download,
+  Calendar
 } from "lucide-react"
 
 export default function AnalyticsPage() {
   const { data: session } = useSession()
-  // Cast session user to any to access the custom 'plan' property
-  const isPremium = (session?.user as any)?.plan === "PREMIUM"
 
   const stats = [
     {
-      title: "Commercial Hubs",
+      title: "Total Revenue",
+      value: "2.4M FCFA",
+      change: "+8.2% from last month",
+      icon: CreditCard,
+    },
+    {
+      title: "Active Restaurants",
       value: "12",
-      change: "+2 new",
+      change: "+2 new this month",
       icon: Store,
-      color: "text-blue-500 bg-blue-500/10",
-      description: "Live restaurant endpoints"
     },
     {
-      title: "AI Interactions",
-      value: "14,208",
-      change: "+15% growth",
-      icon: MessageSquare,
-      color: "text-purple-500 bg-purple-500/10",
-      description: "Unique customer sessions"
-    },
-    {
-      title: "Processed Responses",
-      value: "85,420",
-      change: "+24% vs LY",
-      icon: Zap,
-      color: "text-amber-500 bg-amber-500/10",
-      description: "Automated AI execution"
-    },
-    {
-      title: "Revenue Stream",
-      value: "2.4M",
-      change: "+8.2%",
+      title: "Total Orders",
+      value: "1,208",
+      change: "+15% from last month",
       icon: ShoppingBag,
-      color: "text-green-500 bg-green-500/10",
-      description: "Completed transactions"
+    },
+    {
+      title: "Customer Conversations",
+      value: "8,542",
+      change: "+24% from last month",
+      icon: MessageSquare,
     }
   ]
 
   return (
-    <div className="space-y-12 py-8 px-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
-        <div className="space-y-3">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-black uppercase tracking-widest">
-            <Activity className="h-3 w-3" /> System Analytics
-          </div>
-          <h1 className="text-5xl font-black tracking-tighter text-gradient flex items-center gap-4">
-            Platform Analytics
+    <div className="space-y-6 py-6">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-gray-100 dark:border-gray-800 pb-6">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+            Analytics
           </h1>
-          <p className="text-xl text-muted-foreground font-medium">
-            Monitor your restaurant network's efficiency and growth metrics.
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            Overview of your platform's performance and growth.
           </p>
         </div>
-        {!isPremium && (
-          <Button className="rounded-2xl gap-3 font-black bg-gradient-to-r from-amber-500 to-primary text-white border-none shadow-xl shadow-primary/20 hover:scale-105 transition-all p-6">
-            <Crown className="h-5 w-5" />
-            Unlock Advanced Insights
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" className="h-9 gap-2">
+            <Calendar className="h-4 w-4" />
+            Last 30 Days
           </Button>
-        )}
+          <Button size="sm" className="h-9 gap-2">
+            <Download className="h-4 w-4" />
+            Export Report
+          </Button>
+        </div>
       </div>
 
-      {/* Hero Stats */}
-      <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat) => (
-          <Card key={stat.title} className="glass border-none shadow-2xl rounded-[32px] overflow-hidden card-hover group transition-all duration-500">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-8">
-              <CardTitle className="text-xs font-black uppercase tracking-[0.2em] text-muted-foreground">
+          <Card key={stat.title} className="shadow-sm border-gray-200 dark:border-gray-800">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-gray-500 dark:text-gray-400">
                 {stat.title}
               </CardTitle>
-              <div className={`p-4 rounded-2xl ${stat.color} transition-all duration-500 group-hover:rotate-12 group-hover:scale-110 shadow-xl shadow-current/10`}>
-                <stat.icon className="h-6 w-6" />
-              </div>
+              <stat.icon className="h-4 w-4 text-gray-500 dark:text-gray-400" />
             </CardHeader>
-            <CardContent className="px-8 pb-8">
-              <div className="text-4xl font-black tracking-tight group-hover:text-primary transition-colors text-gradient">{stat.value}</div>
-              <div className="flex items-center gap-1.5 mt-2 text-sm font-black text-green-500 bg-green-500/5 w-fit px-2 py-0.5 rounded-lg">
-                <ArrowUpRight className="h-4 w-4 stroke-[3]" />
+            <CardContent>
+              <div className="text-2xl font-bold text-gray-900 dark:text-white">{stat.value}</div>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                 {stat.change}
-              </div>
-              <p className="text-xs text-muted-foreground mt-4 font-bold opacity-70 italic">
-                / {stat.description}
               </p>
             </CardContent>
           </Card>
         ))}
       </div>
 
-      <div className="grid gap-10 lg:grid-cols-2">
-        {/* Activity Chart Placeholder */}
-        <Card className="glass border-none shadow-3xl rounded-[40px] overflow-hidden group">
-          <CardHeader className="bg-white/40 dark:bg-black/20 p-10">
-            <CardTitle className="text-2xl font-black flex items-center gap-3">
-              <Activity className="h-6 w-6 text-primary" /> Performance Metrics
-            </CardTitle>
-            <CardDescription className="text-lg font-medium opacity-80">Real-time throughput & message volume</CardDescription>
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+        <Card className="col-span-4 shadow-sm border-gray-200 dark:border-gray-800">
+          <CardHeader>
+            <CardTitle className="text-base font-semibold text-gray-900 dark:text-white">Revenue Overview</CardTitle>
+            <CardDescription>Monthly revenue breakdown.</CardDescription>
           </CardHeader>
-          <CardContent className="p-12">
-            <div className="h-[400px] flex flex-col items-center justify-center border-dashed border-2 border-primary/20 rounded-[32px] bg-primary/5 transition-all group-hover:bg-primary/10 overflow-hidden relative">
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent" />
-              <Activity className="h-20 w-20 text-primary/20 mb-6 relative z-10" />
-              <p className="text-xl font-black text-primary/40 relative z-10">SYSTEM PERFORMANCE</p>
-              <p className="text-xs text-muted-foreground/60 mt-2 font-bold tracking-widest relative z-10 uppercase">Live Data Feed</p>
+          <CardContent className="pl-2">
+            <div className="h-[300px] flex items-center justify-center border rounded-md border-dashed border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50">
+              <div className="text-center">
+                <TrendingUp className="h-10 w-10 text-gray-300 mx-auto mb-2" />
+                <p className="text-sm text-gray-400 font-medium">Chart visualization placeholder</p>
+              </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Geographic Impact */}
-        <Card className="glass border-none shadow-3xl rounded-[40px] overflow-hidden relative group">
-          {!isPremium && (
-            <div className="absolute inset-0 z-20 bg-black/40 backdrop-blur-md flex flex-col items-center justify-center p-12 text-center">
-              <div className="p-6 rounded-3xl bg-amber-500/20 border border-amber-500/20 mb-6 animate-bounce">
-                <Crown className="h-12 w-12 text-amber-500 font-black" />
-              </div>
-              <h2 className="text-3xl font-black text-white tracking-tighter mb-4 text-gradient from-amber-200 to-amber-500">Premium Intelligence Required</h2>
-              <p className="text-white/70 font-medium max-w-sm mb-8 px-6">
-                Unlock deeper geographic insights and heatmap distributions with the Premium AI Expansion pack.
-              </p>
-              <Button className="rounded-2xl gap-2 font-black bg-amber-500 hover:bg-amber-600 transition-all shadow-xl shadow-amber-500/20 px-8 py-6">
-                Upgrade your Plan
-              </Button>
-            </div>
-          )}
-          <CardHeader className="bg-white/40 dark:bg-black/20 p-10">
-            <CardTitle className="text-2xl font-black flex items-center gap-3">
-              <Globe className="h-6 w-6 text-blue-500" /> Geo-Strategic Distribution
-            </CardTitle>
-            <CardDescription className="text-lg font-medium opacity-80">Regional impact and market penetration statistics</CardDescription>
+        <Card className="col-span-3 shadow-sm border-gray-200 dark:border-gray-800">
+          <CardHeader>
+            <CardTitle className="text-base font-semibold text-gray-900 dark:text-white">Regional Distribution</CardTitle>
+            <CardDescription>
+              Orders by location.
+            </CardDescription>
           </CardHeader>
-          <CardContent className="p-10 space-y-10">
-            {[
-              { region: "Dakar Metropolis", percentage: 65, color: "bg-primary shadow-primary/40" },
-              { region: "Abidjan Commercial District", percentage: 20, color: "bg-blue-500 shadow-blue-500/40" },
-              { region: "Banjul Free Zone", percentage: 10, color: "bg-green-500 shadow-green-500/40" },
-              { region: "Emerging Markets", percentage: 5, color: "bg-muted shadow-transparent" },
-            ].map((item) => (
-              <div key={item.region} className="space-y-4">
-                <div className="flex justify-between text-base font-black tracking-tight items-end">
-                  <span className="flex items-center gap-2 transition-transform hover:translate-x-2 cursor-default group-hover:text-primary">
-                    <div className={`h-2 w-2 rounded-full ${item.color.split(' ')[0]}`} />
-                    {item.region}
-                  </span>
-                  <span className="text-muted-foreground text-sm font-bold opacity-60 tabular-nums">{item.percentage}%</span>
+          <CardContent>
+            <div className="space-y-4">
+              {[
+                { region: "Dakar", percentage: 65 },
+                { region: "Abidjan", percentage: 20 },
+                { region: "Banjul", percentage: 10 },
+                { region: "Other", percentage: 5 },
+              ].map((item) => (
+                <div key={item.region} className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="font-medium text-gray-700 dark:text-gray-300">{item.region}</span>
+                    <span className="text-gray-500">{item.percentage}%</span>
+                  </div>
+                  <div className="h-2 w-full bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-primary rounded-full"
+                      style={{ width: `${item.percentage}%` }}
+                    />
+                  </div>
                 </div>
-                <div className="h-3 w-full bg-white/30 dark:bg-black/10 rounded-full overflow-hidden shadow-inner">
-                  <div
-                    className={`h-full ${item.color} shadow-lg transition-all duration-1000 ease-out animate-in slide-in-from-left-0`}
-                    style={{ width: `${item.percentage}%` }}
-                  />
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </CardContent>
         </Card>
       </div>

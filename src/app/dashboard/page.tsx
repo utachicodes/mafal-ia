@@ -5,16 +5,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import {
   BarChart3,
-  MessageSquare,
   Store,
   ShoppingBag,
   ArrowRight,
   Plus,
-  Sparkles,
-  Zap,
   TrendingUp,
-  Activity,
-  Crown
+  DollarSign,
+  Users,
+  Clock
 } from "lucide-react"
 import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
@@ -24,120 +22,151 @@ export default function DashboardPage() {
   const userPlan = (session?.user as any)?.plan || "STANDARD"
 
   const quickActions = [
-    { title: "New Restaurant", href: "/onboarding", icon: Plus, color: "bg-primary text-primary-foreground" },
-    { title: "View Analytics", href: "/analytics", icon: BarChart3, color: "bg-blue-500/10 text-blue-500" },
-    { title: "Manage Orders", href: "/orders", icon: ShoppingBag, color: "bg-orange-500/10 text-orange-500" },
+    { title: "New Order", href: "/orders/new", icon: Plus, color: "bg-red-50 text-red-600 dark:bg-red-950/30 dark:text-red-400" },
+    { title: "Add Restaurant", href: "/restaurants/new", icon: Store, color: "bg-blue-50 text-blue-600 dark:bg-blue-950/30 dark:text-blue-400" },
+    { title: "View Analytics", href: "/analytics", icon: BarChart3, color: "bg-green-50 text-green-600 dark:bg-green-950/30 dark:text-green-400" },
   ]
 
   const stats = [
-    { title: "Total Revenue", value: "145,000 FCFA", change: "+12.5%", icon: TrendingUp, color: "text-green-500" },
-    { title: "Active Orders", value: "12", change: "+4 today", icon: Zap, color: "text-amber-500" },
-    { title: "AI interactions", value: "1,284", change: "+85%", icon: Activity, color: "text-blue-500" },
+    { title: "Total Revenue", value: "15,240 FCFA", change: "+12.5%", icon: DollarSign, color: "text-green-600" },
+    { title: "Active Orders", value: "8", change: "+2 this hour", icon: ShoppingBag, color: "text-red-600" },
+    { title: "Total Customers", value: "1,284", change: "+15 new", icon: Users, color: "text-blue-600" },
   ]
 
   return (
-    <div className="space-y-10 py-6">
+    <div className="space-y-8 py-2">
       {/* Welcome Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-        <div className="space-y-2">
-          <h1 className="text-4xl font-extrabold tracking-tight text-gradient">
-            Welcome back, {session?.user?.name?.split(' ')[0] || "Partner"}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-gray-100 dark:border-gray-800 pb-6">
+        <div className="space-y-1">
+          <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+            Dashboard
           </h1>
-          <p className="text-lg text-muted-foreground flex items-center gap-2">
-            Your AI restaurant fleet is active.
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            Overview of your restaurant performance
             {userPlan === "PREMIUM" && (
-              <Badge className="bg-gradient-to-r from-amber-400 to-orange-500 border-none text-white font-bold gap-1 shadow-md">
-                <Crown className="h-3 w-3" /> PREMIUM
+              <Badge variant="outline" className="ml-2 border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-900 dark:bg-amber-950/30 dark:text-amber-400 text-[10px] uppercase font-bold tracking-wider">
+                Premium
               </Badge>
             )}
           </p>
         </div>
-        <Button asChild size="lg" className="rounded-full bg-primary hover:bg-primary/90 shadow-xl shadow-primary/20 hover:shadow-primary/40 transition-all font-bold gap-2">
-          <Link href="/onboarding">
-            <Plus className="h-5 w-5" />
-            Add Restaurant
-          </Link>
-        </Button>
+        <div className="flex gap-3">
+          <Button asChild size="sm" className="bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:text-gray-900 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-700">
+            <Link href="/orders">View Orders</Link>
+          </Button>
+          <Button asChild size="sm" className="bg-red-600 hover:bg-red-700 text-white shadow-sm">
+            <Link href="/onboarding">
+              <Plus className="h-4 w-4 mr-2" />
+              Add Restaurant
+            </Link>
+          </Button>
+        </div>
       </div>
 
       {/* Stats Grid */}
       <div className="grid gap-6 md:grid-cols-3">
         {stats.map((stat) => (
-          <Card key={stat.title} className="glass card-hover border-none shadow-xl overflow-hidden relative group bg-white/50 dark:bg-black/20">
-            <div className="absolute top-0 right-0 p-4 opacity-10 scale-150 transition-transform group-hover:scale-125 duration-500">
-              <stat.icon className="h-16 w-16" />
-            </div>
-            <CardHeader className="pb-2">
-              <CardDescription className="text-xs font-bold uppercase tracking-widest text-muted-foreground/70">{stat.title}</CardDescription>
-              <CardTitle className="text-3xl font-black">{stat.value}</CardTitle>
+          <Card key={stat.title} className="shadow-sm hover:shadow-md transition-all duration-200 bg-white dark:bg-gray-950 border-gray-200 dark:border-gray-800">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                {stat.title}
+              </CardTitle>
+              <stat.icon className={`h-4 w-4 ${stat.color}`} />
             </CardHeader>
             <CardContent>
-              <div className={`text-sm font-bold flex items-center gap-1 ${stat.color}`}>
-                <Sparkles className="h-3 w-3" />
-                {stat.change} <span className="text-muted-foreground font-normal ml-1">vs last month</span>
-              </div>
+              <div className="text-2xl font-bold text-gray-900 dark:text-white">{stat.value}</div>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                {stat.change} <span className="text-gray-400 dark:text-gray-500">from last month</span>
+              </p>
             </CardContent>
           </Card>
         ))}
       </div>
 
       <div className="grid gap-8 lg:grid-cols-3">
-        {/* Quick Actions */}
-        <Card className="lg:col-span-1 glass border-white/20 dark:border-white/5 bg-white/40 dark:bg-black/20 backdrop-blur-md shadow-2xl rounded-3xl overflow-hidden">
-          <CardHeader className="bg-primary/5 pb-6">
-            <CardTitle className="text-xl flex items-center gap-2">
-              <Plus className="h-5 w-5 text-primary" /> Quick Actions
-            </CardTitle>
-            <CardDescription>Commonly used operations</CardDescription>
-          </CardHeader>
-          <CardContent className="p-4 space-y-2">
-            {quickActions.map((action) => (
-              <Link key={action.title} href={action.href} className="flex items-center gap-4 p-4 rounded-2xl hover:bg-primary/5 transition-all group">
-                <div className={`h-12 w-12 rounded-xl flex items-center justify-center shadow-lg transition-transform group-hover:scale-110 ${action.color}`}>
-                  <action.icon className="h-6 w-6" />
-                </div>
-                <div className="flex-1">
-                  <p className="font-bold text-sm tracking-tight">{action.title}</p>
-                </div>
-                <ArrowRight className="h-4 w-4 text-muted-foreground opacity-0 -translate-x-2 transition-all group-hover:opacity-100 group-hover:translate-x-0" />
-              </Link>
-            ))}
-          </CardContent>
-        </Card>
-
-        {/* Live System Feed */}
-        <Card className="lg:col-span-2 glass border-none shadow-2xl rounded-3xl overflow-hidden bg-white/40 dark:bg-black/20">
-          <CardHeader className="flex flex-row items-center justify-between border-b border-border/10 bg-white/30 dark:bg-black/10 px-8 py-6">
-            <div>
-              <CardTitle className="text-xl">Live System Feed</CardTitle>
-              <CardDescription>Real-time updates from your AI agents</CardDescription>
+        {/* Recent Activity */}
+        <Card className="lg:col-span-2 shadow-sm border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950">
+          <CardHeader className="border-b border-gray-100 dark:border-gray-800 pb-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">Recent Orders</CardTitle>
+                <CardDescription className="text-xs text-gray-500">Latest transactions from all locations</CardDescription>
+              </div>
+              <Button variant="ghost" size="sm" className="h-8 text-xs text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/20" asChild>
+                <Link href="/orders">View All</Link>
+              </Button>
             </div>
-            <Button variant="ghost" size="sm" className="rounded-full text-primary hover:bg-primary/5 font-bold" asChild>
-              <Link href="/analytics">View all</Link>
-            </Button>
           </CardHeader>
           <CardContent className="p-0">
-            <div className="divide-y divide-border/10">
+            <div className="divide-y divide-gray-100 dark:divide-gray-800">
               {[
-                { time: "2m ago", user: "+221 77 123...", msg: "Confirmed order at 'Chez Fatou'", status: "success" },
-                { time: "15m ago", user: "+221 78 542...", msg: "Inquiring about menu items at 'Le Terrou'", status: "pending" },
-                { time: "1h ago", user: "System", msg: "AI model updated for better menu matching", status: "system" },
-              ].map((item, i) => (
-                <div key={i} className="flex items-center gap-6 px-8 py-5 hover:bg-primary/5 transition-colors">
-                  <div className="text-xs font-mono text-muted-foreground w-16">{item.time}</div>
-                  <div className="h-2 w-2 rounded-full bg-primary animate-pulse shadow-[0_0_10px_var(--primary)]" />
-                  <div className="flex-1">
-                    <p className="text-sm font-semibold tracking-tight">{item.user}</p>
-                    <p className="text-xs text-muted-foreground">{item.msg}</p>
+                { id: "#2451", customer: "Amadou D.", items: "2x Burger Maison, 1x Coke", amount: "9,000 FCFA", status: "completed", time: "2 mins ago" },
+                { id: "#2450", customer: "Fatou S.", items: "1x Yassa Poulet", amount: "3,500 FCFA", status: "processing", time: "15 mins ago" },
+                { id: "#2449", customer: "Jean P.", items: "3x Pizza Margherita", amount: "12,000 FCFA", status: "pending", time: "1 hour ago" },
+              ].map((order) => (
+                <div key={order.id} className="flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors">
+                  <div className="flex items-center gap-4">
+                    <div className="h-10 w-10 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500">
+                      <ShoppingBag className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-900 dark:text-white">Order {order.id}</p>
+                      <p className="text-xs text-gray-500">{order.items}</p>
+                    </div>
                   </div>
-                  <Badge variant="outline" className="text-[10px] uppercase font-bold tracking-widest bg-muted/20 border-border/20">
-                    {item.status}
-                  </Badge>
+                  <div className="flex items-center gap-4">
+                    <div className="text-right hidden sm:block">
+                      <p className="text-sm font-bold text-gray-900 dark:text-white">{order.amount}</p>
+                      <p className="text-xs text-gray-400">{order.time}</p>
+                    </div>
+                    <Badge variant={order.status === 'completed' ? 'default' : order.status === 'processing' ? 'secondary' : 'outline'}
+                      className={
+                        order.status === 'completed' ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border-none shadow-none" :
+                          order.status === 'processing' ? "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 border-none shadow-none" :
+                            "border-gray-200 text-gray-600 dark:border-gray-700 dark:text-gray-400"
+                      }
+                    >
+                      {order.status}
+                    </Badge>
+                  </div>
                 </div>
               ))}
             </div>
           </CardContent>
         </Card>
+
+        {/* Quick Actions */}
+        <div className="space-y-6">
+          <Card className="shadow-sm border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium text-gray-900 dark:text-white">Quick Actions</CardTitle>
+            </CardHeader>
+            <CardContent className="grid gap-2">
+              {quickActions.map((action) => (
+                <Link key={action.title} href={action.href} className="flex items-center gap-3 p-3 rounded-lg border border-gray-100 dark:border-gray-800 hover:border-red-100 dark:hover:border-red-900/50 hover:bg-gray-50 dark:hover:bg-gray-900 transition-all group">
+                  <div className={`h-8 w-8 rounded-md flex items-center justify-center ${action.color}`}>
+                    <action.icon className="h-4 w-4" />
+                  </div>
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300 group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">{action.title}</span>
+                  <ArrowRight className="ml-auto h-3 w-3 text-gray-400 group-hover:text-red-500" />
+                </Link>
+              ))}
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-red-600 to-red-700 text-white border-none shadow-lg">
+            <CardContent className="p-6">
+              <div className="mb-4 bg-white/20 w-10 h-10 rounded-full flex items-center justify-center backdrop-blur-sm">
+                <Store className="h-5 w-5 text-white" />
+              </div>
+              <h3 className="text-lg font-bold mb-1">Expand your business</h3>
+              <p className="text-red-100 text-sm mb-4">Add a new location to your fleet and sync your inventory automatically.</p>
+              <Button variant="secondary" size="sm" className="w-full bg-white text-red-600 hover:bg-red-50 border-none font-semibold" asChild>
+                <Link href="/onboarding">Add Location</Link>
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   )

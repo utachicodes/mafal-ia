@@ -7,7 +7,7 @@ export function Logo({ className }: { className?: string }) {
       <div className="relative h-10 w-14">
         <Image
           src="/mafalia-logo-svg.svg"
-          alt="Mafal-IA logo"
+          alt="Mafalia logo"
           fill
           className="object-contain"
           priority
