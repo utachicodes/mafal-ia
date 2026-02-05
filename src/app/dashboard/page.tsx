@@ -1,3 +1,6 @@
+"use client"
+
+import { useSession } from "next-auth/react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import {
@@ -10,12 +13,16 @@ import {
   Sparkles,
   Zap,
   TrendingUp,
-  Activity
+  Activity,
+  Crown
 } from "lucide-react"
 import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
 
 export default function DashboardPage() {
+  const { data: session } = useSession()
+  const userPlan = (session?.user as any)?.plan || "STANDARD"
+
   const quickActions = [
     { title: "New Restaurant", href: "/onboarding", icon: Plus, color: "bg-primary text-primary-foreground" },
     { title: "View Analytics", href: "/analytics", icon: BarChart3, color: "bg-blue-500/10 text-blue-500" },
@@ -34,13 +41,18 @@ export default function DashboardPage() {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div className="space-y-2">
           <h1 className="text-4xl font-extrabold tracking-tight text-gradient">
-            Welcome back, Utachi
+            Welcome back, {session?.user?.name?.split(' ')[0] || "Partner"}
           </h1>
-          <p className="text-lg text-muted-foreground">
-            Your AI restaurant fleet is currently managing <span className="text-primary font-bold">3 locations</span> and <span className="text-primary font-bold">12 orders</span>.
+          <p className="text-lg text-muted-foreground flex items-center gap-2">
+            Your AI restaurant fleet is active.
+            {userPlan === "PREMIUM" && (
+              <Badge className="bg-gradient-to-r from-amber-400 to-orange-500 border-none text-white font-bold gap-1 shadow-md">
+                <Crown className="h-3 w-3" /> PREMIUM
+              </Badge>
+            )}
           </p>
         </div>
-        <Button asChild size="lg" className="rounded-full shadow-xl shadow-primary/20 hover:shadow-primary/40 transition-all font-bold gap-2">
+        <Button asChild size="lg" className="rounded-full bg-primary hover:bg-primary/90 shadow-xl shadow-primary/20 hover:shadow-primary/40 transition-all font-bold gap-2">
           <Link href="/onboarding">
             <Plus className="h-5 w-5" />
             Add Restaurant
@@ -51,12 +63,12 @@ export default function DashboardPage() {
       {/* Stats Grid */}
       <div className="grid gap-6 md:grid-cols-3">
         {stats.map((stat) => (
-          <Card key={stat.title} className="glass card-hover border-none shadow-xl overflow-hidden relative group">
+          <Card key={stat.title} className="glass card-hover border-none shadow-xl overflow-hidden relative group bg-white/50 dark:bg-black/20">
             <div className="absolute top-0 right-0 p-4 opacity-10 scale-150 transition-transform group-hover:scale-125 duration-500">
               <stat.icon className="h-16 w-16" />
             </div>
             <CardHeader className="pb-2">
-              <CardDescription className="text-sm font-medium uppercase tracking-wider">{stat.title}</CardDescription>
+              <CardDescription className="text-xs font-bold uppercase tracking-widest text-muted-foreground/70">{stat.title}</CardDescription>
               <CardTitle className="text-3xl font-black">{stat.value}</CardTitle>
             </CardHeader>
             <CardContent>
@@ -94,18 +106,18 @@ export default function DashboardPage() {
         </Card>
 
         {/* Live System Feed */}
-        <Card className="lg:col-span-2 glass border-none shadow-2xl rounded-3xl overflow-hidden">
-          <CardHeader className="flex flex-row items-center justify-between border-b bg-white/30 dark:bg-black/10 px-8 py-6">
+        <Card className="lg:col-span-2 glass border-none shadow-2xl rounded-3xl overflow-hidden bg-white/40 dark:bg-black/20">
+          <CardHeader className="flex flex-row items-center justify-between border-b border-border/10 bg-white/30 dark:bg-black/10 px-8 py-6">
             <div>
               <CardTitle className="text-xl">Live System Feed</CardTitle>
               <CardDescription>Real-time updates from your AI agents</CardDescription>
             </div>
-            <Button variant="ghost" size="sm" className="rounded-full text-primary hover:bg-primary/5" asChild>
+            <Button variant="ghost" size="sm" className="rounded-full text-primary hover:bg-primary/5 font-bold" asChild>
               <Link href="/analytics">View all</Link>
             </Button>
           </CardHeader>
           <CardContent className="p-0">
-            <div className="divide-y divide-border/50">
+            <div className="divide-y divide-border/10">
               {[
                 { time: "2m ago", user: "+221 77 123...", msg: "Confirmed order at 'Chez Fatou'", status: "success" },
                 { time: "15m ago", user: "+221 78 542...", msg: "Inquiring about menu items at 'Le Terrou'", status: "pending" },
@@ -113,12 +125,12 @@ export default function DashboardPage() {
               ].map((item, i) => (
                 <div key={i} className="flex items-center gap-6 px-8 py-5 hover:bg-primary/5 transition-colors">
                   <div className="text-xs font-mono text-muted-foreground w-16">{item.time}</div>
-                  <div className="h-2 w-2 rounded-full bg-primary animate-pulse" />
+                  <div className="h-2 w-2 rounded-full bg-primary animate-pulse shadow-[0_0_10px_var(--primary)]" />
                   <div className="flex-1">
                     <p className="text-sm font-semibold tracking-tight">{item.user}</p>
                     <p className="text-xs text-muted-foreground">{item.msg}</p>
                   </div>
-                  <Badge variant="outline" className="text-[10px] uppercase font-bold tracking-widest bg-muted/50">
+                  <Badge variant="outline" className="text-[10px] uppercase font-bold tracking-widest bg-muted/20 border-border/20">
                     {item.status}
                   </Badge>
                 </div>

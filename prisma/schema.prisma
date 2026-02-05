@@ -14,6 +14,7 @@ model User {
   email         String       @unique
   name          String?
   role          UserRole     @default(RESTAURANT_OWNER)
+  plan          Plan         @default(STANDARD)
   passwordHash  String
   
   // Relations
@@ -24,6 +25,11 @@ model User {
   updatedAt     DateTime     @updatedAt
   
   @@index([email])
+}
+
+enum Plan {
+  STANDARD
+  PREMIUM
 }
 
 enum UserRole {

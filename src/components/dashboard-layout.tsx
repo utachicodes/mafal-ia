@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { usePathname } from "next/navigation"
+import { useSession } from "next-auth/react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent } from "@/components/ui/sheet"
 import { Home, Store, BarChart3, Settings, MessageSquare, Key, PanelLeftOpen, PanelLeftClose, Sparkles, ShoppingBag } from "lucide-react"
@@ -37,6 +38,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   const [collapsed, setCollapsed] = useState(false)
   const [isMounted, setIsMounted] = useState(false)
   const pathname = usePathname()
+  const { data: session } = useSession()
 
   useEffect(() => {
     setIsMounted(true)
@@ -92,12 +94,17 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
       <div className="p-4 mt-auto">
         <div className={cn("rounded-xl border bg-card/50 p-3 flex items-center gap-3 backdrop-blur-sm", collapsed && "justify-center p-2")}>
           <div className="h-8 w-8 rounded-full bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center text-white font-bold text-xs ring-2 ring-white/20">
-            U
+            {session?.user?.name?.[0] || "U"}
           </div>
           {!collapsed && (
             <div className="flex-1 overflow-hidden">
-              <p className="text-sm font-medium truncate">UtachiCodes</p>
-              <p className="text-xs text-muted-foreground truncate">Admin</p>
+              <p className="text-sm font-bold truncate">{session?.user?.name || "User"}</p>
+              <div className="flex items-center gap-1.5">
+                <div className={cn("h-1.5 w-1.5 rounded-full", (session?.user as any)?.plan === "PREMIUM" ? "bg-amber-500" : "bg-muted-foreground")} />
+                <p className="text-[10px] font-black tracking-widest uppercase text-muted-foreground truncate">
+                  {(session?.user as any)?.plan || "STANDARD"}
+                </p>
+              </div>
             </div>
           )}
         </div>

@@ -100,127 +100,133 @@ export function GeneralSettings({ restaurant }: GeneralSettingsProps) {
     isActive !== (restaurant.isActive || false)
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>General Settings</CardTitle>
-        <CardDescription>Update your restaurant's basic information and configuration</CardDescription>
+    <Card className="glass border-none shadow-2xl rounded-3xl overflow-hidden bg-white/40 dark:bg-black/20">
+      <CardHeader className="bg-white/30 dark:bg-black/10 px-8 py-8 border-b border-border/10">
+        <CardTitle className="text-3xl font-black text-gradient">General Settings</CardTitle>
+        <CardDescription className="text-base font-medium">Update your restaurant's basic information and configuration</CardDescription>
       </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="space-y-2">
-              <Label htmlFor="name">Restaurant Name</Label>
+      <CardContent className="p-8">
+        <form onSubmit={handleSubmit} className="space-y-8">
+          <div className="grid gap-6 md:grid-cols-2">
+            <div className="space-y-3">
+              <Label htmlFor="name" className="text-sm font-black uppercase tracking-widest text-muted-foreground/70 ml-1">Restaurant Name</Label>
               <Input
                 id="name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Enter restaurant name"
                 required
+                className="bg-white/50 dark:bg-black/20 border-border/10 h-12 rounded-xl focus:ring-primary/20 font-medium"
               />
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="cuisine">Cuisine Type</Label>
+            <div className="space-y-3">
+              <Label htmlFor="cuisine" className="text-sm font-black uppercase tracking-widest text-muted-foreground/70 ml-1">Cuisine Type</Label>
               <Input
                 id="cuisine"
                 value={cuisine}
                 onChange={(e) => setCuisine(e.target.value)}
                 placeholder="e.g., Italian, Mexican, Asian"
+                className="bg-white/50 dark:bg-black/20 border-border/10 h-12 rounded-xl focus:ring-primary/20 font-medium"
               />
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
+          <div className="space-y-3">
+            <Label htmlFor="description" className="text-sm font-black uppercase tracking-widest text-muted-foreground/70 ml-1">Description</Label>
             <Textarea
               id="description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Brief description of your restaurant"
-              rows={3}
+              rows={4}
               required
+              className="bg-white/50 dark:bg-black/20 border-border/10 rounded-2xl focus:ring-primary/20 font-medium resize-none"
             />
           </div>
 
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="space-y-2">
-              <Label htmlFor="whatsapp">WhatsApp Number</Label>
+          <div className="grid gap-6 md:grid-cols-2">
+            <div className="space-y-3">
+              <Label htmlFor="whatsapp" className="text-sm font-black uppercase tracking-widest text-muted-foreground/70 ml-1">WhatsApp Number</Label>
               <Input
                 id="whatsapp"
                 value={whatsappNumber}
                 onChange={(e) => setWhatsappNumber(e.target.value)}
                 placeholder="+1234567890"
                 type="tel"
+                className="bg-white/50 dark:bg-black/20 border-border/10 h-12 rounded-xl focus:ring-primary/20 font-medium"
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="hours">Business Hours</Label>
+            <div className="space-y-3">
+              <Label htmlFor="hours" className="text-sm font-black uppercase tracking-widest text-muted-foreground/70 ml-1">Business Hours</Label>
               <Input
                 id="hours"
                 value={businessHours}
                 onChange={(e) => setBusinessHours(e.target.value)}
                 placeholder="e.g., 10:00 AM - 10:00 PM"
+                className="bg-white/50 dark:bg-black/20 border-border/10 h-12 rounded-xl focus:ring-primary/20 font-medium"
               />
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="special-instructions">Specialties & Policy Instructions</Label>
+          <div className="space-y-3">
+            <Label htmlFor="special-instructions" className="text-sm font-black uppercase tracking-widest text-muted-foreground/70 ml-1">Specialties & Policy Instructions</Label>
             <Textarea
               id="special-instructions"
               value={specialInstructions}
               onChange={(e) => setSpecialInstructions(e.target.value)}
               placeholder="E.g., We are famous for our spicy wings. No deliveries after 9 PM. Be polite."
-              rows={3}
+              rows={4}
+              className="bg-white/50 dark:bg-black/20 border-border/10 rounded-2xl focus:ring-primary/20 font-medium resize-none"
             />
-            <p className="text-xs text-muted-foreground">These instructions help the AI understand your specific rules and specialties.</p>
+            <p className="text-xs text-muted-foreground font-medium ml-1">These instructions help the AI understand your specific rules and specialties.</p>
           </div>
 
-          <div className="space-y-2">
-            <Label>Supported Languages</Label>
+          <div className="space-y-4">
+            <Label className="text-sm font-black uppercase tracking-widest text-muted-foreground/70 ml-1">Supported Languages</Label>
             <Select onValueChange={addLanguage}>
-              <SelectTrigger>
+              <SelectTrigger className="bg-white/50 dark:bg-black/20 border-border/10 h-12 rounded-xl">
                 <SelectValue placeholder="Add a language" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="glass">
                 {AVAILABLE_LANGUAGES.filter((lang) => !supportedLanguages.includes(lang)).map((language) => (
-                  <SelectItem key={language} value={language}>
+                  <SelectItem key={language} value={language} className="font-medium">
                     {language}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
-            <div className="flex flex-wrap gap-2 mt-2">
+            <div className="flex flex-wrap gap-2 mt-4">
               {supportedLanguages.map((language) => (
-                <Badge key={language} variant="secondary" className="flex items-center gap-1">
+                <Badge key={language} variant="secondary" className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primary hover:bg-primary/20 transition-colors border-none font-bold text-xs uppercase tracking-wider">
                   {language}
                   {language !== "English" && (
-                    <X className="w-3 h-3 cursor-pointer" onClick={() => removeLanguage(language)} />
+                    <X className="w-3.5 h-3.5 cursor-pointer hover:scale-120 transition-transform" onClick={() => removeLanguage(language)} />
                   )}
                 </Badge>
               ))}
             </div>
           </div>
 
-          <div className="flex items-center justify-between p-4 border rounded-lg">
+          <div className="flex items-center justify-between p-6 rounded-2xl bg-white/50 dark:bg-black/20 border border-border/10 shadow-sm">
             <div className="space-y-1">
-              <Label htmlFor="active">Chatbot Status</Label>
-              <p className="text-sm text-muted-foreground">Enable or disable your WhatsApp chatbot</p>
+              <Label htmlFor="active" className="text-base font-black tracking-tight">Chatbot Status</Label>
+              <p className="text-sm text-muted-foreground font-medium">Enable or disable your WhatsApp chatbot</p>
             </div>
-            <Switch id="active" checked={isActive} onCheckedChange={setIsActive} />
+            <Switch id="active" checked={isActive} onCheckedChange={setIsActive} className="data-[state=checked]:bg-primary" />
           </div>
 
-          <div className="flex justify-end">
+          <div className="flex justify-end pt-4">
             <Button
               type="submit"
               disabled={!hasChanges || isLoading}
-              className="min-w-[120px] bg-red-600 hover:bg-red-700"
+              className="min-w-[160px] rounded-full bg-primary hover:bg-primary/90 shadow-xl shadow-primary/20 hover:shadow-primary/40 transition-all font-black py-6 h-auto text-lg gap-2"
             >
               {isLoading ? (
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
               ) : (
                 <>
-                  <Save className="mr-2 h-4 w-4" />
+                  <Save className="h-5 w-5" />
                   Save Changes
                 </>
               )}
