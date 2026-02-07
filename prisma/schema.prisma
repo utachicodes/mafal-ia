@@ -69,6 +69,7 @@ model Restaurant {
   ownerAgeRange         String?
   ownerSex              String?
   country               String?
+  activitySector        String?
   verificationCode      String?
   isVerified            Boolean        @default(false)
   

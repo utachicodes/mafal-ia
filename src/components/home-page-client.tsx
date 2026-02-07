@@ -163,20 +163,20 @@ export default function HomeClient() {
   ];
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-950">
+    <div className="min-h-screen bg-background">
       {/* Navigation */}
-      <nav className="sticky top-0 z-50 bg-white/95 dark:bg-gray-950/95 backdrop-blur-sm border-b border-gray-100 dark:border-gray-800">
+      <nav className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <Logo className="h-10" />
             <div className="hidden md:flex items-center gap-8">
-              <a href="#features" className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-red-500 dark:hover:text-red-400 transition-colors">
+              <a href="#features" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
                 {t.nav.features}
               </a>
-              <a href="#how" className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-red-500 dark:hover:text-red-400 transition-colors">
+              <a href="#how" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
                 {t.nav.howItWorks}
               </a>
-              <a href="#testimonials" className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-red-500 dark:hover:text-red-400 transition-colors">
+              <a href="#testimonials" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
                 {t.nav.testimonials}
               </a>
               <LanguageSwitcher />
@@ -192,7 +192,7 @@ export default function HomeClient() {
                   <Button
                     variant="ghost"
                     onClick={() => signOut()}
-                    className="text-gray-600 hover:text-red-500"
+                    className="text-muted-foreground hover:text-primary"
                   >
                     Sign Out
                   </Button>
@@ -213,7 +213,7 @@ export default function HomeClient() {
       </nav>
 
       {/* Hero Section */}
-      <section className="pt-20 pb-32 bg-gradient-to-b from-red-50/30 dark:from-red-950/10 to-white dark:to-gray-950">
+      <section className="pt-20 pb-32 bg-gradient-to-b from-primary/10 via-background to-background">
         <div className="container mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             {/* Left: Text */}
@@ -224,7 +224,7 @@ export default function HomeClient() {
               className="space-y-8"
             >
               <motion.div variants={fadeInUp}>
-                <h1 className="text-5xl lg:text-6xl xl:text-7xl font-bold text-gray-900 dark:text-white leading-tight">
+                <h1 className="text-5xl lg:text-6xl xl:text-7xl font-bold text-foreground leading-tight">
                   {t.hero.headline}{" "}
                   <span className="text-red-500">{t.hero.headlineHighlight}</span>{" "}
                   {t.hero.headlineEnd}
@@ -233,7 +233,7 @@ export default function HomeClient() {
 
               <motion.p
                 variants={fadeInUp}
-                className="text-xl text-gray-600 dark:text-gray-300 leading-relaxed"
+                className="text-xl text-muted-foreground leading-relaxed"
               >
                 {t.hero.description}
               </motion.p>
@@ -280,13 +280,13 @@ export default function HomeClient() {
       </section>
 
       {/* Trust Badge Section */}
-      <section className="py-16 bg-gray-50 dark:bg-gray-900">
+      <section className="py-16 bg-muted/20">
         <div className="container mx-auto px-6">
           <motion.p
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
-            className="text-center text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-12"
+            className="text-center text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-12"
           >
             {t.trust.title}
           </motion.p>
@@ -304,10 +304,10 @@ export default function HomeClient() {
                 variants={fadeInUp}
                 className="text-center"
               >
-                <div className="w-20 h-20 mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 flex items-center justify-center text-red-500 dark:text-red-400">
+                <div className="w-20 h-20 mx-auto bg-card rounded-xl shadow-sm border border-border flex items-center justify-center text-primary">
                   {item.icon}
                 </div>
-                <p className="text-xs text-gray-600 dark:text-gray-400 mt-2 font-medium">{item.label}</p>
+                <p className="text-xs text-muted-foreground mt-2 font-medium">{item.label}</p>
               </motion.div>
             ))}
           </motion.div>
@@ -323,10 +323,10 @@ export default function HomeClient() {
             viewport={{ once: true }}
             className="text-center max-w-3xl mx-auto mb-16"
           >
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6">
+            <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
               {t.value.title}
             </h2>
-            <p className="text-xl text-gray-600 dark:text-gray-300">
+            <p className="text-xl text-muted-foreground">
               {t.value.subtitle}
             </p>
           </motion.div>
@@ -343,10 +343,10 @@ export default function HomeClient() {
               <motion.div
                 key={i}
                 variants={fadeInUp}
-                className="bg-white dark:bg-gray-900 p-8 rounded-2xl border border-gray-200 dark:border-gray-800 hover:border-red-500 dark:hover:border-red-500 transition-all"
+                className="bg-card p-8 rounded-2xl border border-border hover:border-primary/50 transition-all"
               >
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">{item.title}</h3>
-                <p className="text-gray-600 dark:text-gray-400">{item.description}</p>
+                <h3 className="text-xl font-bold text-foreground mb-3">{item.title}</h3>
+                <p className="text-muted-foreground">{item.description}</p>
               </motion.div>
             ))}
           </motion.div>
@@ -354,7 +354,7 @@ export default function HomeClient() {
       </section>
 
       {/* Features Grid */}
-      <section id="features" className="py-24 bg-gray-50 dark:bg-gray-900">
+      <section id="features" className="py-24 bg-muted/20">
         <div className="container mx-auto px-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -362,10 +362,10 @@ export default function HomeClient() {
             viewport={{ once: true }}
             className="text-center max-w-3xl mx-auto mb-16"
           >
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6">
+            <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
               {t.features.title}
             </h2>
-            <p className="text-xl text-gray-600 dark:text-gray-300">
+            <p className="text-xl text-muted-foreground">
               {t.features.description}
             </p>
           </motion.div>
@@ -383,12 +383,12 @@ export default function HomeClient() {
                 variants={fadeInUp}
                 whileHover={{ y: -8, transition: { duration: 0.2 } }}
               >
-                <Card className="p-6 h-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-red-200 dark:hover:border-red-900/30 hover:shadow-lg transition-all duration-300">
-                  <div className="w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-xl flex items-center justify-center text-red-500 dark:text-red-400 mb-4">
+                <Card className="p-6 h-full bg-card border border-border hover:border-primary/30 hover:shadow-lg transition-all duration-300">
+                  <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center text-primary mb-4">
                     {feature.icon}
                   </div>
-                  <h3 className="font-semibold text-gray-900 dark:text-white mb-2">{feature.title}</h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">{feature.desc}</p>
+                  <h3 className="font-semibold text-foreground mb-2">{feature.title}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{feature.desc}</p>
                 </Card>
               </motion.div>
             ))}
@@ -405,10 +405,10 @@ export default function HomeClient() {
             viewport={{ once: true }}
             className="text-center max-w-3xl mx-auto mb-16"
           >
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6">
+            <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
               {t.howItWorks.title}
             </h2>
-            <p className="text-xl text-gray-600 dark:text-gray-300">
+            <p className="text-xl text-muted-foreground">
               {t.howItWorks.description}
             </p>
           </motion.div>
@@ -445,15 +445,15 @@ export default function HomeClient() {
                 variants={fadeInUp}
                 className="relative"
               >
-                <Card className="p-8 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 hover:border-red-300 dark:hover:border-red-900/50 transition-all duration-300 h-full">
+                <Card className="p-8 bg-card border-2 border-border hover:border-primary/50 transition-all duration-300 h-full">
                   <div className="absolute -top-6 left-8 w-12 h-12 bg-red-500 text-white rounded-full flex items-center justify-center font-bold text-xl shadow-lg">
                     {item.step}
                   </div>
                   <div className="mt-4 mb-4 text-red-500 dark:text-red-400">
                     {item.icon}
                   </div>
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">{item.title}</h3>
-                  <p className="text-gray-600 dark:text-gray-400">{item.desc}</p>
+                  <h3 className="text-xl font-bold text-foreground mb-3">{item.title}</h3>
+                  <p className="text-muted-foreground">{item.desc}</p>
                 </Card>
               </motion.div>
             ))}
@@ -462,7 +462,7 @@ export default function HomeClient() {
       </section>
 
       {/* Testimonials */}
-      <section id="testimonials" className="py-24 bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-950">
+      <section id="testimonials" className="py-24 bg-gradient-to-b from-muted/20 to-background">
         <div className="container mx-auto px-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -470,10 +470,10 @@ export default function HomeClient() {
             viewport={{ once: true }}
             className="text-center max-w-3xl mx-auto mb-16"
           >
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6">
+            <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
               {t.testimonials.title}
             </h2>
-            <p className="text-xl text-gray-600 dark:text-gray-300">
+            <p className="text-xl text-muted-foreground">
               {t.testimonials.description}
             </p>
           </motion.div>
@@ -491,17 +491,17 @@ export default function HomeClient() {
                 variants={fadeInUp}
                 whileHover={{ y: -8 }}
               >
-                <Card className="p-8 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all duration-300 h-full">
+                <Card className="p-8 bg-card border border-border hover:shadow-xl transition-all duration-300 h-full">
                   <div className="flex items-center gap-4 mb-6">
-                    <div className="w-14 h-14 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center">
-                      <Users className="h-7 w-7 text-red-500 dark:text-red-400" />
+                    <div className="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center">
+                      <Users className="h-7 w-7 text-primary" />
                     </div>
                     <div>
-                      <h4 className="font-bold text-gray-900 dark:text-white">{testimonial.name}</h4>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">{testimonial.business}</p>
+                      <h4 className="font-bold text-foreground">{testimonial.name}</h4>
+                      <p className="text-sm text-muted-foreground">{testimonial.business}</p>
                     </div>
                   </div>
-                  <p className="text-gray-600 dark:text-gray-300 italic leading-relaxed mb-6">
+                  <p className="text-muted-foreground italic leading-relaxed mb-6">
                     "{testimonial.quote}"
                   </p>
                   <div className="flex gap-1">
@@ -517,7 +517,7 @@ export default function HomeClient() {
       </section>
 
       {/* Pricing Section */}
-      <section id="pricing" className="py-24 bg-gray-50 dark:bg-gray-900">
+      <section id="pricing" className="py-24 bg-muted/20">
         <div className="container mx-auto px-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -525,10 +525,10 @@ export default function HomeClient() {
             viewport={{ once: true }}
             className="text-center max-w-3xl mx-auto mb-16"
           >
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6">
+            <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
               {t.pricingSection.title}
             </h2>
-            <p className="text-xl text-gray-600 dark:text-gray-300">
+            <p className="text-xl text-muted-foreground">
               {t.pricingSection.description}
             </p>
           </motion.div>
@@ -542,19 +542,19 @@ export default function HomeClient() {
           >
             {/* Standard Plan */}
             <motion.div variants={fadeInUp}>
-              <Card className="p-8 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-xl h-full flex flex-col">
+              <Card className="p-8 bg-card border border-border shadow-xl h-full flex flex-col">
                 <div className="text-center mb-8">
-                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{t.pricingSection.cardTitle}</h3>
+                  <h3 className="text-2xl font-bold text-foreground mb-2">{t.pricingSection.cardTitle}</h3>
                   <div className="flex items-end justify-center gap-1 mb-2">
                     <span className="text-5xl font-bold text-red-500">{t.pricingSection.price}</span>
-                    <span className="text-gray-500 dark:text-gray-400 mb-2">{t.pricingSection.period}</span>
+                    <span className="text-muted-foreground mb-2">{t.pricingSection.period}</span>
                   </div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">{t.pricingSection.caption}</p>
+                  <p className="text-sm text-muted-foreground">{t.pricingSection.caption}</p>
                 </div>
 
                 <ul className="space-y-4 mb-8 flex-grow">
                   {t.pricingSection.features.map((feature, i) => (
-                    <li key={i} className="flex items-center gap-3 text-gray-700 dark:text-gray-300">
+                    <li key={i} className="flex items-center gap-3 text-foreground">
                       <CheckCircle2 className="h-5 w-5 text-green-500 shrink-0" />
                       <span>{feature}</span>
                     </li>
@@ -571,22 +571,22 @@ export default function HomeClient() {
 
             {/* Premium Plan */}
             <motion.div variants={fadeInUp}>
-              <Card className="p-8 bg-white dark:bg-gray-800 border-2 border-red-500 shadow-2xl relative overflow-hidden h-full flex flex-col">
+              <Card className="p-8 bg-card border-2 border-primary shadow-2xl relative overflow-hidden h-full flex flex-col">
                 <div className="absolute top-0 right-0 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-bl-lg uppercase tracking-wider">
                   Popular
                 </div>
                 <div className="text-center mb-8">
-                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{t.pricingSection.premiumCardTitle}</h3>
+                  <h3 className="text-2xl font-bold text-foreground mb-2">{t.pricingSection.premiumCardTitle}</h3>
                   <div className="flex items-end justify-center gap-1 mb-2">
                     <span className="text-5xl font-bold text-red-500">{t.pricingSection.premiumPrice}</span>
-                    <span className="text-gray-500 dark:text-gray-400 mb-2">{t.pricingSection.period}</span>
+                    <span className="text-muted-foreground mb-2">{t.pricingSection.period}</span>
                   </div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">{t.pricingSection.caption}</p>
+                  <p className="text-sm text-muted-foreground">{t.pricingSection.caption}</p>
                 </div>
 
                 <ul className="space-y-4 mb-8 flex-grow">
                   {t.pricingSection.premiumFeatures.map((feature, i) => (
-                    <li key={i} className="flex items-center gap-3 text-gray-700 dark:text-gray-300">
+                    <li key={i} className="flex items-center gap-3 text-foreground">
                       <CheckCircle2 className="h-5 w-5 text-green-500 shrink-0" />
                       <span>{feature}</span>
                     </li>
@@ -638,7 +638,7 @@ export default function HomeClient() {
       </section>
 
       {/* Footer */}
-      <footer className="py-12 bg-gray-900 dark:bg-black text-white">
+      <footer className="py-12 bg-black text-white border-t border-border">
         <div className="container mx-auto px-6">
           <div className="grid md:grid-cols-4 gap-8">
             <div>

@@ -1,14 +1,12 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Loader2 } from "lucide-react"
 import { Logo } from "@/src/components/logo"
 
@@ -22,29 +20,53 @@ export default function RegisterPage() {
   const [formData, setFormData] = useState({
     name: "",
     whatsappNumber: "",
-    ownerAgeRange: "",
-    ownerSex: "",
-    country: "",
+    pin: "",
+    country: "Senegal", // Default
   })
+  const [confirmPin, setConfirmPin] = useState("")
   const [otp, setOtp] = useState("")
   const [restaurantId, setRestaurantId] = useState("")
+
+  // Auto-detect country on mount
+  useEffect(() => {
+    try {
+      const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      if (timeZone.includes("Abidjan") || timeZone.includes("Yamoussoukro")) {
+        setFormData(prev => ({ ...prev, country: "Ivory Coast" }));
+      } else if (timeZone.includes("Lagos")) {
+        setFormData(prev => ({ ...prev, country: "Nigeria" }));
+      } else if (timeZone.includes("Dakar")) {
+        setFormData(prev => ({ ...prev, country: "Senegal" }));
+      } else {
+        // Keep default or set to Other
+        // setFormData(prev => ({ ...prev, country: "Other" }));
+      }
+    } catch (e) {
+      console.error("Timezone detection failed", e);
+    }
+  }, []);
 
   const handleChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }))
   }
 
   const handleNext = () => {
-    if (step < 4) {
-      setStep(step + 1)
-    } else {
-      // Sanitize phone number: remove non-digits
-      const sanitizedPhone = formData.whatsappNumber.replace(/\D/g, "")
-      setFormData(prev => ({ ...prev, whatsappNumber: sanitizedPhone }))
-      initiateRegistration()
-    }
+    // Sanitize phone number: remove non-digits
+    const sanitizedPhone = formData.whatsappNumber.replace(/\D/g, "")
+    setFormData(prev => ({ ...prev, whatsappNumber: sanitizedPhone }))
+    initiateRegistration()
   }
 
   const initiateRegistration = async () => {
+    if (formData.pin !== confirmPin) {
+      setError("PINs do not match");
+      return;
+    }
+    if (formData.pin.length < 4) {
+      setError("PIN must be at least 4 digits");
+      return;
+    }
+
     setLoading(true)
     setError("")
     try {
@@ -62,7 +84,7 @@ export default function RegisterPage() {
       if (!res.ok) throw new Error(data.error || "Failed to initiate registration")
 
       setRestaurantId(data.restaurantId)
-      setStep(5) // Move to OTP step
+      setStep(2) // Move to OTP step
     } catch (err: any) {
       setError(err.message)
     } finally {
@@ -82,10 +104,24 @@ export default function RegisterPage() {
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || "Verification failed")
 
-      // Success - Redirect to dashboard or onboarding
-      router.push("/dashboard")
+      // Login immediately using the PIN and credentials
+      const { signIn } = await import("next-auth/react");
+      const result = await signIn("credentials", {
+        redirect: false,
+        email: `${formData.whatsappNumber.replace(/\D/g, "")}@mafal.ia`,
+        password: formData.pin,
+      });
+
+      if (result?.error) {
+        throw new Error("Login failed after verification");
+      }
+
+      // Success - Redirect to onboarding complete profile
+      router.push("/onboarding/complete-profile")
     } catch (err: any) {
       setError(err.message)
+      // If login fails, user is verified but not logged in.
+      // Redirect to login? Or let them retry?
     } finally {
       setLoading(false)
     }
@@ -93,11 +129,13 @@ export default function RegisterPage() {
 
   const isStepValid = () => {
     switch (step) {
-      case 1: return !!formData.name
-      case 2: return !!formData.whatsappNumber
-      case 3: return !!formData.ownerAgeRange && !!formData.ownerSex
-      case 4: return !!formData.country
-      case 5: return otp.length === 6
+      case 1:
+        return !!formData.name &&
+          !!formData.whatsappNumber &&
+          !!formData.pin &&
+          formData.pin === confirmPin &&
+          formData.pin.length >= 4;
+      case 2: return otp.length === 6
       default: return false
     }
   }
@@ -111,31 +149,22 @@ export default function RegisterPage() {
           </Link>
         </div>
         <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-          Create your account
+          Commencer
         </h2>
         <p className="mt-2 text-center text-sm text-gray-600">
-          Start automating your restaurant today.
+          Inscription rapide — votre compte sera validé par un administrateur
         </p>
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <Card className="shadow-lg border-gray-100 dark:border-gray-800">
-          <div className="h-1 w-full bg-gray-100 rounded-t-md overflow-hidden">
-            <div
-              className="h-full bg-primary transition-all duration-300 ease-out"
-              style={{ width: `${(step / 5) * 100}%` }}
-            />
-          </div>
           <CardHeader>
             <CardTitle>
-              {step === 1 && "Basic Information"}
-              {step === 2 && "WhatsApp Contact"}
-              {step === 3 && "Owner Details"}
-              {step === 4 && "Location"}
-              {step === 5 && "Verify your number"}
+              {step === 1 && "Start Growth"}
+              {step === 2 && "Vérifiez votre numéro"}
             </CardTitle>
             <CardDescription>
-              {step === 5 ? "Enter the 6-digit code sent to your WhatsApp." : "Please fill in the details below."}
+              {step === 2 ? "Entrez le code à 6 chiffres envoyé par SMS." : "Vos informations de base."}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -148,14 +177,61 @@ export default function RegisterPage() {
             {step === 1 && (
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="name">Establishment Name</Label>
+                  <Label htmlFor="name">Nom du restaurant *</Label>
                   <Input
                     id="name"
-                    placeholder="e.g. Chez Fatou"
+                    placeholder="Nom du restaurant"
                     value={formData.name}
                     onChange={(e) => handleChange("name", e.target.value)}
                     autoFocus
                   />
+                </div>
+
+                <div className="space-y-2">
+                  {/* Simplified Type handled later. Auto-Country hidden or shown? 
+                        User said "Auto detect country".
+                        The mocked UI showed "Type d'etablissement" but user said "le reste il le fait aprés l'activation".
+                        So I will NOT ask for type here.
+                    */}
+
+                  <Label htmlFor="phone">Numéro de téléphone *</Label>
+                  <Input
+                    id="phone"
+                    placeholder="770000000"
+                    type="tel"
+                    value={formData.whatsappNumber}
+                    onChange={(e) => handleChange("whatsappNumber", e.target.value)}
+                  />
+                  <p className="text-xs text-gray-500">L'indicatif +221 sera ajouté automatiquement (si c'est sénégal)</p>
+                  {/* Actually we should probably just ask for full number or handle country code based on detection.
+                       I'll stick to full number expectation or handle the "Country" display as info.
+                   */}
+                  {formData.country && <p className="text-xs text-green-600">Pays détecté: {formData.country}</p>}
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="pin">Code PIN *</Label>
+                    <Input
+                      id="pin"
+                      type="password"
+                      placeholder="...."
+                      maxLength={6}
+                      value={formData.pin}
+                      onChange={(e) => handleChange("pin", e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="confirmPin">Confirmer le code PIN *</Label>
+                    <Input
+                      id="confirmPin"
+                      type="password"
+                      placeholder="Confirmez votre code PIN"
+                      maxLength={6}
+                      value={confirmPin}
+                      onChange={(e) => setConfirmPin(e.target.value)}
+                    />
+                  </div>
                 </div>
               </div>
             )}
@@ -163,75 +239,7 @@ export default function RegisterPage() {
             {step === 2 && (
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="phone">Commercial WhatsApp Number</Label>
-                  <Input
-                    id="phone"
-                    placeholder="e.g. 221770000000"
-                    type="tel"
-                    value={formData.whatsappNumber}
-                    onChange={(e) => handleChange("whatsappNumber", e.target.value)}
-                    autoFocus
-                  />
-                  <p className="text-xs text-gray-500">Include country code without +</p>
-                </div>
-              </div>
-            )}
-
-            {step === 3 && (
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label>Age Range</Label>
-                  <Select value={formData.ownerAgeRange} onValueChange={(val) => handleChange("ownerAgeRange", val)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select age range" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="18-25">18 - 25</SelectItem>
-                      <SelectItem value="26-35">26 - 35</SelectItem>
-                      <SelectItem value="36-45">36 - 45</SelectItem>
-                      <SelectItem value="46+">46+</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label>Sex</Label>
-                  <RadioGroup value={formData.ownerSex} onValueChange={(val) => handleChange("ownerSex", val)} className="flex gap-4">
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="M" id="sex-m" />
-                      <Label htmlFor="sex-m">Male</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="F" id="sex-f" />
-                      <Label htmlFor="sex-f">Female</Label>
-                    </div>
-                  </RadioGroup>
-                </div>
-              </div>
-            )}
-
-            {step === 4 && (
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="country">Country</Label>
-                  <Select value={formData.country} onValueChange={(val) => handleChange("country", val)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select country" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Senegal">Senegal</SelectItem>
-                      <SelectItem value="Ivory Coast">Ivory Coast</SelectItem>
-                      <SelectItem value="Nigeria">Nigeria</SelectItem>
-                      <SelectItem value="Other">Other</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            )}
-
-            {step === 5 && (
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="otp">Verification Code</Label>
+                  <Label htmlFor="otp">Code de vérification</Label>
                   <Input
                     id="otp"
                     placeholder="123456"
@@ -246,19 +254,22 @@ export default function RegisterPage() {
             )}
           </CardContent>
           <CardFooter className="flex justify-between border-t border-gray-100 dark:border-gray-800 pt-6">
-            {step > 1 && step < 5 && (
-              <Button variant="ghost" onClick={() => setStep(step - 1)} disabled={loading}>
-                Back
+            {step === 2 && (
+              <Button variant="ghost" onClick={() => setStep(1)} disabled={loading}>
+                Retour
               </Button>
             )}
             <Button
               className={`${step === 1 ? "w-full" : "ml-auto"}`}
-              onClick={step === 5 ? verifyOtp : handleNext}
+              onClick={step === 2 ? verifyOtp : handleNext}
               disabled={!isStepValid() || loading}
             >
-              {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : (step === 5 ? "Verify & Start" : (step === 4 ? "Send Code" : "Continue"))}
+              {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : (step === 2 ? "Valider" : "Commencer")}
             </Button>
           </CardFooter>
+          <div className="text-center pb-4 text-sm text-gray-500">
+            Vous avez déjà un compte ? <Link href="/login" className="text-primary hover:underline">Connectez-vous</Link>
+          </div>
         </Card>
       </div>
     </div>
