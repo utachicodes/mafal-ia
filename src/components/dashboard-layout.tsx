@@ -49,9 +49,9 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   }
 
   const SidebarContent = () => (
-    <div className="flex flex-col h-full bg-white dark:bg-gray-950 border-r border-gray-200 dark:border-gray-800 transition-all duration-300">
+    <div className="flex flex-col h-full bg-gradient-to-b from-white to-gray-50/50 dark:from-gray-950 dark:to-gray-900/50 border-r border-gray-200 dark:border-gray-800 transition-all duration-300">
       {/* Logo Area */}
-      <div className={cn("flex items-center h-16 px-6 border-b border-gray-100 dark:border-gray-900", collapsed && "justify-center px-2")}>
+      <div className={cn("flex items-center h-16 px-6 border-b border-gray-100 dark:border-gray-900 bg-white/50 dark:bg-gray-950/50 backdrop-blur-sm", collapsed && "justify-center px-2")}>
         <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
           <Logo className={cn("h-8", collapsed && "w-10 overflow-hidden")} />
         </Link>
@@ -67,33 +67,44 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
               key={item.name}
               href={item.href}
               className={cn(
-                "group flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition-colors duration-200",
+                "group relative flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200",
                 isActive
-                  ? "bg-red-50 text-red-600 dark:bg-red-950/20 dark:text-red-400"
-                  : "text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-900 dark:hover:text-gray-200",
+                  ? "bg-gradient-to-r from-red-50 to-red-50/50 text-red-600 dark:from-red-950/30 dark:to-red-950/10 dark:text-red-400 shadow-sm"
+                  : "text-gray-600 hover:bg-gradient-to-r hover:from-gray-50 hover:to-transparent hover:text-gray-900 dark:text-gray-400 dark:hover:from-gray-900/50 dark:hover:to-transparent dark:hover:text-gray-200",
                 collapsed && "justify-center px-2"
               )}
               onClick={() => setSidebarOpen(false)}
               title={collapsed ? item.name : undefined}
             >
-              <Icon className={cn("h-5 w-5 shrink-0 transition-colors", isActive ? "text-red-500 dark:text-red-400" : "text-gray-400 group-hover:text-gray-600 dark:text-gray-500 dark:group-hover:text-gray-300")} />
+              {isActive && (
+                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-gradient-to-b from-red-500 to-red-600 rounded-r-full" />
+              )}
+              <Icon className={cn(
+                "h-5 w-5 shrink-0 transition-all duration-200",
+                isActive
+                  ? "text-red-500 dark:text-red-400 scale-110"
+                  : "text-gray-400 group-hover:text-gray-600 dark:text-gray-500 dark:group-hover:text-gray-300 group-hover:scale-105"
+              )} />
               {!collapsed && <span>{item.name}</span>}
+              {!collapsed && isActive && (
+                <div className="ml-auto w-1.5 h-1.5 rounded-full bg-red-500 dark:bg-red-400" />
+              )}
             </Link>
           )
         })}
       </nav>
 
       {/* User Profile */}
-      <div className="p-4 border-t border-gray-100 dark:border-gray-900">
-        <div className={cn("flex items-center gap-3", collapsed && "justify-center")}>
-          <Avatar className="h-9 w-9 border border-gray-200 dark:border-gray-800">
-            <AvatarFallback className="bg-red-50 text-red-600 dark:bg-red-950/30 dark:text-red-400 font-medium text-xs">
+      <div className="p-4 border-t border-gray-100 dark:border-gray-900 bg-white/50 dark:bg-gray-950/50 backdrop-blur-sm">
+        <div className={cn("flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors", collapsed && "justify-center p-2")}>
+          <Avatar className="h-9 w-9 border-2 border-gray-200 dark:border-gray-800 shadow-sm">
+            <AvatarFallback className="bg-gradient-to-br from-red-50 to-red-100 text-red-600 dark:from-red-950/30 dark:to-red-900/20 dark:text-red-400 font-semibold text-xs">
               {session?.user?.name?.[0]?.toUpperCase() || "U"}
             </AvatarFallback>
           </Avatar>
           {!collapsed && (
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+              <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">
                 {session?.user?.name || "User"}
               </p>
               <p className="text-xs text-gray-500 dark:text-gray-400 truncate capitalize">
