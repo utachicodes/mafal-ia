@@ -12,7 +12,6 @@ import { Logo } from "@/src/components/logo"
 
 export default function RegisterPage() {
   const router = useRouter()
-  const [step, setStep] = useState(1)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
 
@@ -24,8 +23,6 @@ export default function RegisterPage() {
     country: "Senegal", // Default
   })
   const [confirmPin, setConfirmPin] = useState("")
-  const [otp, setOtp] = useState("")
-  const [restaurantId, setRestaurantId] = useState("")
 
   // Auto-detect country on mount
   useEffect(() => {
@@ -81,30 +78,9 @@ export default function RegisterPage() {
         body: JSON.stringify(payload),
       })
       const data = await res.json()
-      if (!res.ok) throw new Error(data.error || "Failed to initiate registration")
+      if (!res.ok) throw new Error(data.error || "Failed to create account")
 
-      setRestaurantId(data.restaurantId)
-      setStep(2) // Move to OTP step
-    } catch (err: any) {
-      setError(err.message)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const verifyOtp = async () => {
-    setLoading(true)
-    setError("")
-    try {
-      const res = await fetch("/api/register/verify", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ restaurantId, otp }),
-      })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error || "Verification failed")
-
-      // Login immediately using the PIN and credentials
+      // Account created successfully - now login
       const { signIn } = await import("next-auth/react");
       const result = await signIn("credentials", {
         redirect: false,
@@ -113,162 +89,117 @@ export default function RegisterPage() {
       });
 
       if (result?.error) {
-        throw new Error("Login failed after verification");
+        throw new Error("Login failed after registration");
       }
 
-      // Success - Redirect to onboarding complete profile
-      router.push("/onboarding/complete-profile")
+      // Success - Redirect to dashboard
+      router.push("/dashboard")
     } catch (err: any) {
       setError(err.message)
-      // If login fails, user is verified but not logged in.
-      // Redirect to login? Or let them retry?
     } finally {
       setLoading(false)
     }
   }
 
-  const isStepValid = () => {
-    switch (step) {
-      case 1:
-        return !!formData.name &&
-          !!formData.whatsappNumber &&
-          !!formData.pin &&
-          formData.pin === confirmPin &&
-          formData.pin.length >= 4;
-      case 2: return otp.length === 6
-      default: return false
-    }
+  const isFormValid = () => {
+    return formData.name && formData.whatsappNumber && formData.pin && confirmPin
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="flex justify-center mb-6">
-          <Link href="/" className="hover:opacity-80 transition-opacity">
-            <Logo className="h-10" />
-          </Link>
-        </div>
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-          Commencer
-        </h2>
-        <p className="mt-2 text-center text-sm text-gray-600">
-          Inscription rapide — votre compte sera validé par un administrateur
-        </p>
-      </div>
+    <div className="min-h-screen flex items-center justify-center bg-background p-4">
+      {/* Container for perfect centering */}
+      <div className="w-full max-w-md space-y-8">
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <Card className="shadow-lg border-gray-100 dark:border-gray-800">
+        <div className="flex flex-col items-center justify-center">
+          <Link href="/" className="hover:opacity-80 transition-opacity mb-6">
+            <Logo className="h-12 w-auto" />
+          </Link>
+          <h2 className="text-3xl font-bold tracking-tight text-foreground text-center">
+            Commencer
+          </h2>
+          <p className="mt-2 text-sm text-muted-foreground text-center">
+            Inscription rapide — votre compte sera validé par un administrateur
+          </p>
+        </div>
+
+        <Card className="glass border-white/20 dark:border-white/10 shadow-xl">
           <CardHeader>
-            <CardTitle>
-              {step === 1 && "Start Growth"}
-              {step === 2 && "Vérifiez votre numéro"}
-            </CardTitle>
-            <CardDescription>
-              {step === 2 ? "Entrez le code à 6 chiffres envoyé par SMS." : "Vos informations de base."}
-            </CardDescription>
+            <CardTitle className="text-xl">Start Growth</CardTitle>
+            <CardDescription>Vos informations de base.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {error && (
-              <div className="bg-red-50 text-red-600 p-3 rounded-md text-sm border border-red-100">
+              <div className="bg-destructive/10 text-destructive p-3 rounded-md text-sm border border-destructive/20">
                 {error}
               </div>
             )}
 
-            {step === 1 && (
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="name">Nom du restaurant *</Label>
-                  <Input
-                    id="name"
-                    placeholder="Nom du restaurant"
-                    value={formData.name}
-                    onChange={(e) => handleChange("name", e.target.value)}
-                    autoFocus
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  {/* Simplified Type handled later. Auto-Country hidden or shown? 
-                        User said "Auto detect country".
-                        The mocked UI showed "Type d'etablissement" but user said "le reste il le fait aprés l'activation".
-                        So I will NOT ask for type here.
-                    */}
-
-                  <Label htmlFor="phone">Numéro de téléphone *</Label>
-                  <Input
-                    id="phone"
-                    placeholder="770000000"
-                    type="tel"
-                    value={formData.whatsappNumber}
-                    onChange={(e) => handleChange("whatsappNumber", e.target.value)}
-                  />
-                  <p className="text-xs text-gray-500">L'indicatif +221 sera ajouté automatiquement (si c'est sénégal)</p>
-                  {/* Actually we should probably just ask for full number or handle country code based on detection.
-                       I'll stick to full number expectation or handle the "Country" display as info.
-                   */}
-                  {formData.country && <p className="text-xs text-green-600">Pays détecté: {formData.country}</p>}
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="pin">Code PIN *</Label>
-                    <Input
-                      id="pin"
-                      type="password"
-                      placeholder="...."
-                      maxLength={6}
-                      value={formData.pin}
-                      onChange={(e) => handleChange("pin", e.target.value)}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="confirmPin">Confirmer le code PIN *</Label>
-                    <Input
-                      id="confirmPin"
-                      type="password"
-                      placeholder="Confirmez votre code PIN"
-                      maxLength={6}
-                      value={confirmPin}
-                      onChange={(e) => setConfirmPin(e.target.value)}
-                    />
-                  </div>
-                </div>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="name">Nom du restaurant *</Label>
+                <Input
+                  id="name"
+                  placeholder="Nom du restaurant"
+                  value={formData.name}
+                  onChange={(e) => handleChange("name", e.target.value)}
+                  autoFocus
+                  className="bg-transparent"
+                />
               </div>
-            )}
 
-            {step === 2 && (
-              <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="phone">Numéro de téléphone *</Label>
+                <Input
+                  id="phone"
+                  placeholder="770000000"
+                  type="tel"
+                  value={formData.whatsappNumber}
+                  onChange={(e) => handleChange("whatsappNumber", e.target.value)}
+                  className="bg-transparent"
+                />
+                <p className="text-xs text-muted-foreground">L'indicatif +221 sera ajouté automatiquement (si c'est sénégal)</p>
+                {formData.country && <p className="text-xs text-green-600">Pays détecté: {formData.country}</p>}
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="otp">Code de vérification</Label>
+                  <Label htmlFor="pin">Code PIN *</Label>
                   <Input
-                    id="otp"
-                    placeholder="123456"
+                    id="pin"
+                    type="password"
+                    placeholder="...."
                     maxLength={6}
-                    value={otp}
-                    onChange={(e) => setOtp(e.target.value)}
-                    className="text-center text-lg tracking-widest"
-                    autoFocus
+                    value={formData.pin}
+                    onChange={(e) => handleChange("pin", e.target.value)}
+                    className="bg-transparent"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="confirmPin">Confirmer le code PIN *</Label>
+                  <Input
+                    id="confirmPin"
+                    type="password"
+                    placeholder="Confirmez"
+                    maxLength={6}
+                    value={confirmPin}
+                    onChange={(e) => setConfirmPin(e.target.value)}
+                    className="bg-transparent"
                   />
                 </div>
               </div>
-            )}
+            </div>
           </CardContent>
-          <CardFooter className="flex justify-between border-t border-gray-100 dark:border-gray-800 pt-6">
-            {step === 2 && (
-              <Button variant="ghost" onClick={() => setStep(1)} disabled={loading}>
-                Retour
-              </Button>
-            )}
+          <CardFooter className="flex justify-between pt-2 pb-6">
             <Button
-              className={`${step === 1 ? "w-full" : "ml-auto"}`}
-              onClick={step === 2 ? verifyOtp : handleNext}
-              disabled={!isStepValid() || loading}
+              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
+              onClick={handleNext}
+              disabled={!isFormValid() || loading}
             >
-              {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : (step === 2 ? "Valider" : "Commencer")}
+              {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Créer mon compte"}
             </Button>
           </CardFooter>
-          <div className="text-center pb-4 text-sm text-gray-500">
-            Vous avez déjà un compte ? <Link href="/login" className="text-primary hover:underline">Connectez-vous</Link>
+          <div className="text-center pb-6 text-sm text-muted-foreground">
+            Vous avez déjà un compte ? <Link href="/login" className="text-primary hover:underline font-medium">Connectez-vous</Link>
           </div>
         </Card>
       </div>

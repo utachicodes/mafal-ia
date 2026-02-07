@@ -3,9 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
 }
 
 // B2B2C User Management
@@ -86,7 +85,7 @@ model Restaurant {
   createdAt             DateTime       @default(now())
   updatedAt             DateTime       @updatedAt
   apiKeyCreatedAt       DateTime?
-  apiKeyHash            String?        @db.VarChar(128)
+  apiKeyHash            String?
   apiKeyRevokedAt       DateTime?
   conversations         Conversation[]
   menuItems             MenuItem[]
