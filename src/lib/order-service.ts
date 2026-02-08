@@ -63,4 +63,17 @@ export class OrderService {
       orderBy: { createdAt: "desc" },
     })
   }
+
+  static async getAllOrders(): Promise<(OrderRecord & { restaurant: { name: string } | null })[]> {
+    const prisma = await getPrisma()
+    return prisma.order.findMany({
+      orderBy: { createdAt: "desc" },
+      include: {
+        restaurant: {
+          select: { name: true }
+        }
+      },
+      take: 100
+    })
+  }
 }
