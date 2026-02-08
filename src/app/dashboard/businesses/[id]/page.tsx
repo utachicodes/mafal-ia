@@ -39,25 +39,25 @@ export default async function RestaurantDashboardPage({ params }: RestaurantPage
             title: "Menu Management",
             description: "Manage your menu items and categories",
             icon: UtensilsCrossed,
-            href: `/restaurants/${id}/menu`,
+            href: `/dashboard/businesses/${id}/menu`,
         },
         {
             title: "Chat Analytics",
             description: "View how customers are interacting with your agent",
             icon: BarChart3,
-            href: `/restaurants/${id}/analytics`,
+            href: `/dashboard/businesses/${id}/analytics`,
         },
         {
             title: "WhatsApp Settings",
             description: "Configure your WhatsApp integration and auto-responses",
             icon: MessageSquare,
-            href: `/restaurants/${id}/whatsapp`,
+            href: `/dashboard/businesses/${id}/whatsapp`,
         },
         {
             title: "General Settings",
             description: "Basic restaurant info, location, and operating hours",
             icon: Settings,
-            href: `/restaurants/${id}/settings`,
+            href: `/dashboard/businesses/${id}/settings`,
         }
     ]
 
@@ -67,9 +67,9 @@ export default async function RestaurantDashboardPage({ params }: RestaurantPage
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div className="space-y-1">
                     <Button variant="ghost" asChild className="-ml-2 mb-2 text-muted-foreground hover:text-foreground">
-                        <Link href="/restaurants">
+                        <Link href="/dashboard/businesses">
                             <ArrowLeft className="mr-2 h-4 w-4" />
-                            Back to Restaurants
+                            Back to Businesses
                         </Link>
                     </Button>
                     <div className="flex items-center gap-3">
@@ -82,7 +82,7 @@ export default async function RestaurantDashboardPage({ params }: RestaurantPage
                     </div>
                     <div className="flex items-center text-sm text-muted-foreground">
                         <Store className="mr-2 h-4 w-4" />
-                        {restaurant.cuisine} Restaurant
+                        {restaurant.cuisine} Business
                         <span className="mx-2">•</span>
                         <span className="uppercase font-mono text-xs">{id.slice(-6)}</span>
                     </div>
@@ -90,7 +90,7 @@ export default async function RestaurantDashboardPage({ params }: RestaurantPage
 
                 <div className="flex gap-2">
                     <Button variant="outline" asChild>
-                        <Link href={`/restaurants/${id}/preview`}>
+                        <Link href={`/dashboard/businesses/${id}/preview`}>
                             <ExternalLink className="mr-2 h-4 w-4" />
                             Preview Agent
                         </Link>

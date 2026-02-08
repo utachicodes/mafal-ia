@@ -4,13 +4,13 @@ export const AnalyticsService = {
     async getDashboardStats() {
         const prisma = await getPrisma()
 
-        // 1. Total Revenue (Sum of completed orders)
+        // 1. Total Revenue (Sum of delivered orders)
         const revenueResult = await prisma.order.aggregate({
             _sum: {
                 total: true,
             },
             where: {
-                status: "completed",
+                status: "delivered",
             },
         })
         const totalRevenue = revenueResult._sum.total || 0
@@ -25,11 +25,11 @@ export const AnalyticsService = {
         // 3. Total Orders
         const totalOrders = await prisma.order.count()
 
-        // 4. Active Orders (pending or processing)
+        // 4. Active Orders (pending, confirmed, or preparing)
         const activeOrders = await prisma.order.count({
             where: {
                 status: {
-                    in: ["pending", "processing"]
+                    in: ["pending", "confirmed", "preparing"]
                 }
             }
         })

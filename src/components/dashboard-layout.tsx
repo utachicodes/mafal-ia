@@ -23,10 +23,10 @@ import { Skeleton } from "@/components/ui/skeleton"
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: Home },
-  { name: "Orders", href: "/orders", icon: ShoppingBag },
-  { name: "Analytics", href: "/analytics", icon: BarChart3 },
-  { name: "Restaurants", href: "/restaurants", icon: Store },
-  { name: "Settings", href: "/settings", icon: Settings },
+  { name: "Orders", href: "/dashboard/orders", icon: ShoppingBag },
+  { name: "Analytics", href: "/dashboard/analytics", icon: BarChart3 },
+  { name: "Businesses", href: "/dashboard/businesses", icon: Store },
+  { name: "Settings", href: "/dashboard/settings", icon: Settings },
 ]
 
 interface DashboardLayoutProps {
@@ -162,7 +162,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
             </div>
             <div className="h-8 w-px bg-gray-200 dark:bg-gray-800 hidden sm:block"></div>
             <Button asChild variant="ghost" className="hidden sm:flex items-center gap-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-800">
-              <Link href="/settings">
+              <Link href="/dashboard/settings">
                 <Settings className="w-4 h-4" />
                 <span>Settings</span>
               </Link>

@@ -23,14 +23,16 @@ import {
 
 export default function SettingsPage() {
   return (
-    <div className="space-y-6 py-6 max-w-5xl mx-auto">
-      <div className="border-b border-gray-100 dark:border-gray-800 pb-6">
-        <h1 className="text-3xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-400">
-          Settings
-        </h1>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-          Manage your account settings and preferences.
-        </p>
+    <div className="space-y-8 py-2 h-full">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-gray-100 dark:border-gray-800 pb-6">
+        <div className="space-y-2">
+          <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+            Settings
+          </h1>
+          <p className="text-gray-500 dark:text-gray-400">
+            Manage your account settings and preferences.
+          </p>
+        </div>
       </div>
 
       <div className="grid gap-8 md:grid-cols-[250px_1fr]">

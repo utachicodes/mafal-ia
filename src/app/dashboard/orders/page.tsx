@@ -35,14 +35,14 @@ export default async function OrdersPage() {
   const orders = await OrderService.getAllOrders() as unknown as Order[]
 
   return (
-    <div className="space-y-6 py-6">
+    <div className="space-y-8 py-2 h-full">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-gray-100 dark:border-gray-800 pb-6">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+        <div className="space-y-2">
+          <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
             Orders
           </h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400">
-            Manage and track your restaurant orders
+          <p className="text-gray-500 dark:text-gray-400">
+            Manage and track your business orders
           </p>
         </div>
         <div className="flex gap-2">
@@ -50,7 +50,7 @@ export default async function OrdersPage() {
             <Download className="h-4 w-4" />
             Export
           </Button>
-          <Button size="sm" className="h-9 bg-red-600 hover:bg-red-700 text-white gap-2">
+          <Button size="sm" className="h-9 bg-red-600 hover:bg-red-700 text-white gap-2 shadow-sm">
             <Filter className="h-4 w-4" />
             Filter
           </Button>

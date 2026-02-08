@@ -24,16 +24,16 @@ export default async function DashboardPage() {
   const session = await getServerSession(authOptions)
 
   if (!session) {
-    redirect("/login")
+    redirect("/auth/signin")
   }
 
   const userPlan = (session?.user as any)?.plan || "STANDARD"
   const data = await AnalyticsService.getDashboardStats()
 
   const quickActions = [
-    { title: "New Order", href: "/orders/new", icon: Plus, color: "bg-red-50 text-red-600 dark:bg-red-950/30 dark:text-red-400" },
-    { title: "Add Restaurant", href: "/restaurants/new", icon: Store, color: "bg-blue-50 text-blue-600 dark:bg-blue-950/30 dark:text-blue-400" },
-    { title: "View Analytics", href: "/analytics", icon: BarChart3, color: "bg-green-50 text-green-600 dark:bg-green-950/30 dark:text-green-400" },
+    { title: "New Order", href: "/dashboard/orders/new", icon: Plus, color: "bg-red-50 text-red-600 dark:bg-red-950/30 dark:text-red-400" },
+    { title: "Add Business", href: "/dashboard/businesses/new", icon: Store, color: "bg-blue-50 text-blue-600 dark:bg-blue-950/30 dark:text-blue-400" },
+    { title: "View Analytics", href: "/dashboard/analytics", icon: BarChart3, color: "bg-green-50 text-green-600 dark:bg-green-950/30 dark:text-green-400" },
   ]
 
   const stats = [
@@ -141,20 +141,20 @@ export default async function DashboardPage() {
       </div>
 
       {/* Promotion Card */}
-      <Card className="relative overflow-hidden bg-gradient-to-br from-red-600 via-red-700 to-red-800 text-white border-none shadow-xl mt-8">
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj48cGF0aCBkPSJNIDQwIDAgTCAwIDAgMCA0MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLW9wYWNpdHk9IjAuMDUiIHN0cm9rZS13aWR0aD0iMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIvPjwvc3ZnPg==')] opacity-30" />
-        <CardContent className="relative p-6 flex flex-col md:flex-row items-center justify-between gap-6">
+      <Card className="relative overflow-hidden bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white border-none shadow-xl mt-8 ring-1 ring-white/10">
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj48cGF0aCBkPSJNIDQwIDAgTCAwIDAgMCA0MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLW9wYWNpdHk9IjAuMDUiIHN0cm9rZS13aWR0aD0iMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIvPjwvc3ZnPg==')] opacity-20" />
+        <CardContent className="relative p-8 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-6">
-            <div className="bg-white/20 w-16 h-16 rounded-2xl flex items-center justify-center backdrop-blur-sm shadow-lg shrink-0">
-              <Store className="h-8 w-8 text-white" />
+            <div className="bg-red-600/20 w-16 h-16 rounded-2xl flex items-center justify-center backdrop-blur-sm shadow-lg shrink-0 border border-red-500/30">
+              <Store className="h-8 w-8 text-red-500" />
             </div>
             <div>
-              <h3 className="text-xl font-bold mb-1">Expand your business</h3>
-              <p className="text-red-100 text-sm max-w-lg">Add a new location to your fleet and sync your inventory automatically across all your restaurants.</p>
+              <h3 className="text-2xl font-bold mb-2">Ready to launch your chatbot endpoint?</h3>
+              <p className="text-gray-400 text-sm max-w-lg leading-relaxed">Create your first business and start taking orders via your own channel. Automate your sales today.</p>
             </div>
           </div>
-          <Button variant="secondary" className="bg-white text-red-600 hover:bg-red-50 border-none font-semibold shadow-md hover:shadow-lg transition-all whitespace-nowrap" asChild>
-            <Link href="/onboarding">Add Location</Link>
+          <Button className="bg-red-600 hover:bg-red-700 text-white border-none font-semibold shadow-lg shadow-red-900/20 transition-all hover:scale-105 px-8 py-6 h-auto text-lg" asChild>
+            <Link href="/onboarding">Get Started <ArrowRight className="ml-2 h-5 w-5" /></Link>
           </Button>
         </CardContent>
       </Card>

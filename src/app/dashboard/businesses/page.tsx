@@ -27,20 +27,20 @@ export default async function RestaurantsPage() {
   const restaurants = await RestaurantService.getAllRestaurants()
 
   return (
-    <div className="space-y-6 py-6">
+    <div className="space-y-8 py-2 h-full">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-gray-100 dark:border-gray-800 pb-6">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-            Restaurants
+        <div className="space-y-2">
+          <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+            Businesses
           </h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400">
-            Manage your locations and menus.
+          <p className="text-gray-500 dark:text-gray-400">
+            Manage your business locations and menus.
           </p>
         </div>
-        <Button asChild className="h-9 gap-2">
+        <Button asChild className="h-9 gap-2 bg-red-600 hover:bg-red-700 text-white shadow-sm">
           <Link href="/onboarding">
             <Plus className="h-4 w-4" />
-            Add Restaurant
+            Add Business
           </Link>
         </Button>
       </div>
@@ -50,12 +50,12 @@ export default async function RestaurantsPage() {
           <div className="h-12 w-12 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-4 text-gray-500">
             <Store className="h-6 w-6" />
           </div>
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">No restaurants yet</h3>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">No businesses yet</h3>
           <p className="text-sm text-gray-500 text-center max-w-sm mb-6 mt-1">
-            Get started by adding your first restaurant location to the platform.
+            Get started by adding your first business location to the platform.
           </p>
           <Button asChild variant="outline">
-            <Link href="/onboarding">Create Restaurant</Link>
+            <Link href="/onboarding">Create Business</Link>
           </Button>
         </Card>
       ) : (
@@ -84,7 +84,7 @@ export default async function RestaurantsPage() {
                     <DropdownMenuContent align="end">
                       <DropdownMenuLabel>Actions</DropdownMenuLabel>
                       <DropdownMenuItem asChild>
-                        <Link href={`/restaurants/${res.id}`}>Manage</Link>
+                        <Link href={`/dashboard/businesses/${res.id}`}>Manage</Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem>View Menu</DropdownMenuItem>
                       <DropdownMenuSeparator />
@@ -119,7 +119,7 @@ export default async function RestaurantsPage() {
               </CardContent>
               <CardFooter className="pt-0">
                 <Button asChild variant="outline" className="w-full justify-between group-hover:border-red-200 dark:group-hover:border-red-900/50 group-hover:bg-red-50/50 dark:group-hover:bg-red-900/10 transition-all">
-                  <Link href={`/restaurants/${res.id}`}>
+                  <Link href={`/dashboard/businesses/${res.id}`}>
                     <span className="font-medium group-hover:text-red-700 dark:group-hover:text-red-400 transition-colors">Manage Details</span>
                     <ChevronRight className="h-4 w-4 text-gray-400 group-hover:text-red-500 group-hover:translate-x-1 transition-all" />
                   </Link>
@@ -134,7 +134,7 @@ export default async function RestaurantsPage() {
                 <Plus className="h-7 w-7" />
               </div>
               <p className="font-semibold text-gray-900 dark:text-white group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">Add New Location</p>
-              <p className="text-sm text-gray-500 text-center mt-2 max-w-[200px]">Expand your business by adding a new restaurant branch</p>
+              <p className="text-sm text-gray-500 text-center mt-2 max-w-[200px]">Expand your business by adding a new location</p>
             </Card>
           </Link>
         </div>

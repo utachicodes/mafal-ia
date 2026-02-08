@@ -45,11 +45,11 @@ export default function OnboardingPage({
       status: "completed" // Simulated completed state
     },
     {
-      title: "Add your first restaurant",
-      description: "Set up your restaurant details and location",
+      title: "Add your first business",
+      description: "Set up your business details and location",
       icon: <Store className="h-6 w-6" />,
-      action: "Add Restaurant",
-      link: "/restaurants/new",
+      action: "Add Business",
+      link: "/dashboard/businesses/new",
       status: "pending"
     },
     {
@@ -72,18 +72,18 @@ export default function OnboardingPage({
           Welcome to Mafalia
         </h1>
         <p className="text-lg text-gray-500 max-w-2xl mx-auto">
-          Get your restaurant up and running with just a few steps.
+          Get your business up and running with just a few steps.
         </p>
       </div>
 
       <div className="grid gap-6">
         {steps.map((step, index) => (
-          <Card key={index} className={`shadow-sm border-gray-200 dark:border-gray-800 transition-all duration-300 ${step.status === 'locked' ? 'bg-gray-50 dark:bg-gray-900/50 opacity-75' : 'hover:shadow-md hover:border-red-200 dark:hover:border-red-900/30'}`}>
+          <Card key={index} className={`shadow-sm border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 transition-all duration-300 ${step.status === 'locked' ? 'bg-gray-50 dark:bg-gray-900/50 opacity-75' : 'hover:shadow-md hover:border-red-200 dark:hover:border-red-900/30'}`}>
             <CardContent className="p-6">
               <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
                 <div className={`w-12 h-12 rounded-xl flex items-center justify-center border shadow-sm ${step.status === 'locked' ? 'bg-gray-100 border-gray-200 text-gray-400 dark:bg-gray-800 dark:border-gray-700' :
-                    step.status === 'completed' ? 'bg-green-100 border-green-200 text-green-600 dark:bg-green-900/20 dark:border-green-800 dark:text-green-400' :
-                      'bg-red-50 border-red-100 text-red-600 dark:bg-red-900/10 dark:border-red-900/30 dark:text-red-400'
+                  step.status === 'completed' ? 'bg-green-100 border-green-200 text-green-600 dark:bg-green-900/20 dark:border-green-800 dark:text-green-400' :
+                    'bg-red-50 border-red-100 text-red-600 dark:bg-red-900/10 dark:border-red-900/30 dark:text-red-400'
                   }`}>
                   {step.icon}
                 </div>
@@ -117,7 +117,8 @@ export default function OnboardingPage({
               </div>
             </CardContent>
           </Card>
-        ))}
+        ))
+        }
       </div>
     </div>
   )

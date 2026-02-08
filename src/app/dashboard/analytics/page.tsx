@@ -29,7 +29,7 @@ export default async function AnalyticsPage() {
       bg: "bg-green-100 dark:bg-green-900/20"
     },
     {
-      title: "Active Restaurants",
+      title: "Active Businesses",
       value: data.activeRestaurants.toString(),
       change: "Currently active",
       icon: Store,
@@ -55,13 +55,13 @@ export default async function AnalyticsPage() {
   ]
 
   return (
-    <div className="space-y-6 py-6">
+    <div className="space-y-8 py-2 h-full">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-gray-100 dark:border-gray-800 pb-6">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+        <div className="space-y-2">
+          <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
             Analytics
           </h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400">
+          <p className="text-gray-500 dark:text-gray-400">
             Overview of your platform's performance and growth.
           </p>
         </div>
@@ -70,7 +70,7 @@ export default async function AnalyticsPage() {
             <Calendar className="h-4 w-4" />
             Last 30 Days
           </Button>
-          <Button size="sm" className="h-9 gap-2 bg-red-600 hover:bg-red-700 text-white">
+          <Button size="sm" className="h-9 gap-2 bg-red-600 hover:bg-red-700 text-white shadow-sm">
             <Download className="h-4 w-4" />
             Export Report
           </Button>
