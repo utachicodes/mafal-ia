@@ -1,63 +1,70 @@
-// Centralized logging utility
+import { PrismaClient } from "@prisma/client"
+import { getPrisma } from "@/src/lib/db"
 
-type LogLevel = 'debug' | 'info' | 'warn' | 'error'
+export type LogLevel = "INFO" | "WARN" | "ERROR"
 
-const LOG_LEVELS: Record<LogLevel, number> = {
-  debug: 0,
-  info: 1,
-  warn: 2,
-  error: 3
-}
+class Logger {
+  private prisma: PrismaClient | null = null
 
-const currentLogLevel: LogLevel = process.env.NODE_ENV === 'production' ? 'warn' : 'debug'
-
-function shouldLog(level: LogLevel): boolean {
-  return LOG_LEVELS[level] >= LOG_LEVELS[currentLogLevel]
-}
-
-export const logger = {
-  debug: (message: string, ...args: any[]) => {
-    if (shouldLog('debug')) {
-      console.debug(`[DEBUG] ${message}`, ...args)
+  private async getClient() {
+    if (!this.prisma) {
+      this.prisma = await getPrisma()
     }
-  },
-  
-  info: (message: string, ...args: any[]) => {
-    if (shouldLog('info')) {
-      console.info(`[INFO] ${message}`, ...args)
+    return this.prisma
+  }
+
+  private async log(level: LogLevel, message: string, metadata?: any, source: string = "APP") {
+    // Console fallback for dev/debugging
+    const timestamp = new Date().toISOString()
+    const metaString = metadata ? JSON.stringify(metadata) : ""
+
+    if (level === "ERROR") {
+      console.error(`[${timestamp}] [${level}] [${source}] ${message}`, metadata || "")
+    } else if (level === "WARN") {
+      console.warn(`[${timestamp}] [${level}] [${source}] ${message}`, metadata || "")
+    } else {
+      console.log(`[${timestamp}] [${level}] [${source}] ${message}`, metadata || "")
     }
-  },
-  
-  warn: (message: string, ...args: any[]) => {
-    if (shouldLog('warn')) {
-      console.warn(`[WARN] ${message}`, ...args)
-    }
-  },
-  
-  error: (message: string, error?: Error, ...args: any[]) => {
-    if (shouldLog('error')) {
-      console.error(`[ERROR] ${message}`, error || '', ...args)
-    }
-  },
-  
-  // For API responses and other structured logging
-  api: {
-    request: (endpoint: string, method: string, data?: any) => {
-      if (shouldLog('debug')) {
-        console.debug(`[API] ${method} ${endpoint}`, data || '')
+
+    try {
+      const prisma = await this.getClient()
+      // Fire-and-forget to avoid blocking the main thread
+      // We don't await this promise
+      if (prisma) {
+        (prisma as any).systemLog.create({
+          data: {
+            level,
+            message,
+            metadata: metadata ? (metadata as any) : undefined,
+            source,
+            timestamp: new Date()
+          }
+        }).catch((err: any) => {
+          console.error("Failed to write log to database:", err)
+        })
       }
-    },
-    
-    response: (endpoint: string, method: string, status: number, data?: any) => {
-      if (shouldLog('debug')) {
-        console.debug(`[API] ${method} ${endpoint} ${status}`, data || '')
-      }
-    },
-    
-    error: (endpoint: string, method: string, status: number, error?: any) => {
-      console.error(`[API] ${method} ${endpoint} ${status}`, error || '')
+    } catch (error) {
+      console.error("Failed to acquire prisma client for logging:", error)
     }
+  }
+
+  info(message: string, metadata?: any, source?: string) {
+    this.log("INFO", message, metadata, source)
+  }
+
+  warn(message: string, metadata?: any, source?: string) {
+    this.log("WARN", message, metadata, source)
+  }
+
+  error(message: string, error?: any, source?: string) {
+    const errorMeta = error instanceof Error ? {
+      name: error.name,
+      message: error.message,
+      stack: error.stack
+    } : error
+
+    this.log("ERROR", message, errorMeta, source)
   }
 }
 
-export default logger
+export const logger = new Logger()

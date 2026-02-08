@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from "next/server"
 import { getPrisma } from "@/src/lib/db"
 import { processUnifiedMessage } from "@/src/lib/webhook-processor"
 import { RestaurantService } from "@/src/lib/restaurant-service"
+import { logger } from "@/src/lib/logger"
 
 export const runtime = "nodejs"
 
@@ -47,6 +48,7 @@ export async function POST(request: NextRequest) {
       const restaurant = await RestaurantService.getRestaurantByPhoneNumber(businessPhoneNumber)
 
       if (restaurant) {
+        logger.info(`Received LAM message for ${restaurant.name}`, { from: message.from, restaurantId: restaurant.id }, "WEBHOOK_LAM")
         console.log(`[LAM Webhook] Received message for ${restaurant.name} (${businessPhoneNumber})`)
         const messageText = message.text?.body || message.text || ""
         await processUnifiedMessage(restaurant.id, message.from, message.id, messageText, {
@@ -56,6 +58,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ ok: true })
       }
 
+      logger.warn(`No restaurant found for LAM number: ${businessPhoneNumber}`, { businessPhoneNumber }, "WEBHOOK_LAM")
       console.warn(`[LAM Webhook] No restaurant found for business number: ${businessPhoneNumber}`)
       // If we can't find it via 'to', we might fallback or log.
     }
@@ -99,6 +102,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ ok: true })
   } catch (err) {
+    logger.error("Meta Webhook error", err, "WEBHOOK_WHATSAPP")
     console.error("Meta Webhook error:", err)
     return NextResponse.json({ ok: false }, { status: 500 })
   }

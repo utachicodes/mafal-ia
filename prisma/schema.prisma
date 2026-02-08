@@ -169,7 +169,22 @@ enum OrderStatus {
   cancelled
 }
 
+
 enum MessageDirection {
   inbound
   outbound
 }
+
+model SystemLog {
+  id        String   @id @default(cuid())
+  level     String   // INFO, WARN, ERROR
+  message   String
+  metadata  Json?
+  source    String   // e.g., "API", "Webhook", "Auth"
+  timestamp DateTime @default(now())
+
+  @@index([level])
+  @@index([source])
+  @@index([timestamp])
+}
+
