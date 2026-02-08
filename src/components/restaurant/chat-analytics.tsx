@@ -73,10 +73,10 @@ export function ChatAnalytics({ restaurant }: ChatAnalyticsProps) {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{analytics.totalConversations}</div>
-            <p className="text-xs text-muted-foreground">
+            {/* <p className="text-xs text-muted-foreground">
               <TrendingUp className="inline h-3 w-3 mr-1" />
               +12% from last month
-            </p>
+            </p> */}
           </CardContent>
         </Card>
 
@@ -87,10 +87,10 @@ export function ChatAnalytics({ restaurant }: ChatAnalyticsProps) {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{analytics.totalMessages}</div>
-            <p className="text-xs text-muted-foreground">
+            {/* <p className="text-xs text-muted-foreground">
               <TrendingUp className="inline h-3 w-3 mr-1" />
               +8% from last month
-            </p>
+            </p> */}
           </CardContent>
         </Card>
 
@@ -101,10 +101,10 @@ export function ChatAnalytics({ restaurant }: ChatAnalyticsProps) {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{analytics.averageResponseTime}s</div>
-            <p className="text-xs text-muted-foreground">
+            {/* <p className="text-xs text-muted-foreground">
               <TrendingUp className="inline h-3 w-3 mr-1" />
               15% faster than last month
-            </p>
+            </p> */}
           </CardContent>
         </Card>
 

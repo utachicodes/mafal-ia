@@ -23,7 +23,7 @@ export default async function AnalyticsPage() {
     {
       title: "Total Revenue",
       value: `${new Intl.NumberFormat().format(data.totalRevenue)} FCFA`,
-      change: "+8.2% from last month", // Placeholder for now
+      change: "All time earnings",
       icon: CreditCard,
       color: "text-green-600 dark:text-green-400",
       bg: "bg-green-100 dark:bg-green-900/20"
@@ -31,7 +31,7 @@ export default async function AnalyticsPage() {
     {
       title: "Active Restaurants",
       value: data.activeRestaurants.toString(),
-      change: "+2 new this month", // Placeholder
+      change: "Currently active",
       icon: Store,
       color: "text-blue-600 dark:text-blue-400",
       bg: "bg-blue-100 dark:bg-blue-900/20"
@@ -39,7 +39,7 @@ export default async function AnalyticsPage() {
     {
       title: "Total Orders",
       value: new Intl.NumberFormat().format(data.totalOrders),
-      change: "+15% from last month", // Placeholder
+      change: "All time orders",
       icon: ShoppingBag,
       color: "text-purple-600 dark:text-purple-400",
       bg: "bg-purple-100 dark:bg-purple-900/20"
@@ -47,7 +47,7 @@ export default async function AnalyticsPage() {
     {
       title: "Customer Conversations",
       value: new Intl.NumberFormat().format(data.conversationCount),
-      change: "+24% from last month", // Placeholder
+      change: "Recorded chats",
       icon: MessageSquare,
       color: "text-amber-600 dark:text-amber-400",
       bg: "bg-amber-100 dark:bg-amber-900/20"

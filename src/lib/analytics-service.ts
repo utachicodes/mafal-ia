@@ -25,14 +25,34 @@ export const AnalyticsService = {
         // 3. Total Orders
         const totalOrders = await prisma.order.count()
 
-        // 4. Customer Conversations (Count of unique phone numbers or usage of Conversation model)
-        // Assuming Conversation model tracks unique chats per restaurant
+        // 4. Active Orders (pending or processing)
+        const activeOrders = await prisma.order.count({
+            where: {
+                status: {
+                    in: ["pending", "processing"]
+                }
+            }
+        })
+
+        // 5. Total Customers (unique phone numbers from orders)
+        // Note: distinct is supported in findMany, not count directly in all providers, but count with distinct is supported in Postgres
+        const distinctCustomers = await prisma.order.findMany({
+            distinct: ['phoneNumber'],
+            select: {
+                phoneNumber: true
+            }
+        })
+        const totalCustomers = distinctCustomers.length
+
+        // 6. Customer Conversations
         const conversationCount = await prisma.conversation.count()
 
         return {
             totalRevenue,
             activeRestaurants,
             totalOrders,
+            activeOrders,
+            totalCustomers,
             conversationCount,
         }
     },
