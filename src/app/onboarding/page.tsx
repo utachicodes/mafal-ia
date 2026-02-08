@@ -1,9 +1,29 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { UserCircle, Store, ListTodo, ChevronRight, CheckCircle2 } from "lucide-react"
+import { UserCircle, Store, ListTodo, ChevronRight, CheckCircle2, AlertCircle } from "lucide-react"
 import Link from "next/link"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
 export default function OnboardingPage() {
+  // Mock error state for demonstration - replace with real error handling logic
+  const error = null;
+
+  if (error) {
+    return (
+      <div className="flex h-screen items-center justify-center p-4">
+        <Alert variant="destructive" className="max-w-md">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Error</AlertTitle>
+          <AlertDescription>
+            Something went wrong loading your onboarding progress. Please try refreshing the page.
+          </AlertDescription>
+          <Button className="mt-4 w-full" onClick={() => window.location.reload()}>
+            Refresh Page
+          </Button>
+        </Alert>
+      </div>
+    )
+  }
   const steps = [
     {
       title: "Complete your profile",

@@ -121,7 +121,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
     <div className="flex h-screen bg-gray-50 dark:bg-gray-900 overflow-hidden">
       {/* Desktop Sidebar */}
       <aside className={cn(
-        "hidden md:flex flex-col z-30 transition-all duration-300 ease-in-out",
+        "hidden md:flex flex-col z-40 transition-all duration-300 ease-in-out fixed inset-y-0 left-0 h-full shadow-xl",
         collapsed ? "w-20" : "w-64"
       )}>
         <SidebarContent />
@@ -129,15 +129,18 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
 
       {/* Mobile Sidebar */}
       <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
-        <SheetContent side="left" className="p-0 w-72 border-r-0">
+        <SheetContent side="left" className="p-0 w-72 border-r-0 z-50">
           <SidebarContent />
         </SheetContent>
       </Sheet>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+      <div className={cn(
+        "flex-1 flex flex-col min-w-0 overflow-hidden transition-all duration-300 ease-in-out",
+        !collapsed ? "md:ml-64" : "md:ml-20"
+      )}>
         {/* Top Header */}
-        <header className="h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8 bg-white dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800 z-20">
+        <header className="h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8 bg-white/80 dark:bg-gray-950/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 z-30 sticky top-0">
           <div className="flex items-center gap-4">
             <Button variant="ghost" size="icon" className="md:hidden -ml-2 text-gray-500" onClick={() => setSidebarOpen(true)}>
               <PanelLeftOpen className="h-6 w-6" />
@@ -168,8 +171,8 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 overflow-y-auto focus:outline-none scrollbar-hide custom-scrollbar">
-          <div className="py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <main className="flex-1 overflow-y-auto focus:outline-none custom-scrollbar p-6">
+          <div className="max-w-7xl mx-auto space-y-6">
             {children}
           </div>
         </main>
