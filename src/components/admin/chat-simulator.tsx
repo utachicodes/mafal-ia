@@ -65,8 +65,8 @@ export default function ChatSimulator({ restaurantId, restaurantName }: ChatSimu
                 <div className="flex items-center gap-2">
                     <Bot className="h-5 w-5 text-green-600" />
                     <div>
-                        <h3 className="font-semibold text-sm">Simulator: {restaurantName}</h3>
-                        <p className="text-xs text-muted-foreground">Te sting as "Admin Simulator"</p>
+                        <h3 className="font-semibold text-sm">Preview: {restaurantName}</h3>
+                        <p className="text-xs text-muted-foreground">Live Preview Mode</p>
                     </div>
                 </div>
                 <Button variant="ghost" size="icon" onClick={handleReset} title="Clear Chat UI">
@@ -79,7 +79,7 @@ export default function ChatSimulator({ restaurantId, restaurantName }: ChatSimu
                 {messages.length === 0 ? (
                     <div className="h-full flex flex-col items-center justify-center text-gray-400 space-y-2 mt-20">
                         <Bot className="h-12 w-12 opacity-20" />
-                        <p>Start chatting to test the AI.</p>
+                        <p>Start chatting to test the assistant.</p>
                         <div className="flex gap-2">
                             <Button variant="outline" size="sm" onClick={() => setInput("Hello")}>"Hello"</Button>
                             <Button variant="outline" size="sm" onClick={() => setInput("Show me the menu")}>"Show menu"</Button>

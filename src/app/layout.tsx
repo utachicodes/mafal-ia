@@ -1,11 +1,19 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "../components/providers";
 import { LanguageProvider } from "@/src/context/language-context";
 import { LanguageWrapper } from "./language-wrapper";
 
-const inter = Inter({ subsets: ["latin"] });
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
 
 export const metadata: Metadata = {
   title: "Mafal-IA | Restaurant WhatsApp Chatbot Platform",
@@ -26,7 +34,7 @@ export default function RootLayout({
     <LanguageProvider>
       <LanguageWrapper>
         <html lang="en" suppressHydrationWarning>
-          <body className={inter.className}>
+          <body className={`${geistSans.variable} ${geistMono.variable} antialiased selection:bg-primary/20`}>
             <Providers>
               {children}
             </Providers>

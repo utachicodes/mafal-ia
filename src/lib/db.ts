@@ -11,7 +11,7 @@ export async function getPrisma(): Promise<PrismaClientType> {
   // Validate env var now
   const url = process.env.DATABASE_URL
   if (!url || url.length === 0) {
-    throw new Error('DATABASE_URL is not set. Please configure a Postgres connection string in your .env file.')
+    throw new Error('DATABASE_URL is not set in .env file.')
   }
 
   if (globalForPrisma.prisma) return globalForPrisma.prisma!

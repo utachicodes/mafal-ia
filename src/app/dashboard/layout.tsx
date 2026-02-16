@@ -1,10 +1,7 @@
 "use client"
 
 import { ReactNode } from "react"
-import dynamic from 'next/dynamic'
-
-// Import the DashboardLayout component directly
-import DashboardLayout from '../../components/dashboard-layout'
+import { PlatformLayout } from "@/src/components/platform/PlatformLayout"
 
 interface DashboardLayoutProps {
   children: ReactNode
@@ -12,10 +9,8 @@ interface DashboardLayoutProps {
 
 export default function Layout({ children }: DashboardLayoutProps) {
   return (
-    <div className="min-h-screen bg-background">
-      <DashboardLayout>
-        {children}
-      </DashboardLayout>
-    </div>
+    <PlatformLayout>
+      {children}
+    </PlatformLayout>
   )
 }

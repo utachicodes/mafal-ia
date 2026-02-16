@@ -43,6 +43,7 @@ export class RestaurantService {
         ? p.supportedLanguages
         : ["French", "English", "Wolof", "Arabic"],
       isActive: p.isActive,
+      businessType: p.businessType as "RESTAURANT" | "RETAIL" | "SERVICE",
       isConcierge: !!p.isConcierge,
       menu,
       chatbotContext: {
@@ -83,10 +84,20 @@ export class RestaurantService {
     return p ? this.mapPrismaToRestaurant(p) : null
   }
 
-  static async getAllRestaurants(): Promise<Restaurant[]> {
+  static async getAllRestaurants(userId?: string): Promise<Restaurant[]> {
     await this.ensureSeeded()
     const prisma = await getPrisma()
-    const list = await prisma.restaurant.findMany({ include: { menuItems: true } })
+
+    const whereClause: any = {}
+    if (userId) {
+      whereClause.userId = userId
+    }
+
+    const list = await prisma.restaurant.findMany({
+      where: whereClause,
+      include: { menuItems: true },
+      orderBy: { updatedAt: 'desc' }
+    })
     return list.map((p: any) => this.mapPrismaToRestaurant(p))
   }
 
@@ -105,6 +116,7 @@ export class RestaurantService {
       webhookVerifyToken: updates.apiCredentials?.webhookVerifyToken,
       supportedLanguages: updates.supportedLanguages,
       isActive: updates.isActive,
+      businessType: updates.businessType,
       isConcierge: updates.isConcierge,
       welcomeMessage: updates.chatbotContext?.welcomeMessage,
       businessHours: updates.chatbotContext?.businessHours,
@@ -191,6 +203,7 @@ export class RestaurantService {
         userId: r.userId || "seed-admin",
         supportedLanguages,
         isActive: r.isActive ?? true,
+        businessType: r.businessType || "RESTAURANT",
         isConcierge: r.isConcierge ?? false,
         welcomeMessage: r.chatbotContext?.welcomeMessage || this.defaultChatbotContext().welcomeMessage,
         businessHours: r.chatbotContext?.businessHours || this.defaultChatbotContext().businessHours,

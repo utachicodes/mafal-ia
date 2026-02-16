@@ -1,8 +1,10 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { UserCircle, Store, ListTodo, ChevronRight, CheckCircle2, AlertCircle, RefreshCcw } from "lucide-react"
+import { UserCircle, Store, ListTodo, ChevronRight, CheckCircle2, AlertCircle, RefreshCcw, Sparkles } from "lucide-react"
 import Link from "next/link"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { motion } from "framer-motion"
+import { cn } from "@/lib/utils"
 
 export default function OnboardingPage({
   searchParams,
@@ -11,114 +13,132 @@ export default function OnboardingPage({
 }) {
   const error = searchParams?.error;
 
-  if (error) {
-    return (
-      <div className="max-w-md mx-auto py-12 px-6">
-        <Alert variant="destructive" className="border-red-200 bg-red-50 dark:bg-red-900/20 dark:border-red-900/50">
-          <AlertCircle className="h-4 w-4 text-red-600 dark:text-red-400" />
-          <AlertTitle className="text-red-800 dark:text-red-300 font-semibold">Configuration Error</AlertTitle>
-          <AlertDescription className="text-red-700 dark:text-red-300 mt-1">
-            {error === 'missing_org_id' && "Organization details could not be found. Please check your account settings."}
-            {error === 'permissions' && "You don't have permission to perform this action."}
-            {!['missing_org_id', 'permissions'].includes(error) && "Something went wrong loading your onboarding progress. Please try refreshing the page."}
-          </AlertDescription>
-        </Alert>
-        <div className="mt-6 flex justify-center">
-          <Button asChild variant="outline" className="gap-2">
-            <Link href="/onboarding">
-              <RefreshCcw className="h-4 w-4" />
-              Try Again
-            </Link>
-          </Button>
-        </div>
-      </div>
-    )
-  }
-
   const steps = [
     {
-      title: "Complete your profile",
-      description: "Add your business information and contact details",
+      title: "Security Setup",
+      description: "Initialize your administrative credentials and partner identity",
       icon: <UserCircle className="h-6 w-6" />,
-      action: "Complete",
-      link: "/settings",
-      status: "completed" // Simulated completed state
+      action: "Configure",
+      link: "/dashboard/settings",
+      status: "completed"
     },
     {
-      title: "Add your first business",
-      description: "Set up your business details and location",
+      title: "Initialize Entity",
+      description: "Deploy your first restaurant branch to the ecosystem",
       icon: <Store className="h-6 w-6" />,
-      action: "Add Business",
+      action: "Launch Now",
       link: "/dashboard/businesses/new",
       status: "pending"
     },
     {
-      title: "Set up your menu",
-      description: "Add your menu items and categories to start taking orders",
+      title: "Knowledge Base",
+      description: "Import your menu items for RAG-augmented chat grounding",
       icon: <ListTodo className="h-6 w-6" />,
-      action: "Start Menu",
+      action: "Import Data",
       link: "#",
       status: "locked"
     }
   ]
 
-  return (
-    <div className="max-w-4xl mx-auto py-12 px-6">
-      <div className="text-center space-y-4 mb-12">
-        <div className="inline-flex items-center justify-center p-3 rounded-full bg-red-100 dark:bg-red-900/20 text-red-600 dark:text-red-400 mb-4 animate-in fade-in zoom-in duration-500">
-          <Store className="h-8 w-8" />
-        </div>
-        <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300">
-          Welcome to Mafalia
-        </h1>
-        <p className="text-lg text-gray-500 max-w-2xl mx-auto">
-          Get your business up and running with just a few steps.
-        </p>
+  if (error) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-6 text-center relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-destructive/5 rounded-full blur-[120px] pointer-events-none" />
+        <Card className="glass border-destructive/20 max-w-md p-10 space-y-6 relative z-10">
+          <div className="h-16 w-16 bg-destructive/10 rounded-2xl flex items-center justify-center mx-auto border border-destructive/20">
+            <AlertCircle className="h-8 w-8 text-destructive" />
+          </div>
+          <div className="space-y-2">
+            <h2 className="text-2xl font-bold">System Hold</h2>
+            <p className="text-muted-foreground">
+              {error === 'missing_org_id' ? "Organization identity mismatch detected." : "Authentication handshake failed during onboarding."}
+            </p>
+          </div>
+          <Button asChild variant="outline" className="w-full h-12 rounded-xl glass border-white/10 hover:bg-white/5 transition-all gap-2">
+            <Link href="/onboarding">
+              <RefreshCcw className="h-4 w-4" />
+              Retry Handshake
+            </Link>
+          </Button>
+        </Card>
       </div>
+    )
+  }
 
-      <div className="grid gap-6">
-        {steps.map((step, index) => (
-          <Card key={index} className={`shadow-sm border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 transition-all duration-300 ${step.status === 'locked' ? 'bg-gray-50 dark:bg-gray-900/50 opacity-75' : 'hover:shadow-md hover:border-red-200 dark:hover:border-red-900/30'}`}>
-            <CardContent className="p-6">
-              <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
-                <div className={`w-12 h-12 rounded-xl flex items-center justify-center border shadow-sm ${step.status === 'locked' ? 'bg-gray-100 border-gray-200 text-gray-400 dark:bg-gray-800 dark:border-gray-700' :
-                  step.status === 'completed' ? 'bg-green-100 border-green-200 text-green-600 dark:bg-green-900/20 dark:border-green-800 dark:text-green-400' :
-                    'bg-red-50 border-red-100 text-red-600 dark:bg-red-900/10 dark:border-red-900/30 dark:text-red-400'
-                  }`}>
-                  {step.icon}
-                </div>
-                <div className="flex-1 space-y-1">
-                  <div className="flex items-center gap-3">
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{step.title}</h3>
-                    {step.status === 'completed' && <CheckCircle2 className="h-5 w-5 text-green-500" />}
+  return (
+    <div className="min-h-screen bg-background p-8 flex flex-col items-center justify-center relative overflow-hidden">
+      {/* Ambient Glows */}
+      <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-primary/10 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-accent/10 rounded-full blur-[120px] pointer-events-none" />
+
+      <div className="w-full max-w-5xl z-10">
+        <div className="text-center space-y-4 mb-20">
+          <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-xs font-black uppercase tracking-widest text-primary mb-4 shadow-xl">
+            <Sparkles className="h-4 w-4" />
+            AI Activation Protocol
+          </div>
+          <h1 className="text-5xl font-bold tracking-tighter text-gradient mb-6">
+            Welcome to Mafal-IA
+          </h1>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto font-medium">
+            Synchronizing your restaurant infrastructure with the next generation of automated customer interactions.
+          </p>
+        </div>
+
+        <div className="grid gap-8">
+          {steps.map((step, index) => (
+            <Card key={index} className={cn(
+              "glass border-white/10 overflow-hidden transition-all duration-500 group relative",
+              step.status === 'locked' ? "opacity-50 grayscale pointer-events-none" : "hover:border-primary/40 hover:shadow-2xl hover:shadow-primary/5 cursor-pointer"
+            )}>
+              <div className={cn(
+                "absolute left-0 top-0 h-full w-1.5 transition-all duration-500",
+                step.status === 'completed' ? "bg-emerald-500" : step.status === 'pending' ? "bg-primary" : "bg-neutral-800"
+              )} />
+              <CardContent className="p-8">
+                <div className="flex flex-col md:flex-row items-center gap-8">
+                  <div className={cn(
+                    "w-16 h-16 rounded-[1.5rem] flex items-center justify-center border-2 shadow-2xl transition-all duration-500 group-hover:scale-110",
+                    step.status === 'completed' ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-500" :
+                      step.status === 'pending' ? "bg-primary/10 border-primary/20 text-primary animate-pulse" :
+                        "bg-white/5 border-white/5 text-muted-foreground"
+                  )}>
+                    {step.icon}
                   </div>
-                  <p className="text-gray-500 dark:text-gray-400">{step.description}</p>
+
+                  <div className="flex-1 space-y-2 text-center md:text-left">
+                    <div className="flex items-center justify-center md:justify-start gap-3">
+                      <h3 className="text-2xl font-bold tracking-tight">{step.title}</h3>
+                      {step.status === 'completed' && <CheckCircle2 className="h-6 w-6 text-emerald-500" />}
+                    </div>
+                    <p className="text-muted-foreground text-lg">{step.description}</p>
+                  </div>
+
+                  <div className="w-full md:w-auto">
+                    {step.status === 'locked' ? (
+                      <div className="flex flex-col items-center gap-1 opacity-60">
+                        <span className="text-[10px] font-black uppercase tracking-widest">Locked Stage</span>
+                        <Button variant="ghost" disabled className="text-muted-foreground font-black">
+                          03 / PHASE
+                        </Button>
+                      </div>
+                    ) : (
+                      <Button asChild className={cn(
+                        "w-full md:w-auto h-12 rounded-xl px-10 font-bold uppercase text-[10px] tracking-widest shadow-lg transition-all",
+                        step.status === 'completed' ? "bg-white/5 border border-white/10 hover:bg-white/10 text-emerald-500" : "bg-primary hover:bg-primary/90 text-white shadow-primary/20"
+                      )}>
+                        <Link href={step.link}>
+                          <span>{step.status === 'completed' ? "Verify Settings" : step.action}</span>
+                          <ChevronRight className="h-4 w-4 ml-2" />
+                        </Link>
+                      </Button>
+                    )}
+                  </div>
                 </div>
-                <div className="w-full md:w-auto pt-4 md:pt-0">
-                  {step.status === 'locked' ? (
-                    <Button variant="ghost" disabled className="w-full md:w-auto text-gray-400">
-                      Coming soon
-                    </Button>
-                  ) : step.status === 'completed' ? (
-                    <Button variant="outline" asChild className="w-full md:w-auto gap-2 border-green-200 dark:border-green-800 text-green-700 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20 hover:text-green-800">
-                      <Link href={step.link}>
-                        Manage
-                      </Link>
-                    </Button>
-                  ) : (
-                    <Button asChild className="w-full md:w-auto gap-2 bg-red-600 hover:bg-red-700 text-white shadow-md shadow-red-500/20">
-                      <Link href={step.link}>
-                        <span>{step.action}</span>
-                        <ChevronRight className="h-4 w-4" />
-                      </Link>
-                    </Button>
-                  )}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))
-        }
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       </div>
     </div>
   )

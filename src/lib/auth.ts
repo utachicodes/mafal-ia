@@ -65,9 +65,9 @@ export const authOptions: NextAuthOptions = {
             return session;
         },
     },
-    pages: {
-        signIn: "/admin/login", // Custom login page for employees
-    },
+    /*  pages: {
+        signIn: "/admin/login", 
+    }, */
     session: {
         strategy: "jwt",
     },

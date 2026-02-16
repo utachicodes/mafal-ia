@@ -1,4 +1,4 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { OrderService } from "@/src/lib/order-service"
 import { format } from "date-fns"
@@ -8,7 +8,11 @@ import {
   ShoppingBag,
   Download,
   Search,
-  MoreHorizontal
+  MoreHorizontal,
+  ChevronRight,
+  User,
+  MapPin,
+  Activity
 } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import {
@@ -19,6 +23,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { cn } from "@/lib/utils"
 
 export const dynamic = "force-dynamic"
 
@@ -35,117 +40,138 @@ export default async function OrdersPage() {
   const orders = await OrderService.getAllOrders() as unknown as Order[]
 
   return (
-    <div className="space-y-8 py-2 h-full">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-gray-100 dark:border-gray-800 pb-6">
-        <div className="space-y-2">
-          <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
-            Orders
+    <div className="space-y-10">
+      {/* Page Header */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+        <div className="space-y-1">
+          <h1 className="text-4xl font-bold tracking-tight text-gradient">
+            Order Management
           </h1>
-          <p className="text-gray-500 dark:text-gray-400">
-            Manage and track your business orders
+          <p className="text-muted-foreground text-lg">
+            Track and monitor incoming customer requests
           </p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm" className="h-9 gap-2">
-            <Download className="h-4 w-4" />
-            Export
+        <div className="flex gap-3">
+          <Button variant="outline" className="rounded-xl px-4 h-11 border-white/10 glass hover:bg-white/5 transition-all">
+            <Download className="h-4 w-4 mr-2" />
+            Export CSV
           </Button>
-          <Button size="sm" className="h-9 bg-red-600 hover:bg-red-700 text-white gap-2 shadow-sm">
-            <Filter className="h-4 w-4" />
-            Filter
+          <Button className="rounded-xl px-6 h-11 bg-primary hover:bg-primary/90 text-white shadow-xl shadow-primary/20 transition-all">
+            <Filter className="h-4 w-4 mr-2" />
+            Filter View
           </Button>
         </div>
       </div>
 
-      <Card className="shadow-sm border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 overflow-hidden">
-        <CardHeader className="p-4 border-b border-gray-100 dark:border-gray-800 flex flex-row items-center justify-between bg-gray-50/50 dark:bg-gray-900/50">
-          <div className="relative w-full max-w-sm">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+      {/* Main Content Table */}
+      <Card className="glass border-white/10 overflow-hidden">
+        <CardHeader className="p-6 border-b border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="relative w-full max-w-md group">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
             <Input
               type="search"
-              placeholder="Search orders..."
-              className="pl-9 h-9 border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 transition-colors focus:border-red-500 focus:ring-red-500"
+              placeholder="Search by ID or customer..."
+              className="pl-10 h-11 bg-white/5 border-white/10 rounded-xl focus:ring-primary/50 transition-all"
             />
           </div>
-          <div className="text-xs text-gray-500 font-medium px-3 py-1 bg-white dark:bg-gray-900 rounded-full border border-gray-200 dark:border-gray-800 shadow-sm">
-            Showing {orders.length} orders
+          <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground bg-white/5 px-4 py-2 rounded-full border border-white/5">
+            <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+            {orders.length} TOTAL RECORDS
           </div>
         </CardHeader>
         <CardContent className="p-0">
           {orders.length === 0 ? (
-            <div className="text-center py-24 bg-gray-50/30 dark:bg-gray-900/30">
-              <div className="h-16 w-16 mx-auto mb-4 flex items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800 text-gray-400">
-                <ShoppingBag className="h-8 w-8" />
+            <div className="text-center py-32 bg-white/[0.01]">
+              <div className="h-20 w-20 mx-auto mb-6 flex items-center justify-center rounded-3xl bg-primary/10 text-primary border border-primary/20">
+                <ShoppingBag className="h-10 w-10" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">No orders yet</h3>
-              <p className="text-sm text-gray-500 max-w-sm mx-auto mt-1">
-                When customers place orders via WhatsApp, they will appear here automatically.
+              <h3 className="text-2xl font-bold">No active orders found</h3>
+              <p className="text-muted-foreground max-w-sm mx-auto mt-2">
+                Incoming orders from WhatsApp will appear here synchronously with accurate grounding.
               </p>
             </div>
           ) : (
-            <div className="relative w-full overflow-auto">
-              <table className="w-full text-sm text-left">
-                <thead className="bg-gray-50 dark:bg-gray-900/80 text-gray-500 dark:text-gray-400 font-medium border-b border-gray-200 dark:border-gray-800 backdrop-blur-sm sticky top-0 z-10">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm text-left border-collapse">
+                <thead className="bg-white/5 text-muted-foreground font-semibold border-b border-white/5">
                   <tr>
-                    <th className="px-6 py-3 font-medium">Order ID</th>
-                    <th className="px-6 py-3 font-medium">Customer</th>
-                    <th className="px-6 py-3 font-medium">Location</th>
-                    <th className="px-6 py-3 font-medium text-right">Amount</th>
-                    <th className="px-6 py-3 font-medium text-center">Status</th>
-                    <th className="px-6 py-3 font-medium text-right">Date</th>
-                    <th className="px-6 py-3 font-medium text-right">Actions</th>
+                    <th className="px-8 py-4 uppercase tracking-wider text-[10px]">Reference</th>
+                    <th className="px-8 py-4 uppercase tracking-wider text-[10px]">Customer Information</th>
+                    <th className="px-8 py-4 uppercase tracking-wider text-[10px]">Restaurant Branch</th>
+                    <th className="px-8 py-4 uppercase tracking-wider text-[10px] text-right">Transaction</th>
+                    <th className="px-8 py-4 uppercase tracking-wider text-[10px] text-center">Current Status</th>
+                    <th className="px-8 py-4 uppercase tracking-wider text-[10px] text-right">Timestamp</th>
+                    <th className="px-8 py-4 uppercase tracking-wider text-[10px] text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+                <tbody className="divide-y divide-white/5">
                   {orders.map((order) => (
-                    <tr key={order.id} className="group hover:bg-red-50/50 dark:hover:bg-red-900/10 transition-colors">
-                      <td className="px-6 py-4 font-mono text-xs font-medium text-gray-900 dark:text-white">
-                        <span className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded">{order.id.slice(0, 8)}</span>
+                    <tr key={order.id} className="group hover:bg-white/[0.03] transition-all duration-300">
+                      <td className="px-8 py-6">
+                        <span className="font-mono text-xs text-primary bg-primary/10 px-2 py-1 rounded-md border border-primary/20">
+                          #{order.id.slice(0, 8)}
+                        </span>
                       </td>
-                      <td className="px-6 py-4">
-                        <div className="font-medium text-gray-900 dark:text-white flex flex-col">
-                          <span>{order.phoneNumber}</span>
-                          <span className="text-xs text-gray-500 font-normal flex items-center gap-1">
-                            <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                            WhatsApp
-                          </span>
+                      <td className="px-8 py-6">
+                        <div className="flex items-center gap-3">
+                          <div className="h-10 w-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-muted-foreground group-hover:text-primary transition-colors">
+                            <User className="h-5 w-5" />
+                          </div>
+                          <div className="flex flex-col">
+                            <span className="font-bold text-foreground">{order.phoneNumber}</span>
+                            <span className="text-[10px] text-muted-foreground flex items-center gap-1 mt-0.5">
+                              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-sm shadow-emerald-500/50" />
+                              Verified WhatsApp Webhook
+                            </span>
+                          </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-gray-600 dark:text-gray-300">
-                        {order.restaurant?.name || "-"}
+                      <td className="px-8 py-6">
+                        <div className="flex items-center gap-2 text-muted-foreground group-hover:text-foreground transition-colors">
+                          <MapPin className="h-4 w-4" />
+                          <span className="font-medium">{order.restaurant?.name || "Global Marketplace"}</span>
+                        </div>
                       </td>
-                      <td className="px-6 py-4 text-right font-bold text-gray-900 dark:text-white tabular-nums">
-                        {new Intl.NumberFormat().format(order.total)} <span className="text-xs text-gray-500 font-normal ml-0.5">FCFA</span>
+                      <td className="px-8 py-6 text-right font-black text-foreground tabular-nums text-base">
+                        {new Intl.NumberFormat().format(order.total)}
+                        <span className="text-[10px] text-muted-foreground font-medium ml-1">FCFA</span>
                       </td>
-                      <td className="px-6 py-4 text-center">
+                      <td className="px-8 py-6 text-center">
                         <Badge
-                          variant={order.status === 'completed' ? 'default' : order.status === 'processing' ? 'secondary' : 'outline'}
-                          className={
-                            order.status === 'completed' ? "bg-green-100 text-green-700 hover:bg-green-200 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-900/50 shadow-sm" :
-                              order.status === 'processing' ? "bg-blue-100 text-blue-700 hover:bg-blue-200 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-900/50 shadow-sm" :
-                                "bg-gray-100 text-gray-600 border-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-700"
-                          }
+                          className={cn(
+                            "rounded-full px-4 py-1 text-[10px] font-black uppercase tracking-widest border-2",
+                            order.status === 'completed'
+                              ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20 shadow-[0_0_15px_-5px_theme(colors.emerald.500)]"
+                              : order.status === 'processing'
+                                ? "bg-blue-500/10 text-blue-500 border-blue-500/20 shadow-[0_0_15px_-5px_theme(colors.blue.500)]"
+                                : "bg-neutral-500/10 text-neutral-400 border-neutral-500/20"
+                          )}
                         >
                           {order.status}
                         </Badge>
                       </td>
-                      <td className="px-6 py-4 text-right text-gray-500 dark:text-gray-400 whitespace-nowrap">
+                      <td className="px-8 py-6 text-right text-muted-foreground group-hover:text-foreground whitespace-nowrap font-medium">
                         {format(order.createdAt, "MMM d, HH:mm")}
                       </td>
-                      <td className="px-6 py-4 text-right">
+                      <td className="px-8 py-6 text-right">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="h-8 w-8 p-0 text-gray-500 hover:text-gray-900 dark:hover:text-white opacity-0 group-hover:opacity-100 transition-opacity">
-                              <span className="sr-only">Open menu</span>
-                              <MoreHorizontal className="h-4 w-4" />
+                            <Button variant="ghost" className="h-10 w-10 p-0 rounded-xl hover:bg-white/10 transition-all opacity-40 group-hover:opacity-100">
+                              <MoreHorizontal className="h-5 w-5" />
                             </Button>
                           </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                            <DropdownMenuItem>View Details</DropdownMenuItem>
-                            <DropdownMenuItem>Print Receipt</DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem className="text-red-600 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-950/20">Cancel Order</DropdownMenuItem>
+                          <DropdownMenuContent align="end" className="glass border-white/10">
+                            <DropdownMenuLabel className="text-[10px] text-muted-foreground uppercase tracking-widest px-4 py-2">Management Functions</DropdownMenuLabel>
+                            <DropdownMenuItem className="px-4 py-2 hover:bg-primary/10 hover:text-primary transition-colors cursor-pointer rounded-lg mx-1">
+                              View Detailed Log
+                            </DropdownMenuItem>
+                            <DropdownMenuItem className="px-4 py-2 hover:bg-primary/10 hover:text-primary transition-colors cursor-pointer rounded-lg mx-1">
+                              Generate Invoice
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator className="bg-white/5 mx-1 my-1" />
+                            <DropdownMenuItem className="px-4 py-2 text-destructive hover:bg-destructive/10 hover:text-destructive transition-colors cursor-pointer rounded-lg mx-1 font-bold">
+                              Cancel Full Order
+                            </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </td>
@@ -157,6 +183,23 @@ export default async function OrdersPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Footer Info */}
+      <div className="p-8 rounded-3xl premium-gradient flex flex-col sm:flex-row items-center justify-between gap-6 shadow-2xl relative overflow-hidden group">
+        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.05)_0%,transparent_50%)] pointer-events-none" />
+        <div className="flex items-center gap-6 relative z-10">
+          <div className="bg-white/10 h-16 w-16 rounded-2xl flex items-center justify-center border border-white/20 group-hover:scale-110 transition-transform duration-500">
+            <Activity className="h-8 w-8 text-white" />
+          </div>
+          <div>
+            <h3 className="text-xl font-bold text-white mb-1">Predictive Analytics Ready</h3>
+            <p className="text-white/60 text-sm max-w-lg">Scale your operations with automated order grounding and zero-hallucination AI agents.</p>
+          </div>
+        </div>
+        <Button className="bg-white text-black hover:bg-white/90 rounded-2xl px-8 h-12 relative z-10 shadow-xl font-black uppercase text-[10px] tracking-widest">
+          Enable Cloud Sync <ChevronRight className="ml-2 h-4 w-4" />
+        </Button>
+      </div>
     </div>
   )
 }

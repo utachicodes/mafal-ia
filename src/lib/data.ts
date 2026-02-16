@@ -46,6 +46,7 @@ export interface Restaurant {
   whatsappNumber: string
   supportedLanguages: string[]
   isActive: boolean
+  businessType?: "RESTAURANT" | "RETAIL" | "SERVICE"
   isConcierge: boolean
   menu: MenuItem[]
   chatbotContext: ChatbotContext

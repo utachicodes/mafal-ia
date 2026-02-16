@@ -36,6 +36,12 @@ enum UserRole {
   RESTAURANT_OWNER   // Restaurant clients - read-only dashboard
 }
 
+enum BusinessType {
+  RESTAURANT
+  RETAIL
+  SERVICE
+}
+
 model users_sync {
   id         String    @id
   name       String?
@@ -59,6 +65,7 @@ model Restaurant {
   supportedLanguages    Json
   isActive              Boolean        @default(true)
   isConcierge           Boolean        @default(false)
+  businessType          BusinessType   @default(RESTAURANT)
   userId                String
   welcomeMessage        String         @default("")
   businessHours         String         @default("")
@@ -107,6 +114,8 @@ model MenuItem {
   isAvailable  Boolean    @default(true)
   imageUrl     String?
   embedding    Json?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @default(now()) @updatedAt
   restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
 }
 

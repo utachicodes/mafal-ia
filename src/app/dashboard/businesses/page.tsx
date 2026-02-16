@@ -1,15 +1,19 @@
+import { getServerSession } from "next-auth"
+import { authOptions } from "@/src/lib/auth"
+import { redirect } from "next/navigation"
 import { RestaurantService } from "@/src/lib/restaurant-service"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import {
   Store,
   Plus,
   ChevronRight,
-  MessageSquare,
   UtensilsCrossed,
   MapPin,
-  MoreHorizontal
+  MoreHorizontal,
+  CircleDot,
+  LayoutGrid
 } from "lucide-react"
 import Link from "next/link"
 import {
@@ -20,121 +24,153 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { cn } from "@/lib/utils"
 
 export const dynamic = "force-dynamic"
 
 export default async function RestaurantsPage() {
-  const restaurants = await RestaurantService.getAllRestaurants()
+  const session = await getServerSession(authOptions)
+
+  if (!session?.user) {
+    redirect("/auth/signin")
+  }
+
+  let restaurants: any[] = []
+  let error = null
+
+  try {
+    restaurants = await RestaurantService.getAllRestaurants((session.user as any).id)
+  } catch (e: any) {
+    console.error("Failed to load restaurants:", e)
+    error = e.message || "Failed to load"
+  }
 
   return (
-    <div className="space-y-8 py-2 h-full">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-gray-100 dark:border-gray-800 pb-6">
-        <div className="space-y-2">
-          <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
-            Businesses
+    <div className="space-y-10">
+      {/* Page Header */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+        <div className="space-y-1">
+          <h1 className="text-4xl font-bold tracking-tight text-gradient">
+            Business Hub
           </h1>
-          <p className="text-gray-500 dark:text-gray-400">
-            Manage your business locations and menus.
+          <p className="text-muted-foreground text-lg">
+            Manage your network of restaurant branches and AI knowledge bases
           </p>
         </div>
-        <Button asChild className="h-9 gap-2 bg-red-600 hover:bg-red-700 text-white shadow-sm">
-          <Link href="/onboarding">
-            <Plus className="h-4 w-4" />
-            Add Business
+        <Button asChild className="rounded-xl px-6 h-12 bg-primary hover:bg-primary/90 text-white shadow-xl shadow-primary/20 transition-all">
+          <Link href="/onboarding" className="flex items-center gap-2">
+            <Plus className="h-5 w-5" />
+            Launch New Branch
           </Link>
         </Button>
       </div>
 
-      {restaurants.length === 0 ? (
-        <Card className="flex flex-col items-center justify-center p-12 border-dashed shadow-sm bg-gray-50/50 dark:bg-gray-900/50">
-          <div className="h-12 w-12 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-4 text-gray-500">
-            <Store className="h-6 w-6" />
+      {error && (
+        <div className="p-6 rounded-2xl bg-destructive/10 border border-destructive/20 text-destructive text-sm font-bold flex items-center gap-3">
+          <CircleDot className="h-5 w-5 animate-pulse" />
+          Critical system error: {error}
+        </div>
+      )}
+
+      {restaurants.length === 0 && !error ? (
+        <Card className="glass border-2 border-dashed border-white/10 flex flex-col items-center justify-center p-20 text-center group">
+          <div className="h-20 w-20 rounded-3xl bg-primary/10 flex items-center justify-center mb-6 text-primary border border-primary/20 group-hover:scale-110 transition-transform duration-500">
+            <Store className="h-10 w-10" />
           </div>
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">No businesses yet</h3>
-          <p className="text-sm text-gray-500 text-center max-w-sm mb-6 mt-1">
-            Get started by adding your first business location to the platform.
+          <h3 className="text-2xl font-bold mb-2">Initialize your first entity</h3>
+          <p className="text-muted-foreground max-w-sm mx-auto mb-8">
+            Start by grouping your menus and AI settings under a unique business identity.
           </p>
-          <Button asChild variant="outline">
-            <Link href="/onboarding">Create Business</Link>
+          <Button asChild className="rounded-xl px-8 h-12 bg-primary text-white shadow-lg">
+            <Link href="/onboarding">Begin Onboarding</Link>
           </Button>
         </Card>
       ) : (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
           {restaurants.map((res) => (
-            <Card key={res.id} className="group shadow-sm border-gray-200 dark:border-gray-800 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 bg-white dark:bg-gray-950">
-              <CardHeader className="pb-4 relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-500 to-red-600 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
+            <Card key={res.id} className="glass border-white/10 hover:border-primary/40 transition-all duration-500 overflow-hidden group shadow-xl">
+              <div className="h-2 bg-primary/5 transition-colors group-hover:bg-primary/20" />
+              <CardHeader className="p-6 pb-4">
                 <div className="flex justify-between items-start">
-                  <div className="space-y-1">
-                    <CardTitle className="text-lg font-bold text-gray-900 dark:text-white group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">
+                  <div className="space-y-1.5">
+                    <CardTitle className="text-xl font-bold text-foreground">
                       {res.name}
                     </CardTitle>
-                    <div className="flex items-center gap-1.5 text-gray-500 text-sm">
-                      <MapPin className="h-3.5 w-3.5 text-gray-400" />
-                      {res.cuisine || "General Cuisine"}
+                    <div className="flex items-center gap-2 text-muted-foreground text-xs font-medium uppercase tracking-widest">
+                      <MapPin className="h-3 w-3 text-primary" />
+                      {res.cuisine || "Multi-Cuisine Hub"}
                     </div>
                   </div>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <span className="sr-only">Open menu</span>
-                        <MoreHorizontal className="h-4 w-4" />
+                      <Button variant="ghost" className="h-10 w-10 p-0 rounded-xl hover:bg-white/10 transition-all opacity-40 group-hover:opacity-100">
+                        <MoreHorizontal className="h-5 w-5" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                      <DropdownMenuItem asChild>
-                        <Link href={`/dashboard/businesses/${res.id}`}>Manage</Link>
+                    <DropdownMenuContent align="end" className="glass border-white/10">
+                      <DropdownMenuLabel className="text-[10px] text-muted-foreground uppercase tracking-widest px-4 py-2">Entity Control</DropdownMenuLabel>
+                      <DropdownMenuItem asChild className="px-4 py-2 hover:bg-primary/10 hover:text-primary transition-colors cursor-pointer rounded-lg mx-1">
+                        <Link href={`/dashboard/businesses/${res.id}`}>Branch Manager</Link>
                       </DropdownMenuItem>
-                      <DropdownMenuItem>View Menu</DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem className="text-red-600 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-950/20">Deactivate</DropdownMenuItem>
+                      <DropdownMenuItem className="px-4 py-2 hover:bg-primary/10 hover:text-primary transition-colors cursor-pointer rounded-lg mx-1">
+                        Analytics View
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator className="bg-white/5 mx-1 my-1" />
+                      <DropdownMenuItem className="px-4 py-2 text-destructive hover:bg-destructive/10 hover:text-destructive transition-colors cursor-pointer rounded-lg mx-1 font-bold">
+                        Archive Branch
+                      </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
               </CardHeader>
-              <CardContent className="space-y-4 pb-6">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-500">Status</span>
-                  <Badge variant={res.isActive ? "default" : "secondary"} className={res.isActive ? "bg-green-100 text-green-700 hover:bg-green-200 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-900/50" : ""}>
-                    {res.isActive ? "Active" : "Inactive"}
+              <CardContent className="px-6 py-4 space-y-6">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-black uppercase tracking-widest text-muted-foreground">Operational Status</span>
+                  <Badge className={cn(
+                    "rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-widest border-2",
+                    res.isActive
+                      ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20 shadow-[0_0_10px_-2px_theme(colors.emerald.500)]"
+                      : "bg-neutral-500/10 text-neutral-400 border-neutral-500/20"
+                  )}>
+                    {res.isActive ? "Online" : "Paused"}
                   </Badge>
                 </div>
-                <div className="grid grid-cols-2 gap-4 pt-2">
-                  <div className="space-y-1 p-2 rounded-lg bg-gray-50 dark:bg-gray-900/50 group-hover:bg-gray-100 dark:group-hover:bg-gray-900 transition-colors">
-                    <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">Items</p>
-                    <p className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                      <UtensilsCrossed className="h-4 w-4 text-red-500/70" />
-                      {(res as any).menu?.length || 0}
-                    </p>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="p-4 rounded-2xl bg-white/5 border border-white/5 group-hover:bg-white/10 transition-colors">
+                    <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1">KnowledgeBase</p>
+                    <div className="flex items-center gap-2">
+                      <LayoutGrid className="h-4 w-4 text-primary" />
+                      <span className="text-lg font-bold">{(res as any).menu?.length || 0} items</span>
+                    </div>
                   </div>
-                  <div className="space-y-1 p-2 rounded-lg bg-gray-50 dark:bg-gray-900/50 group-hover:bg-gray-100 dark:group-hover:bg-gray-900 transition-colors">
-                    <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">Health</p>
-                    <p className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                      <Store className="h-4 w-4 text-green-500/70" />
-                      100%
-                    </p>
+                  <div className="p-4 rounded-2xl bg-white/5 border border-white/5 group-hover:bg-white/10 transition-colors">
+                    <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1">Efficiency</p>
+                    <div className="flex items-center gap-2">
+                      <UtensilsCrossed className="h-4 w-4 text-emerald-500" />
+                      <span className="text-lg font-bold">Optimal</span>
+                    </div>
                   </div>
                 </div>
               </CardContent>
-              <CardFooter className="pt-0">
-                <Button asChild variant="outline" className="w-full justify-between group-hover:border-red-200 dark:group-hover:border-red-900/50 group-hover:bg-red-50/50 dark:group-hover:bg-red-900/10 transition-all">
-                  <Link href={`/dashboard/businesses/${res.id}`}>
-                    <span className="font-medium group-hover:text-red-700 dark:group-hover:text-red-400 transition-colors">Manage Details</span>
-                    <ChevronRight className="h-4 w-4 text-gray-400 group-hover:text-red-500 group-hover:translate-x-1 transition-all" />
+              <CardFooter className="p-6 pt-2">
+                <Button asChild variant="outline" className="w-full h-12 rounded-xl group-hover:bg-primary group-hover:text-white group-hover:border-primary transition-all shadow-sm">
+                  <Link href={`/dashboard/businesses/${res.id}`} className="flex items-center justify-between w-full px-2">
+                    <span className="font-bold uppercase tracking-widest text-xs">Enter Branch Manager</span>
+                    <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                   </Link>
                 </Button>
               </CardFooter>
             </Card>
           ))}
 
-          <Link href="/onboarding" className="group h-full">
-            <Card className="h-full border-dashed border-2 border-gray-200 dark:border-gray-800 shadow-none hover:border-red-300 dark:hover:border-red-700 hover:bg-red-50/10 dark:hover:bg-red-900/10 transition-all flex flex-col items-center justify-center p-6 min-h-[250px] cursor-pointer">
-              <div className="h-14 w-14 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-4 text-gray-400 group-hover:text-red-600 dark:group-hover:text-red-400 group-hover:bg-red-100 dark:group-hover:bg-red-900/30 transition-all group-hover:scale-110 duration-300 shadow-sm group-hover:shadow-md">
-                <Plus className="h-7 w-7" />
+          <Link href="/onboarding" className="group">
+            <Card className="h-full border-dashed border-2 border-white/10 glass shadow-none hover:border-primary/50 hover:bg-white/[0.02] transition-all flex flex-col items-center justify-center p-12 min-h-[300px] cursor-pointer rounded-[2rem]">
+              <div className="h-16 w-16 rounded-3xl bg-white/5 flex items-center justify-center mb-6 text-muted-foreground group-hover:text-primary group-hover:bg-primary/10 group-hover:border-primary/20 border border-white/5 transition-all group-hover:scale-110 duration-500">
+                <Plus className="h-8 w-8" />
               </div>
-              <p className="font-semibold text-gray-900 dark:text-white group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">Add New Location</p>
-              <p className="text-sm text-gray-500 text-center mt-2 max-w-[200px]">Expand your business by adding a new location</p>
+              <p className="font-bold text-lg text-foreground mb-1 group-hover:text-primary transition-colors">Add New Entity</p>
+              <p className="text-xs text-muted-foreground text-center max-w-[180px] leading-relaxed">Scale your operation by adding a new restaurant node.</p>
             </Card>
           </Link>
         </div>

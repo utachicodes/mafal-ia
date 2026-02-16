@@ -61,6 +61,11 @@ export const generateResponseFlow = defineFlow(
     }),
   },
   async (input: any): Promise<GenerateResponseOutput & { imageUrl?: string }> => {
+    console.log("[Flow/generateResponse] Input received:", {
+      restaurantName: input.restaurantName,
+      messageCount: input.messages?.length,
+      menuCount: input.menuItems?.length
+    })
     const { messages, restaurantContext, menuItems, restaurantName } = input
     const messagesTyped = messages as ChatMessage[]
     const menuItemsTyped = menuItems as MenuItem[]
@@ -71,10 +76,12 @@ export const generateResponseFlow = defineFlow(
     // Detect language from the last user message using Groq (Fast model)
     const { llm } = await import("@/src/lib/llm")
 
+    console.log("[Flow/generateResponse] Detecting language for message:", lastMessage)
     const languageDetectionResponse = await llm.generate(
       `Detect the language of this message and respond with just the language code (en, fr, wo, ar, etc.): "${lastMessage}"`,
       { model: "llama-3.1-8b-instant" }
     )
+    console.log("[Flow/generateResponse] Language detection result:", languageDetectionResponse)
 
     // Normalize language detection
     const normalizeLang = (s: string): "en" | "fr" | "wo" | "ar" => {
@@ -88,6 +95,7 @@ export const generateResponseFlow = defineFlow(
     const detectedLanguage = normalizeLang(languageDetectionResponse)
 
     // Analyze intent using Groq
+    console.log("[Flow/generateResponse] Analyzing intent...")
     const intentAnalysisResponse = await llm.generate(
       `
         Analyze this customer message and determine the intent:
@@ -103,6 +111,7 @@ export const generateResponseFlow = defineFlow(
       `,
       { model: "llama-3.1-8b-instant" }
     )
+    console.log("[Flow/generateResponse] Intent analysis result:", intentAnalysisResponse)
 
     const intent = intentAnalysisResponse.toLowerCase()
     let toolResponse = ""
@@ -205,6 +214,7 @@ Current user message: "${lastMessage}"
 Respond naturally as the restaurant's AI assistant:
     `
 
+    console.log("[Flow/generateResponse] Generating final response with Llama-3.3-70b...")
     const finalResponseText = await llm.generate(
       prompt
         .replace("{{restaurantName}}", restaurantName)
@@ -213,6 +223,7 @@ Respond naturally as the restaurant's AI assistant:
         .replace("{{menuSummary}}", menuSummary),
       { model: "llama-3.3-70b-versatile" }
     )
+    console.log("[Flow/generateResponse] Final response generated")
 
     const responseText = finalResponseText.trim()
 

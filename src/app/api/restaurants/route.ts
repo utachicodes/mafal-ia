@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server"
+import { getServerSession } from "next-auth"
+import { authOptions } from "@/src/lib/auth"
 import { RestaurantService } from "@/src/lib/restaurant-service"
 import type { Restaurant } from "@/lib/data"
 import { z } from "zod"
@@ -74,6 +76,7 @@ export async function POST(req: Request) {
       supportedLanguages: LangsSchema,
       isActive: z.coerce.boolean().optional().default(true),
       isConcierge: z.coerce.boolean().optional().default(false),
+      businessType: z.enum(["RESTAURANT", "RETAIL", "SERVICE"]).optional().default("RESTAURANT"),
       menu: MenuSchema,
       chatbotContext: z
         .object({
@@ -109,6 +112,10 @@ export async function POST(req: Request) {
       whatsappAppSecret: v.apiCredentials?.whatsappAppSecret ?? v.whatsappAppSecret ?? "",
     }
 
+    // Get session to assign owner
+    const session = await getServerSession(authOptions)
+    const ownerId = (session?.user as any)?.id // If undefined, service defaults to "seed-admin"
+
     const payload: Partial<Restaurant> = {
       name: v.name,
       description: v.description ?? "",
@@ -116,11 +123,12 @@ export async function POST(req: Request) {
       whatsappNumber: v.whatsappNumber ?? "",
       supportedLanguages: (v.supportedLanguages as string[]) ?? [],
       isActive: v.isActive ?? true,
+      businessType: v.businessType ?? "RESTAURANT",
       isConcierge: v.isConcierge ?? false,
       menu: (v.menu as any[]) ?? [],
       chatbotContext: v.chatbotContext as any,
       apiCredentials,
-      // userId (optional) used by service fallback if not present
+      userId: ownerId ?? v.userId, // Prefer session, then input, then service default
       // createdAt/updatedAt set by service/DB
     } as any
 

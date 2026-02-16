@@ -10,15 +10,36 @@ export class AIClient {
   ) {
     // Server-side: dynamically import Genkit flow runner
     // Ensure flows are registered and get concrete flow refs
+    console.log("[AIClient] Starting generateResponse flow for:", restaurantName)
     const { generateResponseFlow } = await import("@/src/ai")
     const { runFlow } = await import("@genkit-ai/flow")
-    const result = await runFlow(generateResponseFlow as any, {
-      messages,
-      restaurantContext,
-      menuItems,
-      restaurantName,
-    })
-    return result as any
+    console.log("[AIClient] Flow runner imported, executing...")
+    try {
+      // Add a 15-second timeout to the flow execution
+      const flowPromise = runFlow(generateResponseFlow as any, {
+        messages,
+        restaurantContext,
+        menuItems,
+        restaurantName,
+      })
+
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("AI_TIMEOUT")), 15000)
+      )
+
+      const result = await Promise.race([flowPromise, timeoutPromise])
+      console.log("[AIClient] Flow result received")
+      return result as any
+    } catch (error) {
+      console.error("[AIClient] Flow execution error or timeout:", error)
+
+      // Return a polite fallback response instead of throwing
+      return {
+        response: "Désolé, je rencontre une petite difficulté technique. Peux-tu reformuler ta question ?",
+        language: "fr",
+        intent: "error"
+      }
+    }
   }
 
   static async getMenuInformation(query: string, menuItems: MenuItem[], restaurantId?: string) {

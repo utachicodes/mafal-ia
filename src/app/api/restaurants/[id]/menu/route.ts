@@ -4,21 +4,27 @@ import { getPrisma } from "@/src/lib/db"
 export const runtime = "nodejs"
 
 // GET: list menu items for a restaurant
-export async function GET(_req: NextRequest, ctx: { params: { id: string } }) {
+export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await params
     const prisma = await getPrisma()
-    const items = await prisma.menuItem.findMany({ where: { restaurantId: ctx.params.id }, orderBy: { createdAt: "desc" } })
+    const items = await prisma.menuItem.findMany({ where: { restaurantId: id }, orderBy: { createdAt: "desc" } })
     return NextResponse.json({ ok: true, items })
   } catch (e: any) {
     console.error("[Menu][GET]", e)
-    return NextResponse.json({ ok: false, error: "internal_error" }, { status: 500 })
+    return NextResponse.json({
+      ok: false,
+      error: "internal_error",
+      details: e instanceof Error ? e.message : String(e)
+    }, { status: 500 })
   }
 }
 
 // POST: create a menu item
 // body: { name: string, price: number, description?: string, category?: string, isAvailable?: boolean }
-export async function POST(req: NextRequest, ctx: { params: { id: string } }) {
+export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await params
     const body = await req.json().catch(() => ({}))
     const name: string | undefined = body?.name
     const price = Number(body?.price)
@@ -33,7 +39,7 @@ export async function POST(req: NextRequest, ctx: { params: { id: string } }) {
     const prisma = await getPrisma()
     const item = await prisma.menuItem.create({
       data: {
-        restaurantId: ctx.params.id,
+        restaurantId: id,
         name,
         price,
         description: description || "",
@@ -45,6 +51,10 @@ export async function POST(req: NextRequest, ctx: { params: { id: string } }) {
     return NextResponse.json({ ok: true, item }, { status: 201 })
   } catch (e: any) {
     console.error("[Menu][POST]", e)
-    return NextResponse.json({ ok: false, error: "internal_error" }, { status: 500 })
+    return NextResponse.json({
+      ok: false,
+      error: "internal_error",
+      details: e instanceof Error ? e.message : String(e)
+    }, { status: 500 })
   }
 }

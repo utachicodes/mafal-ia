@@ -185,7 +185,7 @@ export default function HomeClient() {
               {session ? (
                 <div className="flex items-center gap-4">
                   <Link href="/dashboard">
-                    <Button variant="outline" className="border-red-500 text-red-500 hover:bg-red-50">
+                    <Button variant="outline" className="border-primary text-primary hover:bg-primary/10">
                       Dashboard
                     </Button>
                   </Link>
@@ -201,7 +201,7 @@ export default function HomeClient() {
                 <div className="flex items-center gap-4">
 
                   <Link href="/register">
-                    <Button className="bg-red-500 hover:bg-red-600 text-white px-6 shadow-md hover:shadow-lg transition-all">
+                    <Button className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 shadow-md hover:shadow-lg transition-all">
                       {t.nav.cta}
                     </Button>
                   </Link>
@@ -226,7 +226,7 @@ export default function HomeClient() {
               <motion.div variants={fadeInUp}>
                 <h1 className="text-5xl lg:text-6xl xl:text-7xl font-bold text-foreground leading-tight">
                   {t.hero.headline}{" "}
-                  <span className="text-red-500">{t.hero.headlineHighlight}</span>{" "}
+                  <span className="text-primary">{t.hero.headlineHighlight}</span>{" "}
                   {t.hero.headlineEnd}
                 </h1>
               </motion.div>
@@ -243,14 +243,14 @@ export default function HomeClient() {
                 className="flex flex-col sm:flex-row gap-4"
               >
                 <Link href="/onboarding">
-                  <Button size="lg" className="bg-red-500 hover:bg-red-600 text-white px-8 py-6 text-lg font-semibold shadow-lg hover:shadow-xl transition-all">
+                  <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-6 text-lg font-semibold shadow-lg hover:shadow-xl transition-all">
                     {t.hero.cta}
                   </Button>
                 </Link>
                 <Button
                   size="lg"
                   variant="outline"
-                  className="border-2 border-red-500 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 px-8 py-6 text-lg font-semibold transition-all"
+                  className="border-2 border-primary text-primary hover:bg-primary/5 dark:hover:bg-primary/20 px-8 py-6 text-lg font-semibold transition-all"
                 >
                   {t.hero.ctaSecondary}
                 </Button>
@@ -259,7 +259,7 @@ export default function HomeClient() {
               <motion.div variants={fadeInUp} className="grid grid-cols-3 gap-8 pt-4">
                 {t.hero.stats.map((stat, i) => (
                   <div key={i} className="text-center">
-                    <div className="text-2xl font-bold text-red-500">{stat.value}</div>
+                    <div className="text-2xl font-bold text-primary">{stat.value}</div>
                     <div className="text-sm text-gray-600 dark:text-gray-400">{stat.label}</div>
                   </div>
                 ))}
@@ -446,10 +446,10 @@ export default function HomeClient() {
                 className="relative"
               >
                 <Card className="p-8 bg-card border-2 border-border hover:border-primary/50 transition-all duration-300 h-full">
-                  <div className="absolute -top-6 left-8 w-12 h-12 bg-red-500 text-white rounded-full flex items-center justify-center font-bold text-xl shadow-lg">
+                  <div className="absolute -top-6 left-8 w-12 h-12 bg-primary text-primary-foreground rounded-full flex items-center justify-center font-bold text-xl shadow-lg">
                     {item.step}
                   </div>
-                  <div className="mt-4 mb-4 text-red-500 dark:text-red-400">
+                  <div className="mt-4 mb-4 text-primary dark:text-primary">
                     {item.icon}
                   </div>
                   <h3 className="text-xl font-bold text-foreground mb-3">{item.title}</h3>
@@ -546,7 +546,7 @@ export default function HomeClient() {
                 <div className="text-center mb-8">
                   <h3 className="text-2xl font-bold text-foreground mb-2">{t.pricingSection.cardTitle}</h3>
                   <div className="flex items-end justify-center gap-1 mb-2">
-                    <span className="text-5xl font-bold text-red-500">{t.pricingSection.price}</span>
+                    <span className="text-5xl font-bold text-primary">{t.pricingSection.price}</span>
                     <span className="text-muted-foreground mb-2">{t.pricingSection.period}</span>
                   </div>
                   <p className="text-sm text-muted-foreground">{t.pricingSection.caption}</p>
@@ -562,7 +562,7 @@ export default function HomeClient() {
                 </ul>
 
                 <Link href="/register">
-                  <Button className="w-full bg-red-500 hover:bg-red-600 text-white py-6 text-lg font-semibold shadow-lg hover:shadow-xl transition-all">
+                  <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-6 text-lg font-semibold shadow-lg hover:shadow-xl transition-all">
                     {t.pricingSection.cta}
                   </Button>
                 </Link>
@@ -572,13 +572,13 @@ export default function HomeClient() {
             {/* Premium Plan */}
             <motion.div variants={fadeInUp}>
               <Card className="p-8 bg-card border-2 border-primary shadow-2xl relative overflow-hidden h-full flex flex-col">
-                <div className="absolute top-0 right-0 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-bl-lg uppercase tracking-wider">
+                <div className="absolute top-0 right-0 bg-primary text-primary-foreground text-xs font-bold px-3 py-1 rounded-bl-lg uppercase tracking-wider">
                   Popular
                 </div>
                 <div className="text-center mb-8">
                   <h3 className="text-2xl font-bold text-foreground mb-2">{t.pricingSection.premiumCardTitle}</h3>
                   <div className="flex items-end justify-center gap-1 mb-2">
-                    <span className="text-5xl font-bold text-red-500">{t.pricingSection.premiumPrice}</span>
+                    <span className="text-5xl font-bold text-primary">{t.pricingSection.premiumPrice}</span>
                     <span className="text-muted-foreground mb-2">{t.pricingSection.period}</span>
                   </div>
                   <p className="text-sm text-muted-foreground">{t.pricingSection.caption}</p>
@@ -594,7 +594,7 @@ export default function HomeClient() {
                 </ul>
 
                 <Link href="/register">
-                  <Button className="w-full bg-red-500 hover:bg-red-600 text-white py-6 text-lg font-semibold shadow-lg hover:shadow-xl transition-all">
+                  <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-6 text-lg font-semibold shadow-lg hover:shadow-xl transition-all">
                     {t.pricingSection.cta}
                   </Button>
                 </Link>
@@ -611,7 +611,7 @@ export default function HomeClient() {
             initial={{ opacity: 0, scale: 0.95 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
-            className="bg-gradient-to-r from-red-500 to-red-600 rounded-3xl p-12 md:p-16 text-center text-white shadow-2xl"
+            className="bg-gradient-to-r from-primary to-primary/80 rounded-3xl p-12 md:p-16 text-center text-primary-foreground shadow-2xl"
           >
             <h2 className="text-4xl md:text-5xl font-bold mb-6">
               {t.cta.title}
@@ -621,7 +621,7 @@ export default function HomeClient() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/onboarding">
-                <Button size="lg" className="bg-white text-red-500 hover:bg-gray-100 px-10 py-6 text-lg font-semibold shadow-lg hover:shadow-xl transition-all">
+                <Button size="lg" className="bg-background text-foreground hover:bg-accent px-10 py-6 text-lg font-semibold shadow-lg hover:shadow-xl transition-all">
                   {t.cta.ctaPrimary}
                 </Button>
               </Link>

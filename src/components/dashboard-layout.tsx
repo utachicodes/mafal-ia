@@ -69,25 +69,25 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
               className={cn(
                 "group relative flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200",
                 isActive
-                  ? "bg-gradient-to-r from-red-50 to-red-50/50 text-red-600 dark:from-red-950/30 dark:to-red-950/10 dark:text-red-400 shadow-sm"
-                  : "text-gray-600 hover:bg-gradient-to-r hover:from-gray-50 hover:to-transparent hover:text-gray-900 dark:text-gray-400 dark:hover:from-gray-900/50 dark:hover:to-transparent dark:hover:text-gray-200",
+                  ? "bg-gray-100/80 text-gray-900 border-gray-200/50 dark:bg-gray-900/50 dark:text-gray-100 dark:border-gray-800/50 shadow-sm border"
+                  : "text-gray-500 hover:bg-gray-50/80 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-900/40 dark:hover:text-gray-200 border border-transparent",
                 collapsed && "justify-center px-2"
               )}
               onClick={() => setSidebarOpen(false)}
               title={collapsed ? item.name : undefined}
             >
               {isActive && (
-                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-gradient-to-b from-red-500 to-red-600 rounded-r-full" />
+                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-gray-900 dark:bg-gray-400 rounded-r-full" />
               )}
               <Icon className={cn(
                 "h-5 w-5 shrink-0 transition-all duration-200",
                 isActive
-                  ? "text-red-500 dark:text-red-400 scale-110"
+                  ? "text-gray-900 dark:text-gray-100 scale-110"
                   : "text-gray-400 group-hover:text-gray-600 dark:text-gray-500 dark:group-hover:text-gray-300 group-hover:scale-105"
               )} />
               {!collapsed && <span>{item.name}</span>}
               {!collapsed && isActive && (
-                <div className="ml-auto w-1.5 h-1.5 rounded-full bg-red-500 dark:bg-red-400" />
+                <div className="ml-auto w-1.5 h-1.5 rounded-full bg-gray-900 dark:bg-gray-400" />
               )}
             </Link>
           )
@@ -98,7 +98,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
       <div className="p-4 border-t border-gray-100 dark:border-gray-900 bg-white/50 dark:bg-gray-950/50 backdrop-blur-sm">
         <div className={cn("flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors", collapsed && "justify-center p-2")}>
           <Avatar className="h-9 w-9 border-2 border-gray-200 dark:border-gray-800 shadow-sm">
-            <AvatarFallback className="bg-gradient-to-br from-red-50 to-red-100 text-red-600 dark:from-red-950/30 dark:to-red-900/20 dark:text-red-400 font-semibold text-xs">
+            <AvatarFallback className="bg-gray-100 text-gray-900 dark:bg-gray-900 dark:text-gray-100 font-semibold text-xs">
               {session?.user?.name?.[0]?.toUpperCase() || "U"}
             </AvatarFallback>
           </Avatar>

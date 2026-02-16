@@ -1,7 +1,35 @@
 "use client"
 
 import { useEffect, useMemo, useState } from "react"
-import { useParams } from "next/navigation"
+import { useParams, useRouter } from "next/navigation"
+import { motion, AnimatePresence } from "framer-motion"
+import {
+  Plus,
+  Search,
+  Filter,
+  MoreHorizontal,
+  Trash2,
+  Edit3,
+  Check,
+  X,
+  ChefHat,
+  ShoppingBag,
+  ArrowLeft,
+  Zap,
+  Tag,
+  Eye,
+  EyeOff,
+  AlertCircle,
+  Loader2,
+  ChevronRight,
+  Sparkles
+} from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+import { Badge } from "@/components/ui/badge"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { cn } from "@/lib/utils"
 
 type MenuItem = {
   id: string
@@ -14,12 +42,15 @@ type MenuItem = {
 
 export default function RestaurantMenuPage() {
   const params = useParams<{ id: string }>()
+  const router = useRouter()
   const restaurantId = useMemo(() => String(params?.id || ""), [params])
 
   const [loading, setLoading] = useState(false)
   const [items, setItems] = useState<MenuItem[]>([])
   const [error, setError] = useState<string | null>(null)
+  const [searchQuery, setSearchQuery] = useState("")
 
+  const [isAdding, setIsAdding] = useState(false)
   const [form, setForm] = useState({
     name: "",
     price: "",
@@ -55,8 +86,14 @@ export default function RestaurantMenuPage() {
 
   useEffect(() => {
     load()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [restaurantId])
+
+  const filteredItems = useMemo(() => {
+    return items.filter(it =>
+      it.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (it.category?.toLowerCase() || "").includes(searchQuery.toLowerCase())
+    )
+  }, [items, searchQuery])
 
   async function onCreate(e: React.FormEvent) {
     e.preventDefault()
@@ -79,6 +116,7 @@ export default function RestaurantMenuPage() {
       const data = await res.json()
       if (!res.ok || !data.ok) throw new Error(data?.error || "Failed to create item")
       setForm({ name: "", price: "", description: "", category: "", isAvailable: true })
+      setIsAdding(false)
       await load()
     } catch (e: any) {
       setError(e?.message || "Failed to create item")
@@ -98,22 +136,19 @@ export default function RestaurantMenuPage() {
     })
   }
 
-  function cancelEdit() {
-    setEditingId(null)
-  }
-
   async function onSaveEdit(e: React.FormEvent) {
     e.preventDefault()
     if (!restaurantId || !editingId) return
     setLoading(true)
     setError(null)
     try {
-      const payload: any = {}
-      if (editForm.name.trim() !== "") payload.name = editForm.name.trim()
-      if (editForm.price !== "") payload.price = Number(editForm.price)
-      payload.description = editForm.description.trim()
-      payload.category = editForm.category.trim() || null
-      payload.isAvailable = Boolean(editForm.isAvailable)
+      const payload: any = {
+        name: editForm.name.trim(),
+        price: Number(editForm.price),
+        description: editForm.description.trim(),
+        category: editForm.category.trim() || null,
+        isAvailable: Boolean(editForm.isAvailable),
+      }
 
       const res = await fetch(`/api/restaurants/${restaurantId}/menu/${editingId}`, {
         method: "PATCH",
@@ -132,160 +167,334 @@ export default function RestaurantMenuPage() {
   }
 
   async function onDelete(id: string) {
-    if (!restaurantId || !id) return
-    if (!confirm("Delete this item?")) return
+    if (!confirm("Confirm removal of this menu item from logic engine?")) return
     setLoading(true)
-    setError(null)
     try {
       const res = await fetch(`/api/restaurants/${restaurantId}/menu/${id}`, { method: "DELETE" })
-      const data = await res.json()
-      if (!res.ok || !data.ok) throw new Error(data?.error || "Failed to delete item")
+      if (!res.ok) throw new Error("Deletion failed")
       await load()
     } catch (e: any) {
-      setError(e?.message || "Failed to delete item")
+      setError(e?.message)
     } finally {
       setLoading(false)
     }
   }
 
-  async function toggleAvailability(item: MenuItem) {
-    await onQuickPatch(item.id, { isAvailable: !item.isAvailable })
-  }
-
-  async function onQuickPatch(id: string, patch: Record<string, any>) {
-    if (!restaurantId || !id) return
+  async function toggleAvailability(it: MenuItem) {
     setLoading(true)
-    setError(null)
     try {
-      const res = await fetch(`/api/restaurants/${restaurantId}/menu/${id}`, {
+      const res = await fetch(`/api/restaurants/${restaurantId}/menu/${it.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(patch),
+        body: JSON.stringify({ isAvailable: !it.isAvailable }),
       })
-      const data = await res.json()
-      if (!res.ok || !data.ok) throw new Error(data?.error || "Failed to update")
+      if (!res.ok) throw new Error("Update failed")
       await load()
     } catch (e: any) {
-      setError(e?.message || "Failed to update")
+      setError(e?.message)
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <main className="mx-auto max-w-4xl p-6 space-y-8">
-      <header className="space-y-1">
-        <h1 className="text-2xl font-bold">Menu</h1>
-        <p className="text-sm text-muted-foreground">Add and manage your restaurant menu items. No WhatsApp setup required.</p>
-      </header>
-
-      {error && (
-        <div className="rounded border border-red-300 bg-red-50 p-3 text-sm text-red-800">
-          {error}
-        </div>
-      )}
-
-      <section className="rounded border bg-card p-4 shadow-sm">
-        <h2 className="mb-3 text-lg font-semibold">Add item</h2>
-        <form onSubmit={onCreate} className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <label className="flex flex-col gap-1">
-            <span className="text-sm">Name</span>
-            <input className="rounded border px-3 py-2" required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
-          </label>
-          <label className="flex flex-col gap-1">
-            <span className="text-sm">Price (FCFA)</span>
-            <input className="rounded border px-3 py-2" required type="number" min={0} value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} />
-          </label>
-          <label className="flex flex-col gap-1 sm:col-span-2">
-            <span className="text-sm">Description</span>
-            <textarea className="rounded border px-3 py-2" rows={2} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
-          </label>
-          <label className="flex flex-col gap-1">
-            <span className="text-sm">Category</span>
-            <input className="rounded border px-3 py-2" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} />
-          </label>
-          <label className="flex items-center gap-2">
-            <input type="checkbox" checked={form.isAvailable} onChange={(e) => setForm({ ...form, isAvailable: e.target.checked })} />
-            <span className="text-sm">Available</span>
-          </label>
-          <div className="sm:col-span-2">
-            <button disabled={loading} className="rounded bg-black px-4 py-2 text-white disabled:opacity-50">Create</button>
+    <div className="space-y-10">
+      {/* Page Header */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+        <div className="space-y-2">
+          <Button variant="ghost" onClick={() => router.back()} className="-ml-3 mb-2 text-muted-foreground hover:text-primary transition-colors group">
+            <ArrowLeft className="mr-2 h-4 w-4 transition-transform group-hover:-translate-x-1" />
+            Return to Branch
+          </Button>
+          <div className="flex items-center gap-4">
+            <h1 className="text-4xl font-bold tracking-tight text-gradient">Menu Terminal</h1>
+            <Badge className="bg-primary/10 text-primary border-primary/20 font-black uppercase text-[10px] tracking-widest px-3 py-1">
+              Grounding Engine
+            </Badge>
           </div>
-        </form>
-      </section>
-
-      <section className="space-y-3">
-        <h2 className="text-lg font-semibold">Items</h2>
-        <div className="overflow-x-auto rounded border">
-          <table className="w-full text-sm">
-            <thead className="bg-muted text-left">
-              <tr>
-                <th className="p-2">Name</th>
-                <th className="p-2">Price</th>
-                <th className="p-2">Category</th>
-                <th className="p-2">Available</th>
-                <th className="p-2 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {items.length === 0 && (
-                <tr>
-                  <td className="p-3 text-muted-foreground" colSpan={5}>No items yet.</td>
-                </tr>
-              )}
-              {items.map((it) => (
-                <tr key={it.id} className="border-t">
-                  <td className="p-2 font-medium">{it.name}</td>
-                  <td className="p-2">{new Intl.NumberFormat().format(it.price)} FCFA</td>
-                  <td className="p-2">{it.category || "-"}</td>
-                  <td className="p-2">{it.isAvailable ? "Yes" : "No"}</td>
-                  <td className="p-2 text-right space-x-2">
-                    <button onClick={() => toggleAvailability(it)} className="rounded border px-2 py-1">Toggle</button>
-                    <button onClick={() => startEdit(it)} className="rounded border px-2 py-1">Edit</button>
-                    <button onClick={() => onDelete(it.id)} className="rounded border px-2 py-1 text-red-600">Delete</button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <p className="text-muted-foreground text-lg">Define the knowledge parameters for your AI server agent</p>
         </div>
-      </section>
+        <Button
+          onClick={() => setIsAdding(!isAdding)}
+          className="rounded-xl px-6 h-12 bg-primary hover:bg-primary/90 text-white shadow-xl shadow-primary/20 transition-all gap-2"
+        >
+          {isAdding ? <X className="h-5 w-5" /> : <Plus className="h-5 w-5" />}
+          {isAdding ? "Cancel Entry" : "Register Item"}
+        </Button>
+      </div>
 
-      {editingId && (
-        <section className="rounded border bg-card p-4 shadow-sm">
-          <h2 className="mb-3 text-lg font-semibold">Edit item</h2>
-          <form onSubmit={onSaveEdit} className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <label className="flex flex-col gap-1">
-              <span className="text-sm">Name</span>
-              <input className="rounded border px-3 py-2" required value={editForm.name} onChange={(e) => setEditForm({ ...editForm, name: e.target.value })} />
-            </label>
-            <label className="flex flex-col gap-1">
-              <span className="text-sm">Price (FCFA)</span>
-              <input className="rounded border px-3 py-2" required type="number" min={0} value={editForm.price} onChange={(e) => setEditForm({ ...editForm, price: e.target.value })} />
-            </label>
-            <label className="flex flex-col gap-1 sm:col-span-2">
-              <span className="text-sm">Description</span>
-              <textarea className="rounded border px-3 py-2" rows={2} value={editForm.description} onChange={(e) => setEditForm({ ...editForm, description: e.target.value })} />
-            </label>
-            <label className="flex flex-col gap-1">
-              <span className="text-sm">Category</span>
-              <input className="rounded border px-3 py-2" value={editForm.category} onChange={(e) => setEditForm({ ...editForm, category: e.target.value })} />
-            </label>
-            <label className="flex items-center gap-2">
-              <input type="checkbox" checked={editForm.isAvailable} onChange={(e) => setEditForm({ ...editForm, isAvailable: e.target.checked })} />
-              <span className="text-sm">Available</span>
-            </label>
-            <div className="sm:col-span-2 space-x-2">
-              <button disabled={loading} className="rounded bg-black px-4 py-2 text-white disabled:opacity-50">Save</button>
-              <button type="button" onClick={cancelEdit} className="rounded border px-4 py-2">Cancel</button>
+      <AnimatePresence>
+        {isAdding && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="overflow-hidden"
+          >
+            <Card className="glass border-primary/30 shadow-2xl shadow-primary/5 p-8 rounded-[2.5rem]">
+              <CardHeader className="p-0 mb-8 flex flex-row items-center gap-4">
+                <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
+                  <ChefHat className="h-6 w-6" />
+                </div>
+                <div>
+                  <CardTitle className="text-xl font-bold">New Catalog Entry</CardTitle>
+                  <CardDescription>Grounding your agent with new item data</CardDescription>
+                </div>
+              </CardHeader>
+              <form onSubmit={onCreate} className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div className="md:col-span-2 space-y-2">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Item Identity</label>
+                  <Input
+                    placeholder="e.g. Signature Truffle Burger"
+                    value={form.name}
+                    onChange={e => setForm({ ...form, name: e.target.value })}
+                    className="h-12 rounded-xl bg-white/5 border-white/10 focus:ring-primary/50"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Value (FCFA)</label>
+                  <Input
+                    type="number"
+                    placeholder="3500"
+                    value={form.price}
+                    onChange={e => setForm({ ...form, price: e.target.value })}
+                    className="h-12 rounded-xl bg-white/5 border-white/10 focus:ring-primary/50"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Logic Cluster</label>
+                  <Input
+                    placeholder="e.g. Mains"
+                    value={form.category}
+                    onChange={e => setForm({ ...form, category: e.target.value })}
+                    className="h-12 rounded-xl bg-white/5 border-white/10 focus:ring-primary/50"
+                  />
+                </div>
+                <div className="md:col-span-3 space-y-2">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">AI Context / description</label>
+                  <Textarea
+                    placeholder="Describe ingredients, allergens, and flavor profiles for the AI to understand..."
+                    value={form.description}
+                    onChange={e => setForm({ ...form, description: e.target.value })}
+                    className="rounded-xl bg-white/5 border-white/10 focus:ring-primary/50 h-24"
+                  />
+                </div>
+                <div className="flex items-end pb-1.5 px-4">
+                  <Button type="submit" className="w-full h-12 bg-primary text-white rounded-xl shadow-lg font-bold" disabled={loading}>
+                    {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : "Deploy to Catalog"}
+                  </Button>
+                </div>
+              </form>
+            </Card>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <div className="flex flex-col md:flex-row gap-6">
+        {/* Sidebar Stats */}
+        <div className="w-full md:w-80 space-y-6">
+          <Card className="glass border-white/10 p-6 rounded-[2rem] relative overflow-hidden group">
+            <div className="absolute -top-4 -right-4 w-20 h-20 bg-primary/10 rounded-full blur-2xl group-hover:bg-primary/20 transition-colors" />
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Catalog Volume</span>
+              <ShoppingBag className="h-4 w-4 text-primary" />
             </div>
-          </form>
-        </section>
-      )}
+            <div className="text-4xl font-black mb-1">{items.length}</div>
+            <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-tighter italic">Grounding points active</p>
+          </Card>
 
-      {loading && (
-        <p className="text-sm text-muted-foreground">Working…</p>
-      )}
-    </main>
+          <div className="p-6 glass border-white/10 rounded-[2rem] space-y-6">
+            <div className="relative group">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+              <Input
+                placeholder="Search terminal..."
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                className="pl-10 h-10 bg-white/5 border-white/10 rounded-xl text-xs"
+              />
+            </div>
+
+            <div className="space-y-3">
+              <p className="text-[10px] font-black tracking-widest uppercase text-muted-foreground ml-1">Terminal Status</p>
+              <div className="flex items-center gap-3 p-3 rounded-xl bg-emerald-500/5 border border-emerald-500/10">
+                <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="text-xs font-bold text-emerald-500/80">RAG Engine Online</span>
+              </div>
+              <div className="flex items-center gap-3 p-3 rounded-xl bg-primary/5 border border-primary/10">
+                <Sparkles className="h-3 w-3 text-primary" />
+                <span className="text-xs font-bold text-primary/80">LLM Cache Synced</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Items Table */}
+        <div className="flex-1">
+          <Card className="glass border-white/10 overflow-hidden rounded-[2.5rem] shadow-2xl">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left">
+                <thead>
+                  <tr className="bg-white/5 text-[10px] font-black uppercase tracking-widest text-muted-foreground border-b border-white/5">
+                    <th className="px-8 py-5">Catalog Item</th>
+                    <th className="px-8 py-5">Value</th>
+                    <th className="px-8 py-5">Cluster</th>
+                    <th className="px-8 py-5">Logic State</th>
+                    <th className="px-8 py-5 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/5">
+                  <AnimatePresence initial={false}>
+                    {filteredItems.map((it, idx) => (
+                      <motion.tr
+                        key={it.id}
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: idx * 0.05 }}
+                        className="group hover:bg-white/[0.02] transition-colors"
+                      >
+                        <td className="px-8 py-6">
+                          <div className="flex flex-col gap-0.5">
+                            <span className="font-bold text-lg text-foreground">{it.name}</span>
+                            <span className="text-xs text-muted-foreground line-clamp-1 max-w-[200px]">{it.description || "No logic grounding provided."}</span>
+                          </div>
+                        </td>
+                        <td className="px-8 py-6">
+                          <span className="text-sm font-black text-white/90">{new Intl.NumberFormat().format(it.price)} <span className="text-[10px] opacity-50">FCFA</span></span>
+                        </td>
+                        <td className="px-8 py-6">
+                          <Badge variant="outline" className="rounded-lg bg-white/5 border-white/5 text-[10px] uppercase font-bold px-2 py-0.5">
+                            {it.category || "Unclustered"}
+                          </Badge>
+                        </td>
+                        <td className="px-8 py-6">
+                          <motion.button
+                            whileTap={{ scale: 0.9 }}
+                            onClick={() => toggleAvailability(it)}
+                            className={cn(
+                              "flex items-center gap-2 text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full border-2 transition-all",
+                              it.isAvailable
+                                ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20 shadow-[0_0_10px_-4px_theme(colors.emerald.500)]"
+                                : "bg-neutral-500/10 text-neutral-400 border-neutral-500/20"
+                            )}
+                          >
+                            {it.isAvailable ? <Eye className="h-3 w-3" /> : <EyeOff className="h-3 w-3" />}
+                            {it.isAvailable ? "Visible" : "Hidden"}
+                          </motion.button>
+                        </td>
+                        <td className="px-8 py-6 text-right">
+                          <div className="flex items-center justify-end gap-2 opacity-20 group-hover:opacity-100 transition-opacity">
+                            <Button variant="ghost" size="icon" onClick={() => startEdit(it)} className="h-9 w-9 rounded-xl hover:bg-primary/20 hover:text-primary transition-colors">
+                              <Edit3 className="h-4 w-4" />
+                            </Button>
+                            <Button variant="ghost" size="icon" onClick={() => onDelete(it.id)} className="h-9 w-9 rounded-xl hover:bg-destructive/20 hover:text-destructive transition-colors">
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </td>
+                      </motion.tr>
+                    ))}
+                  </AnimatePresence>
+                </tbody>
+              </table>
+              {filteredItems.length === 0 && (
+                <div className="p-20 text-center space-y-4">
+                  <AlertCircle className="h-12 w-12 text-muted-foreground mx-auto opacity-20" />
+                  <p className="text-muted-foreground font-bold italic uppercase tracking-widest text-xs">No entries detected in selected cluster.</p>
+                  <Button variant="link" onClick={() => setSearchQuery("")} className="text-primary font-black uppercase tracking-widest text-[10px]">Reset Telemetry Space</Button>
+                </div>
+              )}
+            </div>
+          </Card>
+        </div>
+      </div>
+
+      {/* Edit Modal (Portal-like Overlay) */}
+      <AnimatePresence>
+        {editingId && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-background/80 backdrop-blur-xl">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              className="w-full max-w-2xl"
+            >
+              <Card className="glass border-primary/20 shadow-2xl p-10 rounded-[3rem]">
+                <div className="flex justify-between items-start mb-10">
+                  <div className="space-y-1">
+                    <h2 className="text-3xl font-bold tracking-tight">Modify Entity Logic</h2>
+                    <p className="text-muted-foreground text-lg">Safely updating catalog entry: <span className="text-primary font-bold">{editForm.name}</span></p>
+                  </div>
+                  <Button variant="ghost" size="icon" onClick={() => setEditingId(null)} className="rounded-full h-12 w-12 hover:bg-white/10">
+                    <X className="h-6 w-6" />
+                  </Button>
+                </div>
+                <form onSubmit={onSaveEdit} className="space-y-8">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Identity Override</label>
+                      <Input
+                        value={editForm.name}
+                        onChange={e => setEditForm({ ...editForm, name: e.target.value })}
+                        className="h-14 bg-white/5 border-white/10 rounded-2xl text-lg font-bold"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Value Refactor</label>
+                      <Input
+                        type="number"
+                        value={editForm.price}
+                        onChange={e => setEditForm({ ...editForm, price: e.target.value })}
+                        className="h-14 bg-white/5 border-white/10 rounded-2xl text-lg font-bold"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Grounding Category</label>
+                      <Input
+                        value={editForm.category}
+                        onChange={e => setEditForm({ ...editForm, category: e.target.value })}
+                        className="h-14 bg-white/5 border-white/10 rounded-2xl"
+                      />
+                    </div>
+                    <div className="flex items-center gap-4 pt-10">
+                      <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Visibility Protocol</label>
+                      <Button
+                        type="button"
+                        onClick={() => setEditForm({ ...editForm, isAvailable: !editForm.isAvailable })}
+                        className={cn(
+                          "flex-1 h-12 rounded-xl border-2 font-black uppercase tracking-widest transition-all",
+                          editForm.isAvailable
+                            ? "bg-emerald-500 text-white border-emerald-400 shadow-xl shadow-emerald-500/20"
+                            : "bg-white/5 text-muted-foreground border-white/10"
+                        )}
+                      >
+                        {editForm.isAvailable ? "Active Transmission" : "Silent Mode"}
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Contextual Description Refinement</label>
+                    <Textarea
+                      value={editForm.description}
+                      onChange={e => setEditForm({ ...editForm, description: e.target.value })}
+                      className="bg-white/5 border-white/10 rounded-2xl h-32 text-base leading-relaxed"
+                    />
+                  </div>
+                  <div className="flex gap-4 pt-4">
+                    <Button type="submit" disabled={loading} className="flex-1 h-14 bg-primary text-white text-lg font-bold rounded-2xl shadow-xl shadow-primary/20">
+                      {loading ? <Loader2 className="h-6 w-6 animate-spin" /> : "Commit Changes"}
+                    </Button>
+                    <Button type="button" variant="outline" onClick={() => setEditingId(null)} className="h-14 px-8 rounded-2xl border-white/10 font-bold glass">
+                      Abort
+                    </Button>
+                  </div>
+                </form>
+              </Card>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+    </div>
   )
 }

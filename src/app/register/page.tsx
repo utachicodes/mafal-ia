@@ -2,13 +2,14 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
+import { motion, AnimatePresence } from "framer-motion"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Loader2 } from "lucide-react"
+import { Loader2, Sparkles, Smartphone, ShieldCheck, Zap, ArrowRight, Globe, CheckCircle2 } from "lucide-react"
 import { Logo } from "@/src/components/logo"
+import { cn } from "@/lib/utils"
 
 export default function RegisterPage() {
   const router = useRouter()
@@ -34,9 +35,6 @@ export default function RegisterPage() {
         setFormData(prev => ({ ...prev, country: "Nigeria" }));
       } else if (timeZone.includes("Dakar")) {
         setFormData(prev => ({ ...prev, country: "Senegal" }));
-      } else {
-        // Keep default or set to Other
-        // setFormData(prev => ({ ...prev, country: "Other" }));
       }
     } catch (e) {
       console.error("Timezone detection failed", e);
@@ -48,7 +46,6 @@ export default function RegisterPage() {
   }
 
   const handleNext = () => {
-    // Sanitize phone number: remove non-digits
     const sanitizedPhone = formData.whatsappNumber.replace(/\D/g, "")
     setFormData(prev => ({ ...prev, whatsappNumber: sanitizedPhone }))
     initiateRegistration()
@@ -67,7 +64,6 @@ export default function RegisterPage() {
     setLoading(true)
     setError("")
     try {
-      // Final sanitization check before sending
       const payload = {
         ...formData,
         whatsappNumber: formData.whatsappNumber.replace(/\D/g, "")
@@ -80,7 +76,6 @@ export default function RegisterPage() {
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || "Failed to create account")
 
-      // Account created successfully - now login
       const { signIn } = await import("next-auth/react");
       const result = await signIn("credentials", {
         redirect: false,
@@ -92,7 +87,6 @@ export default function RegisterPage() {
         throw new Error("Login failed after registration");
       }
 
-      // Success - Redirect to dashboard
       router.push("/dashboard")
     } catch (err: any) {
       setError(err.message)
@@ -106,102 +100,184 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      {/* Container for perfect centering */}
-      <div className="w-full max-w-md space-y-8">
+    <div className="min-h-screen bg-background flex flex-col lg:flex-row relative overflow-hidden">
+      {/* Ambient Backgrounds */}
+      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/10 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-accent/10 rounded-full blur-[120px] pointer-events-none" />
 
-        <div className="flex flex-col items-center justify-center">
-          <Link href="/" className="hover:opacity-80 transition-opacity mb-6">
-            <Logo className="h-12 w-auto" />
+      {/* Left Section: Branding & Vision */}
+      <div className="hidden lg:flex flex-col justify-between p-16 w-[45%] bg-white/5 backdrop-blur-3xl border-r border-white/10 relative z-10">
+        <div className="space-y-12">
+          <Link href="/" className="inline-flex items-center gap-3 group">
+            <div className="p-3 rounded-2xl bg-primary/10 group-hover:bg-primary/20 transition-all duration-500 scale-110">
+              <Logo className="h-10 w-auto" />
+            </div>
+            <span className="font-bold text-3xl tracking-tighter text-gradient">Mafal-IA</span>
           </Link>
-          <h2 className="text-3xl font-bold tracking-tight text-foreground text-center">
-            Commencer
-          </h2>
-          <p className="mt-2 text-sm text-muted-foreground text-center">
-            Inscription rapide — votre compte sera validé par un administrateur
-          </p>
+
+          <div className="space-y-6">
+            <motion.h1
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="text-6xl font-bold tracking-tight leading-[0.9] text-white"
+            >
+              Digital Alchemist <br />
+              <span className="text-primary italic font-light">for Restaurants</span>
+            </motion.h1>
+            <p className="text-xl text-muted-foreground leading-relaxed max-w-md">
+              Join the elite network of automated restaurants using Neural Agents to scale operations.
+            </p>
+          </div>
+
+          <div className="grid gap-6 pt-12">
+            {[
+              { icon: Zap, label: "Instant Deployment", desc: "Live in under 5 minutes" },
+              { icon: ShieldCheck, label: "Bank-Grade Privacy", desc: "Strict data isolation protocols" },
+              { icon: Globe, label: "Multilingual Core", desc: "English, French, and Arabic" }
+            ].map((feature, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.1 }}
+                className="flex gap-4 items-start p-6 rounded-3xl bg-white/[0.03] border border-white/5 hover:bg-white/5 transition-colors"
+              >
+                <div className="p-3 rounded-2xl bg-primary/10 text-primary border border-primary/20">
+                  <feature.icon className="h-5 w-5" />
+                </div>
+                <div>
+                  <div className="font-bold text-white uppercase text-xs tracking-widest">{feature.label}</div>
+                  <div className="text-muted-foreground text-sm">{feature.desc}</div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
         </div>
 
-        <Card className="glass border-white/20 dark:border-white/10 shadow-xl">
-          <CardHeader>
-            <CardTitle className="text-xl">Start Growth</CardTitle>
-            <CardDescription>Vos informations de base.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {error && (
-              <div className="bg-destructive/10 text-destructive p-3 rounded-md text-sm border border-destructive/20">
-                {error}
-              </div>
-            )}
+        <div className="text-muted-foreground text-sm font-medium tracking-tight">
+          © 2026 Mafal-IA Research Layer. All Rights Reserved.
+        </div>
+      </div>
 
-            <div className="space-y-4">
+      {/* Right Section: Interactive Registration */}
+      <div className="flex-1 flex flex-col justify-center items-center p-8 lg:p-16 z-20">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="w-full max-w-[480px] space-y-10"
+        >
+          <div className="lg:hidden text-center mb-12">
+            <Logo className="h-12 w-auto mx-auto" />
+          </div>
+
+          <div className="space-y-3">
+            <h2 className="text-4xl font-bold tracking-tight text-white flex items-center gap-3">
+              Initiate Account
+              <Sparkles className="h-6 w-6 text-primary animate-pulse" />
+            </h2>
+            <p className="text-muted-foreground text-lg">
+              Enter your restaurant details to begin the onboarding cycle.
+            </p>
+          </div>
+
+          <div className="glass border-white/10 rounded-[2.5rem] p-10 shadow-2xl space-y-8 relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-8 opacity-5">
+              <Smartphone className="h-40 w-40" />
+            </div>
+
+            <AnimatePresence mode="wait">
+              {error && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="bg-red-500/10 text-red-400 p-4 rounded-2xl text-sm border border-red-500/20 font-bold flex items-center gap-3"
+                >
+                  <ShieldCheck className="h-5 w-5" />
+                  {error}
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            <div className="space-y-6 relative z-10">
               <div className="space-y-2">
-                <Label htmlFor="name">Nom du restaurant *</Label>
+                <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Restaurant Identity</Label>
                 <Input
-                  id="name"
-                  placeholder="Nom du restaurant"
+                  placeholder="e.g. Mafal Grillhouse"
                   value={formData.name}
                   onChange={(e) => handleChange("name", e.target.value)}
-                  autoFocus
-                  className="bg-transparent"
+                  className="h-14 bg-white/5 border-white/10 rounded-2xl px-6 focus:ring-primary/50 transition-all text-base"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="phone">Numéro de téléphone *</Label>
-                <Input
-                  id="phone"
-                  placeholder="770000000"
-                  type="tel"
-                  value={formData.whatsappNumber}
-                  onChange={(e) => handleChange("whatsappNumber", e.target.value)}
-                  className="bg-transparent"
-                />
-                <p className="text-xs text-muted-foreground">L'indicatif +221 sera ajouté automatiquement (si c'est sénégal)</p>
-                {formData.country && <p className="text-xs text-green-600">Pays détecté: {formData.country}</p>}
+                <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">WhatsApp Interface</Label>
+                <div className="relative">
+                  <div className="absolute left-6 top-1/2 -translate-y-1/2 flex items-center gap-2 pr-4 border-r border-white/10 text-sm font-bold text-white">
+                    {formData.country === 'Senegal' ? '🇸🇳 +221' :
+                      formData.country === 'Ivory Coast' ? '🇨🇮 +225' :
+                        formData.country === 'Nigeria' ? '🇳🇬 +234' : '🌍'}
+                  </div>
+                  <Input
+                    placeholder="77 000 00 00"
+                    type="tel"
+                    value={formData.whatsappNumber}
+                    onChange={(e) => handleChange("whatsappNumber", e.target.value)}
+                    className="h-14 pl-[7.5rem] bg-white/5 border-white/10 rounded-2xl pr-6 focus:ring-primary/50 transition-all text-base"
+                  />
+                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="pin">Code PIN *</Label>
+                  <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Access PIN</Label>
                   <Input
-                    id="pin"
                     type="password"
-                    placeholder="...."
+                    placeholder="••••"
                     maxLength={6}
                     value={formData.pin}
                     onChange={(e) => handleChange("pin", e.target.value)}
-                    className="bg-transparent"
+                    className="h-14 bg-white/5 border-white/10 rounded-2xl px-6 focus:ring-primary/50 transition-all text-center tracking-[0.5em] text-xl font-bold"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="confirmPin">Confirmer le code PIN *</Label>
+                  <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Confirm PIN</Label>
                   <Input
-                    id="confirmPin"
                     type="password"
-                    placeholder="Confirmez"
+                    placeholder="••••"
                     maxLength={6}
                     value={confirmPin}
                     onChange={(e) => setConfirmPin(e.target.value)}
-                    className="bg-transparent"
+                    className="h-14 bg-white/5 border-white/10 rounded-2xl px-6 focus:ring-primary/50 transition-all text-center tracking-[0.5em] text-xl font-bold"
                   />
                 </div>
               </div>
+
+              <Button
+                className="w-full h-16 rounded-2xl bg-primary hover:bg-primary/90 text-white font-black uppercase text-xs tracking-widest shadow-2xl shadow-primary/30 transition-all hover:scale-[1.02] active:scale-[0.98] mt-4"
+                onClick={handleNext}
+                disabled={!isFormValid() || loading}
+              >
+                {loading ? (
+                  <div className="flex items-center gap-2">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Provisioning Instance...
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    Establish Connection <ArrowRight className="h-4 w-4" />
+                  </div>
+                )}
+              </Button>
             </div>
-          </CardContent>
-          <CardFooter className="flex justify-between pt-2 pb-6">
-            <Button
-              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
-              onClick={handleNext}
-              disabled={!isFormValid() || loading}
-            >
-              {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Créer mon compte"}
-            </Button>
-          </CardFooter>
-          <div className="text-center pb-6 text-sm text-muted-foreground">
-            Vous avez déjà un compte ? <Link href="/login" className="text-primary hover:underline font-medium">Connectez-vous</Link>
+
+            <div className="text-center">
+              <p className="text-sm text-muted-foreground">
+                Already integrated? <Link href="/auth/signin" className="text-primary font-bold hover:underline">Secure Login</Link>
+              </p>
+            </div>
           </div>
-        </Card>
+        </motion.div>
       </div>
     </div>
   )

@@ -108,8 +108,8 @@ export async function searchMenuItemsByVector(
         restaurantId,
         isAvailable: true,
         OR: [
-          { name: { contains: query, mode: "insensitive" } },
-          { description: { contains: query, mode: "insensitive" } },
+          { name: { contains: query } },
+          { description: { contains: query } },
         ],
       },
       take: limit,
