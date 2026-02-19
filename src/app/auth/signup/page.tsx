@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { motion } from "framer-motion"
-import { User, Mail, Lock, UserPlus, Sparkles, CheckCircle2 } from "lucide-react"
+import { User, Mail, Lock, UserPlus, CheckCircle2 } from "lucide-react"
 import Link from "next/link"
 import { Logo } from "@/src/components/logo"
 import { Button } from "@/components/ui/button"
@@ -38,9 +38,9 @@ export default function SignupPage() {
             <CheckCircle2 className="h-10 w-10 text-emerald-500" />
           </div>
           <h1 className="text-3xl font-bold">Account Created</h1>
-          <p className="text-muted-foreground">Your restaurant instance is being provisioned. You can now initialize your first AI branch.</p>
+          <p className="text-muted-foreground">Your account is ready. You can now sign in and add your first restaurant.</p>
           <Button asChild className="w-full h-14 rounded-2xl bg-primary hover:bg-primary/90">
-            <Link href="/auth/signin">Access Dashboard</Link>
+            <Link href="/auth/signin">Go to Sign In</Link>
           </Button>
         </motion.div>
       </div>
@@ -66,14 +66,14 @@ export default function SignupPage() {
             </div>
             <span className="font-bold text-3xl tracking-tighter text-gradient">Mafal-IA</span>
           </Link>
-          <h1 className="text-3xl font-bold tracking-tight mb-2">Join the Network</h1>
-          <p className="text-muted-foreground">Automate your restaurant operations with AI agents</p>
+          <h1 className="text-3xl font-bold tracking-tight mb-2">Create an account</h1>
+          <p className="text-muted-foreground">Start automating your restaurant orders via WhatsApp</p>
         </div>
 
-        <Card className="glass border-white/10 p-8 rounded-[2rem] shadow-2xl relative">
+        <div className={cn("glass border-white/10 p-8 rounded-[2rem] shadow-2xl relative bg-card text-card-foreground")}>
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-2">
-              <label className="text-xs font-black uppercase tracking-widest text-muted-foreground ml-1">Partner Identity</label>
+              <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">Your name</label>
               <div className="relative group">
                 <User className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
                 <Input
@@ -87,7 +87,7 @@ export default function SignupPage() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-xs font-black uppercase tracking-widest text-muted-foreground ml-1">Email Terminal</label>
+              <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">Email address</label>
               <div className="relative group">
                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
                 <Input
@@ -102,12 +102,12 @@ export default function SignupPage() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-xs font-black uppercase tracking-widest text-muted-foreground ml-1">Access Protocol</label>
+              <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">Password</label>
               <div className="relative group">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
                 <Input
                   type="password"
-                  placeholder="Create Secure Key"
+                  placeholder="Create a secure password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="pl-12 h-14 bg-white/5 border-white/10 rounded-2xl focus:ring-primary/50 transition-all text-base"
@@ -124,40 +124,25 @@ export default function SignupPage() {
               {loading ? (
                 <div className="flex items-center gap-2">
                   <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  Generating Identity...
+                  Creating account...
                 </div>
               ) : (
                 <div className="flex items-center gap-2">
-                  Initialize Hub <UserPlus className="h-5 w-5" />
+                  Create Account <UserPlus className="h-5 w-5" />
                 </div>
               )}
             </Button>
           </form>
 
-          <div className="mt-8 flex items-center gap-4">
-            <div className="h-px bg-white/5 flex-1" />
-            <span className="text-[10px] text-muted-foreground font-black uppercase tracking-widest">Network Verification</span>
-            <div className="h-px bg-white/5 flex-1" />
-          </div>
-
           <div className="mt-6 flex items-center justify-center gap-2 text-xs text-muted-foreground">
-            <Sparkles className="h-3 w-3 text-primary" />
-            By joining, you agree to the AI Terms of Operation
+            By signing up, you agree to our Terms of Service
           </div>
-        </Card>
+        </div>
 
         <p className="text-center mt-8 text-muted-foreground">
-          Existing partner? <Link href="/auth/signin" className="text-primary font-bold hover:underline">Secure Login</Link>
+          Already have an account? <Link href="/auth/signin" className="text-primary font-bold hover:underline">Sign in</Link>
         </p>
       </motion.div>
-    </div>
-  )
-}
-
-function Card({ children, className }: { children: React.ReactNode, className?: string }) {
-  return (
-    <div className={cn("bg-card text-card-foreground rounded-lg border shadow-sm", className)}>
-      {children}
     </div>
   )
 }

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { usePathname } from "next/navigation"
-import { motion, AnimatePresence } from "framer-motion"
+import { motion } from "framer-motion"
 import {
     Home,
     ShoppingBag,
@@ -13,7 +13,7 @@ import {
     ChevronRight,
     LogOut,
     User,
-    Sparkles
+    MessageSquare
 } from "lucide-react"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
@@ -21,11 +21,12 @@ import { Logo } from "@/src/components/logo"
 import { useSession, signOut } from "next-auth/react"
 
 const navigation = [
-    { name: "Dashboard", href: "/dashboard", icon: Home },
-    { name: "Orders", href: "/dashboard/orders", icon: ShoppingBag },
-    { name: "Analytics", href: "/dashboard/analytics", icon: BarChart3 },
-    { name: "Businesses", href: "/dashboard/businesses", icon: Store },
-    { name: "Settings", href: "/dashboard/settings", icon: Settings },
+    { name: "Dashboard", href: "/dashboard", exact: true, icon: Home },
+    { name: "Orders", href: "/dashboard/orders", exact: false, icon: ShoppingBag },
+    { name: "Analytics", href: "/dashboard/analytics", exact: false, icon: BarChart3 },
+    { name: "Businesses", href: "/dashboard/businesses", exact: false, icon: Store },
+    { name: "Playground", href: "/playground", exact: false, icon: MessageSquare },
+    { name: "Settings", href: "/dashboard/settings", exact: false, icon: Settings },
 ]
 
 interface SidebarProps {
@@ -70,7 +71,9 @@ export function Sidebar({ collapsed, setCollapsed }: SidebarProps) {
             {/* Navigation */}
             <nav className="flex-1 px-4 space-y-2 py-4">
                 {navigation.map((item) => {
-                    const isActive = pathname === item.href || pathname.startsWith(item.href + "/")
+                    const isActive = item.exact
+                        ? pathname === item.href
+                        : pathname === item.href || pathname.startsWith(item.href + "/")
                     const Icon = item.icon
 
                     return (
@@ -83,7 +86,6 @@ export function Sidebar({ collapsed, setCollapsed }: SidebarProps) {
                             )}>
                                 <Icon className={cn(
                                     "h-5 w-5 shrink-0 transition-transform duration-300 group-hover:scale-110",
-                                    isActive && "animate-pulse"
                                 )} />
 
                                 {!collapsed && (

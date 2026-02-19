@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { useState } from "react"
-import { Store, ArrowLeft, Loader2, Sparkles } from "lucide-react"
+import { Store, ArrowLeft, Loader2, Plus } from "lucide-react"
 import Link from "next/link"
 
 export default function NewBusinessPage() {
@@ -22,7 +22,7 @@ export default function NewBusinessPage() {
         const name = formData.get("name")
         const cuisine = formData.get("cuisine")
         const description = formData.get("description")
-        const businessType = formData.get("businessType") // We'll add this field
+        const businessType = formData.get("businessType")
 
         try {
             const res = await fetch("/api/restaurants", {
@@ -33,8 +33,8 @@ export default function NewBusinessPage() {
                     cuisine,
                     description,
                     businessType,
-                    whatsappNumber: "221000000000", // Default for demo
-                    menu: [] // Empty menu initially
+                    whatsappNumber: "221000000000",
+                    menu: []
                 })
             })
 
@@ -63,54 +63,54 @@ export default function NewBusinessPage() {
 
             <div className="space-y-6">
                 <div className="space-y-2">
-                    <h1 className="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
-                        Create Your New Business
+                    <h1 className="text-3xl font-extrabold tracking-tight text-gradient">
+                        Create a New Business
                     </h1>
                     <p className="text-muted-foreground text-lg">
-                        Let's set up the digital presence for your new location.
+                        Fill in the details below to set up your new restaurant.
                     </p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-8">
-                    <Card className="shadow-lg border-gray-200 dark:border-gray-800 bg-white/50 dark:bg-gray-950/50 backdrop-blur-sm overflow-hidden">
-                        <div className="h-1.5 w-full bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-400" />
+                    <Card className="glass border-white/10 overflow-hidden">
+                        <div className="h-1.5 w-full bg-primary/20" />
                         <CardHeader className="pt-8">
                             <div className="flex items-center gap-4 pb-2">
-                                <div className="p-3 bg-gray-100 dark:bg-gray-900 rounded-2xl">
-                                    <Store className="h-6 w-6 text-gray-900 dark:text-white" />
+                                <div className="p-3 bg-primary/10 rounded-2xl border border-primary/20">
+                                    <Store className="h-6 w-6 text-primary" />
                                 </div>
                                 <div>
-                                    <CardTitle className="text-2xl">Core Details</CardTitle>
-                                    <CardDescription>Essential information for your AI agent.</CardDescription>
+                                    <CardTitle className="text-2xl">Business Details</CardTitle>
+                                    <CardDescription>Basic information about your restaurant.</CardDescription>
                                 </div>
                             </div>
                         </CardHeader>
                         <CardContent className="space-y-6 pt-2">
                             <div className="grid gap-3">
-                                <Label htmlFor="name" className="text-sm font-bold uppercase tracking-wider text-gray-500">Business Name</Label>
-                                <Input name="name" id="name" placeholder="e.g. Gourmet Burger Dakar" required className="h-12 text-lg rounded-xl border-gray-200 dark:border-gray-800" />
+                                <Label htmlFor="name" className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Business Name</Label>
+                                <Input name="name" id="name" placeholder="e.g. Gourmet Burger Dakar" required className="h-12 text-lg rounded-xl bg-white/5 border-white/10 focus:ring-primary/50" />
                             </div>
 
                             <div className="grid gap-3">
-                                <Label htmlFor="businessType" className="text-sm font-bold uppercase tracking-wider text-gray-500">Business Type</Label>
+                                <Label htmlFor="businessType" className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Business Type</Label>
                                 <div className="grid grid-cols-3 gap-4">
                                     <label className="cursor-pointer">
                                         <input type="radio" name="businessType" value="RESTAURANT" className="peer sr-only" defaultChecked />
-                                        <div className="rounded-xl border-2 border-gray-200 dark:border-gray-800 p-4 hover:bg-gray-50 dark:hover:bg-gray-900 peer-checked:border-gray-900 dark:peer-checked:border-white peer-checked:bg-gray-900/5 transition-all text-center">
+                                        <div className="rounded-xl border-2 border-white/10 p-4 hover:bg-white/5 peer-checked:border-primary peer-checked:bg-primary/5 transition-all text-center">
                                             <span className="block font-bold">Restaurant</span>
                                             <span className="text-xs text-muted-foreground">Menu & Dishes</span>
                                         </div>
                                     </label>
                                     <label className="cursor-pointer">
                                         <input type="radio" name="businessType" value="RETAIL" className="peer sr-only" />
-                                        <div className="rounded-xl border-2 border-gray-200 dark:border-gray-800 p-4 hover:bg-gray-50 dark:hover:bg-gray-900 peer-checked:border-gray-900 dark:peer-checked:border-white peer-checked:bg-gray-900/5 transition-all text-center">
+                                        <div className="rounded-xl border-2 border-white/10 p-4 hover:bg-white/5 peer-checked:border-primary peer-checked:bg-primary/5 transition-all text-center">
                                             <span className="block font-bold">Retail</span>
                                             <span className="text-xs text-muted-foreground">Products & Catalog</span>
                                         </div>
                                     </label>
                                     <label className="cursor-pointer">
                                         <input type="radio" name="businessType" value="SERVICE" className="peer sr-only" />
-                                        <div className="rounded-xl border-2 border-gray-200 dark:border-gray-800 p-4 hover:bg-gray-50 dark:hover:bg-gray-900 peer-checked:border-gray-900 dark:peer-checked:border-white peer-checked:bg-gray-900/5 transition-all text-center">
+                                        <div className="rounded-xl border-2 border-white/10 p-4 hover:bg-white/5 peer-checked:border-primary peer-checked:bg-primary/5 transition-all text-center">
                                             <span className="block font-bold">Service</span>
                                             <span className="text-xs text-muted-foreground">Booking & Rates</span>
                                         </div>
@@ -119,17 +119,17 @@ export default function NewBusinessPage() {
                             </div>
 
                             <div className="grid gap-3">
-                                <Label htmlFor="cuisine" className="text-sm font-bold uppercase tracking-wider text-gray-500">Category / Tags</Label>
-                                <Input name="cuisine" id="cuisine" placeholder="e.g. Fast Food, Sports, Taxi" required className="h-12 rounded-xl border-gray-200 dark:border-gray-800" />
+                                <Label htmlFor="cuisine" className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Category / Tags</Label>
+                                <Input name="cuisine" id="cuisine" placeholder="e.g. Fast Food, Sports, Taxi" required className="h-12 rounded-xl bg-white/5 border-white/10 focus:ring-primary/50" />
                             </div>
 
                             <div className="grid gap-3">
-                                <Label htmlFor="description" className="text-sm font-bold uppercase tracking-wider text-gray-500">Short Description</Label>
+                                <Label htmlFor="description" className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Description</Label>
                                 <Textarea
                                     name="description"
                                     id="description"
-                                    placeholder="Tell your AI agent what makes this business special..."
-                                    className="min-h-[120px] rounded-2xl border-gray-200 dark:border-gray-800 resize-none p-4"
+                                    placeholder="Briefly describe your business to help customers understand what you offer..."
+                                    className="min-h-[120px] rounded-2xl bg-white/5 border-white/10 focus:ring-primary/50 resize-none p-4"
                                 />
                             </div>
                         </CardContent>
@@ -142,17 +142,17 @@ export default function NewBusinessPage() {
                         <Button
                             type="submit"
                             disabled={loading}
-                            className="bg-gray-900 hover:bg-gray-800 text-white dark:bg-white dark:text-gray-900 dark:hover:bg-gray-100 rounded-xl h-12 px-10 shadow-xl gap-2 font-bold"
+                            className="bg-primary hover:bg-primary/90 text-white rounded-xl h-12 px-10 shadow-xl shadow-primary/20 gap-2 font-bold"
                         >
                             {loading ? (
                                 <>
                                     <Loader2 className="h-5 w-5 animate-spin" />
-                                    Creating Business...
+                                    Creating...
                                 </>
                             ) : (
                                 <>
-                                    <Sparkles className="h-5 w-5" />
-                                    Launch Business
+                                    <Plus className="h-5 w-5" />
+                                    Create Business
                                 </>
                             )}
                         </Button>

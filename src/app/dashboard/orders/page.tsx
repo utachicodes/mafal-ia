@@ -9,10 +9,8 @@ import {
   Download,
   Search,
   MoreHorizontal,
-  ChevronRight,
   User,
   MapPin,
-  Activity
 } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import {
@@ -45,10 +43,10 @@ export default async function OrdersPage() {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div className="space-y-1">
           <h1 className="text-4xl font-bold tracking-tight text-gradient">
-            Order Management
+            Orders
           </h1>
           <p className="text-muted-foreground text-lg">
-            Track and monitor incoming customer requests
+            Track and manage incoming customer orders
           </p>
         </div>
         <div className="flex gap-3">
@@ -58,12 +56,12 @@ export default async function OrdersPage() {
           </Button>
           <Button className="rounded-xl px-6 h-11 bg-primary hover:bg-primary/90 text-white shadow-xl shadow-primary/20 transition-all">
             <Filter className="h-4 w-4 mr-2" />
-            Filter View
+            Filter
           </Button>
         </div>
       </div>
 
-      {/* Main Content Table */}
+      {/* Orders Table */}
       <Card className="glass border-white/10 overflow-hidden">
         <CardHeader className="p-6 border-b border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="relative w-full max-w-md group">
@@ -76,7 +74,7 @@ export default async function OrdersPage() {
           </div>
           <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground bg-white/5 px-4 py-2 rounded-full border border-white/5">
             <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-            {orders.length} TOTAL RECORDS
+            {orders.length} TOTAL
           </div>
         </CardHeader>
         <CardContent className="p-0">
@@ -85,9 +83,9 @@ export default async function OrdersPage() {
               <div className="h-20 w-20 mx-auto mb-6 flex items-center justify-center rounded-3xl bg-primary/10 text-primary border border-primary/20">
                 <ShoppingBag className="h-10 w-10" />
               </div>
-              <h3 className="text-2xl font-bold">No active orders found</h3>
+              <h3 className="text-2xl font-bold">No orders yet</h3>
               <p className="text-muted-foreground max-w-sm mx-auto mt-2">
-                Incoming orders from WhatsApp will appear here synchronously with accurate grounding.
+                Orders placed via WhatsApp will appear here automatically.
               </p>
             </div>
           ) : (
@@ -95,12 +93,12 @@ export default async function OrdersPage() {
               <table className="w-full text-sm text-left border-collapse">
                 <thead className="bg-white/5 text-muted-foreground font-semibold border-b border-white/5">
                   <tr>
-                    <th className="px-8 py-4 uppercase tracking-wider text-[10px]">Reference</th>
-                    <th className="px-8 py-4 uppercase tracking-wider text-[10px]">Customer Information</th>
-                    <th className="px-8 py-4 uppercase tracking-wider text-[10px]">Restaurant Branch</th>
-                    <th className="px-8 py-4 uppercase tracking-wider text-[10px] text-right">Transaction</th>
-                    <th className="px-8 py-4 uppercase tracking-wider text-[10px] text-center">Current Status</th>
-                    <th className="px-8 py-4 uppercase tracking-wider text-[10px] text-right">Timestamp</th>
+                    <th className="px-8 py-4 uppercase tracking-wider text-[10px]">Order ID</th>
+                    <th className="px-8 py-4 uppercase tracking-wider text-[10px]">Customer</th>
+                    <th className="px-8 py-4 uppercase tracking-wider text-[10px]">Restaurant</th>
+                    <th className="px-8 py-4 uppercase tracking-wider text-[10px] text-right">Total</th>
+                    <th className="px-8 py-4 uppercase tracking-wider text-[10px] text-center">Status</th>
+                    <th className="px-8 py-4 uppercase tracking-wider text-[10px] text-right">Date</th>
                     <th className="px-8 py-4 uppercase tracking-wider text-[10px] text-right">Actions</th>
                   </tr>
                 </thead>
@@ -121,7 +119,7 @@ export default async function OrdersPage() {
                             <span className="font-bold text-foreground">{order.phoneNumber}</span>
                             <span className="text-[10px] text-muted-foreground flex items-center gap-1 mt-0.5">
                               <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-sm shadow-emerald-500/50" />
-                              Verified WhatsApp Webhook
+                              WhatsApp
                             </span>
                           </div>
                         </div>
@@ -129,7 +127,7 @@ export default async function OrdersPage() {
                       <td className="px-8 py-6">
                         <div className="flex items-center gap-2 text-muted-foreground group-hover:text-foreground transition-colors">
                           <MapPin className="h-4 w-4" />
-                          <span className="font-medium">{order.restaurant?.name || "Global Marketplace"}</span>
+                          <span className="font-medium">{order.restaurant?.name || "—"}</span>
                         </div>
                       </td>
                       <td className="px-8 py-6 text-right font-black text-foreground tabular-nums text-base">
@@ -161,16 +159,16 @@ export default async function OrdersPage() {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end" className="glass border-white/10">
-                            <DropdownMenuLabel className="text-[10px] text-muted-foreground uppercase tracking-widest px-4 py-2">Management Functions</DropdownMenuLabel>
+                            <DropdownMenuLabel className="text-[10px] text-muted-foreground uppercase tracking-widest px-4 py-2">Actions</DropdownMenuLabel>
                             <DropdownMenuItem className="px-4 py-2 hover:bg-primary/10 hover:text-primary transition-colors cursor-pointer rounded-lg mx-1">
-                              View Detailed Log
+                              View Details
                             </DropdownMenuItem>
                             <DropdownMenuItem className="px-4 py-2 hover:bg-primary/10 hover:text-primary transition-colors cursor-pointer rounded-lg mx-1">
                               Generate Invoice
                             </DropdownMenuItem>
                             <DropdownMenuSeparator className="bg-white/5 mx-1 my-1" />
                             <DropdownMenuItem className="px-4 py-2 text-destructive hover:bg-destructive/10 hover:text-destructive transition-colors cursor-pointer rounded-lg mx-1 font-bold">
-                              Cancel Full Order
+                              Cancel Order
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -183,23 +181,6 @@ export default async function OrdersPage() {
           )}
         </CardContent>
       </Card>
-
-      {/* Footer Info */}
-      <div className="p-8 rounded-3xl premium-gradient flex flex-col sm:flex-row items-center justify-between gap-6 shadow-2xl relative overflow-hidden group">
-        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.05)_0%,transparent_50%)] pointer-events-none" />
-        <div className="flex items-center gap-6 relative z-10">
-          <div className="bg-white/10 h-16 w-16 rounded-2xl flex items-center justify-center border border-white/20 group-hover:scale-110 transition-transform duration-500">
-            <Activity className="h-8 w-8 text-white" />
-          </div>
-          <div>
-            <h3 className="text-xl font-bold text-white mb-1">Predictive Analytics Ready</h3>
-            <p className="text-white/60 text-sm max-w-lg">Scale your operations with automated order grounding and zero-hallucination AI agents.</p>
-          </div>
-        </div>
-        <Button className="bg-white text-black hover:bg-white/90 rounded-2xl px-8 h-12 relative z-10 shadow-xl font-black uppercase text-[10px] tracking-widest">
-          Enable Cloud Sync <ChevronRight className="ml-2 h-4 w-4" />
-        </Button>
-      </div>
     </div>
   )
 }

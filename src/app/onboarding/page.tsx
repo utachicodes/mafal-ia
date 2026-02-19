@@ -1,6 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { UserCircle, Store, ListTodo, ChevronRight, CheckCircle2, AlertCircle, RefreshCcw, Sparkles } from "lucide-react"
+import { UserCircle, Store, ListTodo, ChevronRight, CheckCircle2, AlertCircle, RefreshCcw } from "lucide-react"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
 
@@ -13,26 +13,26 @@ export default function OnboardingPage({
 
   const steps = [
     {
-      title: "Security Setup",
-      description: "Initialize your administrative credentials and partner identity",
+      title: "Account Setup",
+      description: "Your account is ready. Configure your login and profile settings.",
       icon: <UserCircle className="h-6 w-6" />,
-      action: "Configure",
+      action: "View Settings",
       link: "/dashboard/settings",
       status: "completed"
     },
     {
-      title: "Initialize Entity",
-      description: "Deploy your first restaurant branch to the ecosystem",
+      title: "Add Your Restaurant",
+      description: "Create your first restaurant to start taking orders via WhatsApp.",
       icon: <Store className="h-6 w-6" />,
-      action: "Launch Now",
+      action: "Add Now",
       link: "/dashboard/businesses/new",
       status: "pending"
     },
     {
-      title: "Knowledge Base",
-      description: "Import your menu items for RAG-augmented chat grounding",
+      title: "Upload Menu",
+      description: "Add your menu items so customers can browse and order.",
       icon: <ListTodo className="h-6 w-6" />,
-      action: "Import Data",
+      action: "Add Menu",
       link: "#",
       status: "locked"
     }
@@ -47,15 +47,15 @@ export default function OnboardingPage({
             <AlertCircle className="h-8 w-8 text-destructive" />
           </div>
           <div className="space-y-2">
-            <h2 className="text-2xl font-bold">System Hold</h2>
+            <h2 className="text-2xl font-bold">Setup Error</h2>
             <p className="text-muted-foreground">
-              {error === 'missing_org_id' ? "Organization identity mismatch detected." : "Authentication handshake failed during onboarding."}
+              {error === 'missing_org_id' ? "There was an issue with your account. Please try again." : "Something went wrong during setup."}
             </p>
           </div>
           <Button asChild variant="outline" className="w-full h-12 rounded-xl glass border-white/10 hover:bg-white/5 transition-all gap-2">
             <Link href="/onboarding">
               <RefreshCcw className="h-4 w-4" />
-              Retry Handshake
+              Try Again
             </Link>
           </Button>
         </Card>
@@ -71,15 +71,11 @@ export default function OnboardingPage({
 
       <div className="w-full max-w-5xl z-10">
         <div className="text-center space-y-4 mb-20">
-          <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-xs font-black uppercase tracking-widest text-primary mb-4 shadow-xl">
-            <Sparkles className="h-4 w-4" />
-            AI Activation Protocol
-          </div>
           <h1 className="text-5xl font-bold tracking-tighter text-gradient mb-6">
             Welcome to Mafal-IA
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto font-medium">
-            Synchronizing your restaurant infrastructure with the next generation of automated customer interactions.
+            Let's get your restaurant set up so you can start taking orders via WhatsApp.
           </p>
         </div>
 
@@ -98,7 +94,7 @@ export default function OnboardingPage({
                   <div className={cn(
                     "w-16 h-16 rounded-[1.5rem] flex items-center justify-center border-2 shadow-2xl transition-all duration-500 group-hover:scale-110",
                     step.status === 'completed' ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-500" :
-                      step.status === 'pending' ? "bg-primary/10 border-primary/20 text-primary animate-pulse" :
+                      step.status === 'pending' ? "bg-primary/10 border-primary/20 text-primary" :
                         "bg-white/5 border-white/5 text-muted-foreground"
                   )}>
                     {step.icon}
@@ -115,10 +111,7 @@ export default function OnboardingPage({
                   <div className="w-full md:w-auto">
                     {step.status === 'locked' ? (
                       <div className="flex flex-col items-center gap-1 opacity-60">
-                        <span className="text-[10px] font-black uppercase tracking-widest">Locked Stage</span>
-                        <Button variant="ghost" disabled className="text-muted-foreground font-black">
-                          03 / PHASE
-                        </Button>
+                        <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Complete step 2 first</span>
                       </div>
                     ) : (
                       <Button asChild className={cn(
@@ -126,7 +119,7 @@ export default function OnboardingPage({
                         step.status === 'completed' ? "bg-white/5 border border-white/10 hover:bg-white/10 text-emerald-500" : "bg-primary hover:bg-primary/90 text-white shadow-primary/20"
                       )}>
                         <Link href={step.link}>
-                          <span>{step.status === 'completed' ? "Verify Settings" : step.action}</span>
+                          <span>{step.action}</span>
                           <ChevronRight className="h-4 w-4 ml-2" />
                         </Link>
                       </Button>

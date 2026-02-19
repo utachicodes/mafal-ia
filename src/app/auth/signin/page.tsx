@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { motion } from "framer-motion"
-import { Mail, Lock, LogIn, Github, Sparkles, AlertCircle } from "lucide-react"
+import { Mail, Lock, LogIn, Github, AlertCircle } from "lucide-react"
 import Link from "next/link"
 import { signIn } from "next-auth/react"
 import { useRouter, useSearchParams } from "next/navigation"
@@ -68,14 +68,10 @@ export default function LoginPage() {
             <span className="font-bold text-3xl tracking-tighter text-gradient">Mafal-IA</span>
           </Link>
           <h1 className="text-3xl font-bold tracking-tight mb-2">Welcome back</h1>
-          <p className="text-muted-foreground">Enter your credentials to access your business terminal</p>
+          <p className="text-muted-foreground">Sign in to manage your businesses</p>
         </div>
 
-        <Card className="glass border-white/10 p-8 rounded-[2rem] shadow-2xl relative overflow-hidden neural-border">
-          <div className="absolute top-0 right-0 p-4 opacity-10">
-            <Sparkles className="h-12 w-12 text-primary" />
-          </div>
-
+        <div className={cn("glass border-white/10 p-8 rounded-[2rem] shadow-2xl relative overflow-hidden neural-border bg-card text-card-foreground")}>
           <form onSubmit={handleSubmit} className="space-y-5">
             {loginError && (
               <motion.div
@@ -89,7 +85,7 @@ export default function LoginPage() {
             )}
 
             <div className="space-y-2">
-              <label className="text-xs font-black uppercase tracking-widest text-muted-foreground ml-1">Identity Terminal</label>
+              <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">Email address</label>
               <div className="relative group">
                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
                 <Input
@@ -105,8 +101,8 @@ export default function LoginPage() {
 
             <div className="space-y-2">
               <div className="flex justify-between items-center ml-1">
-                <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Secure Access</label>
-                <Link href="#" className="text-xs font-bold text-primary hover:underline">Forgot key?</Link>
+                <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Password</label>
+                <Link href="#" className="text-xs font-bold text-primary hover:underline">Forgot password?</Link>
               </div>
               <div className="relative group">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
@@ -129,42 +125,34 @@ export default function LoginPage() {
               {loading ? (
                 <div className="flex items-center gap-2">
                   <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  Authenticating...
+                  Signing in...
                 </div>
               ) : (
                 <div className="flex items-center gap-2">
-                  Initialize Session <LogIn className="h-5 w-5" />
+                  Sign In <LogIn className="h-5 w-5" />
                 </div>
               )}
             </Button>
           </form>
 
           <div className="mt-8 flex items-center gap-4">
-            <div className="h-px bg-white/5 flex-1" />
-            <span className="text-[10px] text-muted-foreground font-black uppercase tracking-widest">Global Protocol</span>
-            <div className="h-px bg-white/5 flex-1" />
+            <div className="h-px bg-white/10 flex-1" />
+            <span className="text-xs text-muted-foreground font-medium">or</span>
+            <div className="h-px bg-white/10 flex-1" />
           </div>
 
           <div className="mt-6">
             <Button variant="outline" className="w-full h-14 rounded-2xl glass border-white/10 hover:bg-white/5 transition-all text-base font-semibold gap-3">
               <Github className="h-5 w-5" />
-              Link via Partner Network
+              Continue with GitHub
             </Button>
           </div>
-        </Card>
+        </div>
 
         <p className="text-center mt-8 text-muted-foreground">
-          New partner? <Link href="/auth/signup" className="text-primary font-bold hover:underline">Register entity</Link>
+          Don't have an account? <Link href="/register" className="text-primary font-bold hover:underline">Create one</Link>
         </p>
       </motion.div>
-    </div>
-  )
-}
-
-function Card({ children, className }: { children: React.ReactNode, className?: string }) {
-  return (
-    <div className={cn("bg-card text-card-foreground rounded-lg border shadow-sm", className)}>
-      {children}
     </div>
   )
 }

@@ -7,25 +7,22 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Loader2, Sparkles, Smartphone, ShieldCheck, Zap, ArrowRight, Globe, CheckCircle2 } from "lucide-react"
+import { Loader2, Smartphone, ShieldCheck, Zap, ArrowRight, Globe, AlertCircle } from "lucide-react"
 import { Logo } from "@/src/components/logo"
-import { cn } from "@/lib/utils"
 
 export default function RegisterPage() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
 
-  // Form Data
   const [formData, setFormData] = useState({
     name: "",
     whatsappNumber: "",
     pin: "",
-    country: "Senegal", // Default
+    country: "Senegal",
   })
   const [confirmPin, setConfirmPin] = useState("")
 
-  // Auto-detect country on mount
   useEffect(() => {
     try {
       const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -105,7 +102,7 @@ export default function RegisterPage() {
       <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/10 rounded-full blur-[120px] pointer-events-none" />
       <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-accent/10 rounded-full blur-[120px] pointer-events-none" />
 
-      {/* Left Section: Branding & Vision */}
+      {/* Left Section: Branding */}
       <div className="hidden lg:flex flex-col justify-between p-16 w-[45%] bg-white/5 backdrop-blur-3xl border-r border-white/10 relative z-10">
         <div className="space-y-12">
           <Link href="/" className="inline-flex items-center gap-3 group">
@@ -121,19 +118,19 @@ export default function RegisterPage() {
               animate={{ opacity: 1, x: 0 }}
               className="text-6xl font-bold tracking-tight leading-[0.9] text-white"
             >
-              Digital Alchemist <br />
-              <span className="text-primary italic font-light">for Restaurants</span>
+              Grow Your Business <br />
+              <span className="text-primary italic font-light">with WhatsApp</span>
             </motion.h1>
             <p className="text-xl text-muted-foreground leading-relaxed max-w-md">
-              Join the elite network of automated restaurants using Neural Agents to scale operations.
+              Join hundreds of restaurants using Mafal-IA to automate orders and serve customers 24/7.
             </p>
           </div>
 
           <div className="grid gap-6 pt-12">
             {[
-              { icon: Zap, label: "Instant Deployment", desc: "Live in under 5 minutes" },
-              { icon: ShieldCheck, label: "Bank-Grade Privacy", desc: "Strict data isolation protocols" },
-              { icon: Globe, label: "Multilingual Core", desc: "English, French, and Arabic" }
+              { icon: Zap, label: "Live in Minutes", desc: "Set up your chatbot in under 5 minutes" },
+              { icon: ShieldCheck, label: "Secure & Private", desc: "Your data is encrypted and protected" },
+              { icon: Globe, label: "Multilingual", desc: "English, French, Arabic and more" }
             ].map((feature, i) => (
               <motion.div
                 key={i}
@@ -155,11 +152,11 @@ export default function RegisterPage() {
         </div>
 
         <div className="text-muted-foreground text-sm font-medium tracking-tight">
-          © 2026 Mafal-IA Research Layer. All Rights Reserved.
+          © 2026 Mafal-IA. All Rights Reserved.
         </div>
       </div>
 
-      {/* Right Section: Interactive Registration */}
+      {/* Right Section: Registration Form */}
       <div className="flex-1 flex flex-col justify-center items-center p-8 lg:p-16 z-20">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -171,12 +168,11 @@ export default function RegisterPage() {
           </div>
 
           <div className="space-y-3">
-            <h2 className="text-4xl font-bold tracking-tight text-white flex items-center gap-3">
-              Initiate Account
-              <Sparkles className="h-6 w-6 text-primary animate-pulse" />
+            <h2 className="text-4xl font-bold tracking-tight text-white">
+              Create Your Account
             </h2>
             <p className="text-muted-foreground text-lg">
-              Enter your restaurant details to begin the onboarding cycle.
+              Enter your restaurant details to get started.
             </p>
           </div>
 
@@ -193,7 +189,7 @@ export default function RegisterPage() {
                   exit={{ opacity: 0, height: 0 }}
                   className="bg-red-500/10 text-red-400 p-4 rounded-2xl text-sm border border-red-500/20 font-bold flex items-center gap-3"
                 >
-                  <ShieldCheck className="h-5 w-5" />
+                  <AlertCircle className="h-5 w-5" />
                   {error}
                 </motion.div>
               )}
@@ -201,7 +197,7 @@ export default function RegisterPage() {
 
             <div className="space-y-6 relative z-10">
               <div className="space-y-2">
-                <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Restaurant Identity</Label>
+                <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Restaurant Name</Label>
                 <Input
                   placeholder="e.g. Mafal Grillhouse"
                   value={formData.name}
@@ -211,7 +207,7 @@ export default function RegisterPage() {
               </div>
 
               <div className="space-y-2">
-                <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">WhatsApp Interface</Label>
+                <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">WhatsApp Number</Label>
                 <div className="relative">
                   <div className="absolute left-6 top-1/2 -translate-y-1/2 flex items-center gap-2 pr-4 border-r border-white/10 text-sm font-bold text-white">
                     {formData.country === 'Senegal' ? '🇸🇳 +221' :
@@ -230,7 +226,7 @@ export default function RegisterPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Access PIN</Label>
+                  <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">PIN</Label>
                   <Input
                     type="password"
                     placeholder="••••"
@@ -261,11 +257,11 @@ export default function RegisterPage() {
                 {loading ? (
                   <div className="flex items-center gap-2">
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    Provisioning Instance...
+                    Creating account...
                   </div>
                 ) : (
                   <div className="flex items-center gap-2">
-                    Establish Connection <ArrowRight className="h-4 w-4" />
+                    Get Started <ArrowRight className="h-4 w-4" />
                   </div>
                 )}
               </Button>
@@ -273,7 +269,7 @@ export default function RegisterPage() {
 
             <div className="text-center">
               <p className="text-sm text-muted-foreground">
-                Already integrated? <Link href="/auth/signin" className="text-primary font-bold hover:underline">Secure Login</Link>
+                Already have an account? <Link href="/auth/signin" className="text-primary font-bold hover:underline">Sign in</Link>
               </p>
             </div>
           </div>
