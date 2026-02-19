@@ -83,8 +83,11 @@ export function WhatsAppMockup() {
             {/* Chat Background with pattern overlay */}
             <div className="flex-1 overflow-hidden relative bg-[#0b141a]">
                 <div
-                    className="absolute inset-0 opacity-5 pointer-events-none"
-                    style={{ backgroundImage: `url('https://wweb.dev/assets/whatsapp-chat-wallpaper.png')`, backgroundSize: '400px' }}
+                    className="absolute inset-0 opacity-[0.04] pointer-events-none"
+                    style={{
+                        backgroundImage: `radial-gradient(circle, #aebac1 1px, transparent 1px)`,
+                        backgroundSize: '20px 20px'
+                    }}
                 />
 
                 <div className="relative h-full overflow-y-auto p-4 flex flex-col gap-2 scrollbar-none">
