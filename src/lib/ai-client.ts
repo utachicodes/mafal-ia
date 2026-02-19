@@ -7,6 +7,7 @@ export class AIClient {
     restaurantContext: string,
     menuItems: MenuItem[],
     restaurantName: string,
+    restaurantId: string = "",
   ) {
     // Server-side: dynamically import Genkit flow runner
     // Ensure flows are registered and get concrete flow refs
@@ -21,6 +22,7 @@ export class AIClient {
         restaurantContext,
         menuItems,
         restaurantName,
+        restaurantId,
       })
 
       const timeoutPromise = new Promise((_, reject) =>

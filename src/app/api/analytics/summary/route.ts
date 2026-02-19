@@ -52,7 +52,7 @@ export async function GET(request: Request) {
       dailyMap.set(date, 0)
     }
 
-    last7DaysConversations.forEach(c => {
+    last7DaysConversations.forEach((c: { createdAt: Date }) => {
       const date = format(new Date(c.createdAt), 'yyyy-MM-dd')
       if (dailyMap.has(date)) {
         dailyMap.set(date, (dailyMap.get(date) || 0) + 1)

@@ -45,14 +45,14 @@ export default async function DashboardPage() {
       value: data.activeOrders.toString(),
       icon: ShoppingBag,
       trend: "In progress",
-      color: "text-blue-500"
+      color: "text-primary"
     },
     {
       title: "Customers",
       value: new Intl.NumberFormat().format(data.totalCustomers),
       icon: Users,
       trend: "+4.2%",
-      color: "text-purple-500"
+      color: "text-muted-foreground"
     },
   ]
 
@@ -60,26 +60,28 @@ export default async function DashboardPage() {
     <div className="space-y-10">
       {/* Welcome Section */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-        <div className="space-y-1">
+        <div className="space-y-2">
           <div className="flex items-center gap-3">
-            <h1 className="text-4xl font-bold tracking-tight text-gradient">
-              System Overview
+            <h1 className="text-6xl font-black tracking-tighter text-gradient py-4">
+              NEURAL COMMAND
             </h1>
             {userPlan === "PREMIUM" && (
-              <Badge className="bg-primary/10 text-primary border-primary/20 hover:bg-primary/20 transition-colors py-1 px-3">
-                <Sparkles className="h-3.5 w-3.5 mr-1.5" />
-                Premium
+              <Badge className="bg-primary/20 text-primary border-primary/20 hover:bg-primary/30 transition-all font-black py-1.5 px-4 shadow-[0_0_20px_rgba(var(--primary),0.2)] animate-pulse">
+                <Sparkles className="h-4 w-4 mr-2" />
+                ELITE PROTOCOL
               </Badge>
             )}
           </div>
-          <p className="text-muted-foreground text-lg">
-            Welcome back, <span className="text-foreground font-medium">{session?.user?.name || "User"}</span>
+          <p className="text-muted-foreground text-lg font-medium opacity-80">
+            Welcome back, <span className="text-foreground font-bold border-b-2 border-primary/20">{session?.user?.name || "User"}</span>
           </p>
         </div>
-        <div className="flex items-center gap-3">
-          <Button className="rounded-xl px-6 h-12 bg-primary hover:bg-primary/90 text-white shadow-xl shadow-primary/20 transition-all hover:scale-[1.02] active:scale-[0.98]">
-            <Plus className="h-5 w-5 mr-2" />
-            Create Listing
+        <div className="flex items-center gap-4">
+          <Button asChild className="rounded-2xl px-8 h-12 bg-primary hover:bg-primary/90 text-white shadow-2xl shadow-primary/30 transition-all duration-300 transform hover:scale-[1.03] active:scale-[0.97] border border-white/20">
+            <Link href="/dashboard/businesses/new">
+              <Plus className="h-5 w-5 mr-2" />
+              Create Listing
+            </Link>
           </Button>
         </div>
       </div>
@@ -87,8 +89,8 @@ export default async function DashboardPage() {
       {/* Stats Grid */}
       <div className="grid gap-6 md:grid-cols-3">
         {stats.map((stat, index) => (
-          <Card key={index} className="glass border-white/10 hover:border-primary/30 transition-all duration-500 group overflow-hidden relative">
-            <div className="absolute -right-4 -top-4 w-24 h-24 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-colors" />
+          <Card key={index} className="glass border-white/10 hover:border-primary/40 transition-all duration-500 group overflow-hidden relative neural-border py-4">
+            <div className="absolute -right-4 -top-4 w-32 h-32 bg-primary/10 rounded-full blur-3xl group-hover:bg-primary/20 transition-colors" />
 
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
@@ -150,9 +152,9 @@ export default async function DashboardPage() {
             </Link>
 
             <Link href="/dashboard/businesses/new">
-              <div className="group flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 hover:border-blue-500/20 transition-all">
+              <div className="group flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 hover:border-primary/20 transition-all">
                 <div className="flex items-center gap-4">
-                  <div className="p-3 rounded-xl bg-blue-500/10 text-blue-500">
+                  <div className="p-3 rounded-xl bg-primary/10 text-primary">
                     <Store className="h-6 w-6" />
                   </div>
                   <div>
@@ -160,16 +162,16 @@ export default async function DashboardPage() {
                     <p className="text-xs text-muted-foreground">Setup multi-tenancy</p>
                   </div>
                 </div>
-                <ArrowRight className="h-5 w-5 text-muted-foreground group-hover:text-blue-500 transition-all group-hover:translate-x-1" />
+                <ArrowRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-all group-hover:translate-x-1" />
               </div>
             </Link>
 
-            <div className="mt-8 p-6 rounded-2xl premium-gradient relative overflow-hidden group">
-              <div className="absolute -top-4 -right-4 w-24 h-24 bg-white/10 rounded-full blur-2xl" />
-              <h4 className="text-white font-bold text-lg mb-2 relative z-10">Upgrade to Pro</h4>
-              <p className="text-white/70 text-sm mb-4 relative z-10">Get advanced RAG insights and priority support.</p>
-              <Button className="w-full bg-white text-black hover:bg-white/90 rounded-xl relative z-10">
-                Join Private Beta
+            <div className="mt-8 p-8 rounded-[2rem] premium-gradient relative overflow-hidden group neural-border">
+              <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-3xl group-hover:bg-white/20 transition-transform duration-700 group-hover:scale-150" />
+              <h4 className="text-white font-black text-2xl mb-2 relative z-10 tracking-tighter">ASCEND TO PRO</h4>
+              <p className="text-white/70 text-sm mb-6 relative z-10 leading-relaxed">Unlock advanced multi-node synthesis and priority RAG throughput.</p>
+              <Button className="w-full bg-white text-primary hover:bg-white/90 rounded-2xl relative z-10 h-12 font-black shadow-xl">
+                UPGRADE SYNDICATE
               </Button>
             </div>
           </CardContent>

@@ -43,7 +43,7 @@ export default async function RestaurantDashboardPage({ params }: RestaurantPage
             title: "Menu Terminal",
             description: "Logic mapping for your restaurant's digital inventory",
             icon: UtensilsCrossed,
-            color: "text-blue-500",
+            color: "text-primary",
             href: `/dashboard/businesses/${id}/menu`,
         },
         {
@@ -64,7 +64,7 @@ export default async function RestaurantDashboardPage({ params }: RestaurantPage
             title: "Core Configuration",
             description: "Fundamental operational parameters and identity",
             icon: Settings,
-            color: "text-purple-500",
+            color: "text-muted-foreground",
             href: `/dashboard/businesses/${id}/settings`,
         }
     ]
@@ -119,7 +119,7 @@ export default async function RestaurantDashboardPage({ params }: RestaurantPage
             {/* Performance Grid */}
             <div className="grid gap-6 md:grid-cols-3">
                 {[
-                    { label: "Total Transactions", value: orderCount, icon: ShoppingBag, color: "text-blue-500" },
+                    { label: "Total Transactions", value: orderCount, icon: ShoppingBag, color: "text-primary" },
                     { label: "Grounding Data", value: menuItemCount, icon: Activity, color: "text-primary" },
                     { label: "System Health", value: "99.8%", icon: Shield, color: "text-emerald-500" }
                 ].map((stat, i) => (

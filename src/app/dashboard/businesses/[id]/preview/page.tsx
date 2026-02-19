@@ -95,8 +95,8 @@ export default async function BusinessPreviewPage({ params }: PreviewPageProps) 
                         icon: Globe,
                         title: "Multilingual Grid",
                         desc: "Seamless translation between FR, EN, and AR with local dialect awareness.",
-                        color: "text-blue-500",
-                        bg: "bg-blue-500/10"
+                        color: "text-primary",
+                        bg: "bg-primary/10"
                     },
                     {
                         icon: ShieldCheck,

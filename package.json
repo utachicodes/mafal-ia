@@ -17,6 +17,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.77.0",
     "@genkit-ai/ai": "1.16.1",
     "@genkit-ai/core": "1.16.1",
     "@genkit-ai/flow": "0.5.17",

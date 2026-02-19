@@ -1,9 +1,7 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { UserCircle, Store, ListTodo, ChevronRight, CheckCircle2, AlertCircle, RefreshCcw, Sparkles } from "lucide-react"
 import Link from "next/link"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { motion } from "framer-motion"
 import { cn } from "@/lib/utils"
 
 export default function OnboardingPage({

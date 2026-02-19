@@ -68,10 +68,10 @@ export default function LoginPage() {
             <span className="font-bold text-3xl tracking-tighter text-gradient">Mafal-IA</span>
           </Link>
           <h1 className="text-3xl font-bold tracking-tight mb-2">Welcome back</h1>
-          <p className="text-muted-foreground">Enter your credentials to access your restaurant hub</p>
+          <p className="text-muted-foreground">Enter your credentials to access your business terminal</p>
         </div>
 
-        <Card className="glass border-white/10 p-8 rounded-[2rem] shadow-2xl relative overflow-hidden">
+        <Card className="glass border-white/10 p-8 rounded-[2rem] shadow-2xl relative overflow-hidden neural-border">
           <div className="absolute top-0 right-0 p-4 opacity-10">
             <Sparkles className="h-12 w-12 text-primary" />
           </div>
@@ -89,12 +89,12 @@ export default function LoginPage() {
             )}
 
             <div className="space-y-2">
-              <label className="text-xs font-black uppercase tracking-widest text-muted-foreground ml-1">Email Terminal</label>
+              <label className="text-xs font-black uppercase tracking-widest text-muted-foreground ml-1">Identity Terminal</label>
               <div className="relative group">
                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
                 <Input
                   type="email"
-                  placeholder="name@restaurant.com"
+                  placeholder="name@business.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="pl-12 h-14 bg-white/5 border-white/10 rounded-2xl focus:ring-primary/50 transition-all text-base"
@@ -154,7 +154,7 @@ export default function LoginPage() {
         </Card>
 
         <p className="text-center mt-8 text-muted-foreground">
-          New restaurant partner? <Link href="/auth/signup" className="text-primary font-bold hover:underline">Register hub</Link>
+          New partner? <Link href="/auth/signup" className="text-primary font-bold hover:underline">Register entity</Link>
         </p>
       </motion.div>
     </div>

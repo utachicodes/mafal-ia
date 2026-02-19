@@ -1,4 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server"
+import crypto from "crypto"
 import { getPrisma } from "@/src/lib/db"
 import { processUnifiedMessage } from "@/src/lib/webhook-processor"
 import { RestaurantService } from "@/src/lib/restaurant-service"
@@ -31,7 +32,22 @@ export async function GET(request: NextRequest) {
 // POST endpoint for receiving WhatsApp messages from Meta
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json()
+    const rawBody = await request.text()
+
+    // Verify Meta webhook signature (HMAC-SHA256)
+    const appSecret = process.env.WHATSAPP_APP_SECRET
+    if (appSecret) {
+      const signature = request.headers.get("x-hub-signature-256") || ""
+      const expected = "sha256=" + crypto.createHmac("sha256", appSecret).update(rawBody).digest("hex")
+      const sigBuf = Buffer.from(signature)
+      const expBuf = Buffer.from(expected)
+      if (sigBuf.length !== expBuf.length || !crypto.timingSafeEqual(sigBuf, expBuf)) {
+        logger.warn("Webhook signature mismatch", {}, "WEBHOOK_WHATSAPP")
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+      }
+    }
+
+    const body = JSON.parse(rawBody)
     // Check for LAM payload (simplified structure)
     if (body.messages && Array.isArray(body.messages)) {
       const message = body.messages[0]

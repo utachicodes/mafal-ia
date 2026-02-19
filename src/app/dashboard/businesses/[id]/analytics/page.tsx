@@ -73,10 +73,10 @@ export default async function BusinessAnalyticsPage({ params }: BusinessAnalytic
             {/* Intelligence Grid */}
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
                 {[
-                    { label: "Conversations", value: "1,284", change: "+12.5%", icon: MessageSquare, color: "text-blue-500", trend: "up" },
+                    { label: "Conversations", value: "1,284", change: "+12.5%", icon: MessageSquare, color: "text-primary", trend: "up" },
                     { label: "Conversion Rate", value: "24.2%", change: "+4.3%", icon: Sparkles, color: "text-primary", trend: "up" },
                     { label: "Order Volume", value: "342", change: "+8.1%", icon: ShoppingBag, color: "text-emerald-500", trend: "up" },
-                    { label: "AI Response %", value: "98.8%", change: "Stable", icon: BrainCircuit, color: "text-purple-500", trend: "neutral" }
+                    { label: "AI Response %", value: "98.8%", change: "Stable", icon: BrainCircuit, color: "text-muted-foreground", trend: "neutral" }
                 ].map((stat, i) => (
                     <Card key={i} className="glass border-white/10 overflow-hidden group">
                         <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -145,9 +145,9 @@ export default async function BusinessAnalyticsPage({ params }: BusinessAnalytic
                     <CardContent className="p-8 space-y-6">
                         {[
                             { label: "Order Initiation", value: 65, color: "bg-primary" },
-                            { label: "Menu Inquiry", value: 48, color: "bg-blue-500" },
+                            { label: "Menu Inquiry", value: 48, color: "bg-primary/60" },
                             { label: "Location Routing", value: 32, color: "bg-emerald-500" },
-                            { label: "Price Verification", value: 25, color: "bg-purple-500" },
+                            { label: "Price Verification", value: 25, color: "bg-primary/30" },
                             { label: "Human Escalation", value: 12, color: "bg-orange-500" }
                         ].map((item, i) => (
                             <div key={i} className="space-y-2">

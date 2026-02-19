@@ -11,6 +11,7 @@ interface GenerateResponseInput {
   restaurantContext: string
   menuItems: MenuItem[]
   restaurantName: string
+  restaurantId: string
 }
 
 interface GenerateResponseOutput {
@@ -52,6 +53,7 @@ export const generateResponseFlow = defineFlow(
         }),
       ),
       restaurantName: z.string(),
+      restaurantId: z.string(),
     }),
     outputSchema: z.object({
       response: z.string(),
@@ -66,7 +68,7 @@ export const generateResponseFlow = defineFlow(
       messageCount: input.messages?.length,
       menuCount: input.menuItems?.length
     })
-    const { messages, restaurantContext, menuItems, restaurantName } = input
+    const { messages, restaurantContext, menuItems, restaurantName, restaurantId } = input
     const messagesTyped = messages as ChatMessage[]
     const menuItemsTyped = menuItems as MenuItem[]
     const lastMessage = messagesTyped[messagesTyped.length - 1]?.content || ""
@@ -79,7 +81,7 @@ export const generateResponseFlow = defineFlow(
     console.log("[Flow/generateResponse] Detecting language for message:", lastMessage)
     const languageDetectionResponse = await llm.generate(
       `Detect the language of this message and respond with just the language code (en, fr, wo, ar, etc.): "${lastMessage}"`,
-      { model: "llama-3.1-8b-instant" }
+      { model: "claude-haiku-4-5-20251001" }
     )
     console.log("[Flow/generateResponse] Language detection result:", languageDetectionResponse)
 
@@ -109,7 +111,7 @@ export const generateResponseFlow = defineFlow(
         
         Respond with just the intent category.
       `,
-      { model: "llama-3.1-8b-instant" }
+      { model: "claude-haiku-4-5-20251001" }
     )
     console.log("[Flow/generateResponse] Intent analysis result:", intentAnalysisResponse)
 
@@ -120,14 +122,16 @@ export const generateResponseFlow = defineFlow(
     // Use appropriate tools based on intent
     if (intent === "menu_question") {
       try {
-        const menuInfo = await runFlow(getMenuItemInformationFlow as any, {
-          query: lastMessage,
-          menuItems,
-        })
-        toolResponse = menuInfo.information
-        usedTools.push("getMenuItemInformation")
+        const { retrieveMenuItems } = await import("@/src/lib/retrieval")
+        const results = await retrieveMenuItems(restaurantId, lastMessage, 5)
+        if (results.length > 0) {
+          toolResponse = results
+            .map(r => `- ${r.name}: ${r.description} (${r.price} FCFA)${r.category ? ` [${r.category}]` : ""}`)
+            .join("\n")
+        }
+        usedTools.push("retrieveMenuItems")
       } catch (error) {
-        console.error("Error using menu information tool:", error)
+        console.error("Error using RAG menu retrieval:", error)
       }
     } else if (intent === "order_calculation") {
       try {
@@ -214,14 +218,14 @@ Current user message: "${lastMessage}"
 Respond naturally as the restaurant's AI assistant:
     `
 
-    console.log("[Flow/generateResponse] Generating final response with Llama-3.3-70b...")
+    console.log("[Flow/generateResponse] Generating final response with Claude Sonnet...")
     const finalResponseText = await llm.generate(
       prompt
         .replace("{{restaurantName}}", restaurantName)
         .replace("{{restaurantContext}}", restaurantContext)
         .replace("{{conversationHistory}}", conversationHistory)
         .replace("{{menuSummary}}", menuSummary),
-      { model: "llama-3.3-70b-versatile" }
+      { model: "claude-sonnet-4-6" }
     )
     console.log("[Flow/generateResponse] Final response generated")
 

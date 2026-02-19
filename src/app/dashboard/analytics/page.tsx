@@ -38,7 +38,7 @@ export default async function AnalyticsPage() {
       value: data.activeRestaurants.toString(),
       change: "Operational nodes",
       icon: Store,
-      color: "text-blue-500",
+      color: "text-primary",
       trend: "Steady"
     },
     {
@@ -54,7 +54,7 @@ export default async function AnalyticsPage() {
       value: new Intl.NumberFormat().format(data.conversationCount),
       change: "AI Interactions",
       icon: MessageSquare,
-      color: "text-purple-500",
+      color: "text-muted-foreground",
       trend: "+12%"
     }
   ]
@@ -137,8 +137,8 @@ export default async function AnalyticsPage() {
             <div className="space-y-8">
               {[
                 { region: "Dakar Metropolis", value: "65%", color: "bg-primary" },
-                { region: "Abidjan Coast", value: "20%", color: "bg-blue-500" },
-                { region: "Banjul Center", value: "10%", color: "bg-purple-500" },
+                { region: "Abidjan Coast", value: "20%", color: "bg-primary/60" },
+                { region: "Banjul Center", value: "10%", color: "bg-primary/30" },
                 { region: "Emerging Markets", value: "5%", color: "bg-neutral-500" },
               ].map((item) => (
                 <div key={item.region} className="group cursor-default">

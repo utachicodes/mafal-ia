@@ -10,13 +10,14 @@ function stripBold(s: string) {
   return s.replace(/\*\*(.*?)\*\*/g, "$1").replace(/__(.*?)__/g, "$1")
 }
 
-export async function GET(_req: NextRequest, ctx: { params: { id: string } }) {
-  return NextResponse.json({ ok: true, id: ctx.params.id, status: "healthy" })
+export async function GET(_req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
+  const { id } = await ctx.params
+  return NextResponse.json({ ok: true, id, status: "healthy" })
 }
 
-export async function POST(req: NextRequest, ctx: { params: { id: string } }) {
+export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
   try {
-    const { id } = ctx.params
+    const { id } = await ctx.params
     const body = await req.json().catch(() => ({}))
     const from: string | undefined = body?.from
     const text: string | undefined = body?.text
@@ -63,7 +64,7 @@ Ordering Enabled: ${restaurant.chatbotContext.orderingEnabled ? "Yes" : "No"}
       { id: `u_${Date.now()}`, role: "user" as const, content: text, timestamp: new Date() },
     ]
 
-    const ai = await AIClient.generateResponse(messages, restaurantContext, (restaurant as any).menu || [], restaurant.name)
+    const ai = await AIClient.generateResponse(messages, restaurantContext, (restaurant as any).menu || [], restaurant.name, restaurant.id)
 
     let outbound = stripBold(ai.response)
     if (ai.orderQuote && ai.orderQuote.orderItems?.length) {

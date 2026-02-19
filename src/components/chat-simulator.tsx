@@ -6,10 +6,12 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Send, Bot, User, Loader2 } from "lucide-react"
+import { Send, Bot, User, Loader2, Sparkles, BrainCircuit, Terminal } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { apiBridge } from "@/src/lib/api-client-bridge"
+import { motion, AnimatePresence } from "framer-motion"
 
-interface Restaurant {
+interface Business {
     id: string
     name: string
 }
@@ -20,29 +22,29 @@ interface Message {
     content: string
 }
 
-export function ChatSimulator({ restaurants }: { restaurants: Restaurant[] }) {
-    const [selectedRestaurantId, setSelectedRestaurantId] = useState<string>(restaurants[0]?.id || "")
+export function ChatSimulator({ restaurants: businesses }: { restaurants: Business[] }) {
+    const [selectedBusinessId, setSelectedBusinessId] = useState<string>(businesses[0]?.id || "")
     const [messages, setMessages] = useState<Message[]>([])
     const [input, setInput] = useState("")
     const [isLoading, setIsLoading] = useState(false)
-    const [sessionId, setSessionId] = useState<string>("")
     const scrollRef = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
         if (scrollRef.current) {
-            scrollRef.current.scrollTop = scrollRef.current.scrollHeight
+            const viewport = scrollRef.current.querySelector('[data-radix-scroll-area-viewport]')
+            if (viewport) {
+                viewport.scrollTop = viewport.scrollHeight
+            }
         }
-    }, [messages])
+    }, [messages, isLoading])
 
-    // Clear chat when switching restaurants
-    const handleRestaurantChange = (val: string) => {
-        setSelectedRestaurantId(val)
+    const handleBusinessChange = (val: string) => {
+        setSelectedBusinessId(val)
         setMessages([])
-        setSessionId(`web_${Date.now()}`) // New session
     }
 
     const handleSend = async () => {
-        if (!input.trim() || !selectedRestaurantId) return
+        if (!input.trim() || !selectedBusinessId) return
 
         const userMsg: Message = { id: Date.now().toString(), role: "user", content: input }
         setMessages(prev => [...prev, userMsg])
@@ -50,19 +52,7 @@ export function ChatSimulator({ restaurants }: { restaurants: Restaurant[] }) {
         setIsLoading(true)
 
         try {
-            const res = await fetch("/api/ai/chat", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    restaurantId: selectedRestaurantId,
-                    message: userMsg.content,
-                    sessionId: sessionId || undefined
-                })
-            })
-
-            const data = await res.json()
-
-            if (data.sessionId) setSessionId(data.sessionId)
+            const data: any = await apiBridge.processChat(userMsg.content, selectedBusinessId)
 
             const aiMsg: Message = {
                 id: (Date.now() + 1).toString(),
@@ -72,117 +62,169 @@ export function ChatSimulator({ restaurants }: { restaurants: Restaurant[] }) {
             setMessages(prev => [...prev, aiMsg])
 
         } catch (e) {
-            setMessages(prev => [...prev, { id: Date.now().toString(), role: "assistant", content: "Error: Could not connect to AI." }])
+            setMessages(prev => [...prev, { id: Date.now().toString(), role: "assistant", content: "CRITICAL ERROR: Neural Bridge Disconnected. Please check API configuration." }])
         } finally {
             setIsLoading(false)
         }
     }
 
-    if (restaurants.length === 0) {
-        return <div className="text-center p-8 text-muted-foreground">No restaurants available. Create one first!</div>
+    if (businesses.length === 0) {
+        return (
+            <div className="flex flex-col items-center justify-center p-12 glass rounded-3xl border-dashed border-2">
+                <BrainCircuit className="h-12 w-12 text-muted-foreground mb-4 opacity-20" />
+                <p className="text-muted-foreground font-medium">No active business nodes detected.</p>
+            </div>
+        )
     }
 
     return (
-        <Card className="w-full h-[600px] flex flex-col shadow-xl border-none ring-1 ring-gray-200 dark:ring-gray-800 bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm">
-            <CardHeader className="py-4 border-b border-gray-100 dark:border-gray-800 bg-white/50 dark:bg-gray-900/50">
-                <div className="flex items-center gap-4">
-                    <div className="flex-1">
-                        <CardTitle className="text-lg font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
-                            Live Chat Preview
-                        </CardTitle>
-                        <p className="text-xs text-muted-foreground">Test your WhatsApp assistant</p>
+        <Card className="w-full h-[700px] flex flex-col shadow-2xl border-none ring-1 ring-white/10 dark:ring-white/5 bg-white/40 dark:bg-black/40 backdrop-blur-3xl rounded-[2.5rem] overflow-hidden neural-glow neural-border">
+            <CardHeader className="py-7 px-10 border-b border-white/10 dark:border-white/5 relative z-10 glass">
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                        <div className="p-3 bg-primary/10 rounded-2xl border border-primary/20">
+                            <BrainCircuit className="h-6 w-6 text-primary" />
+                        </div>
+                        <div>
+                            <CardTitle className="text-2xl font-black tracking-tighter text-gradient flex items-center gap-2">
+                                NEURAL PREVIEW
+                                <Sparkles className="h-4 w-4 text-primary animate-pulse" />
+                            </CardTitle>
+                            <div className="flex items-center gap-2 mt-0.5">
+                                <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">Inference Protocol Active</p>
+                            </div>
+                        </div>
                     </div>
-                    <Select value={selectedRestaurantId} onValueChange={handleRestaurantChange}>
-                        <SelectTrigger className="w-[220px] bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 focus:ring-primary/20">
-                            <SelectValue placeholder="Select Restaurant" />
+                    <Select value={selectedBusinessId} onValueChange={handleBusinessChange}>
+                        <SelectTrigger className="w-[240px] h-12 rounded-2xl bg-white/5 border-white/10 focus:ring-primary/20 dark:text-white font-medium">
+                            <SelectValue placeholder="Select Business Node" />
                         </SelectTrigger>
-                        <SelectContent>
-                            {restaurants.map(r => (
-                                <SelectItem key={r.id} value={r.id}>{r.name}</SelectItem>
+                        <SelectContent className="glass border-white/10 rounded-2xl">
+                            {businesses.map(b => (
+                                <SelectItem key={b.id} value={b.id} className="focus:bg-primary/10 rounded-xl">{b.name}</SelectItem>
                             ))}
                         </SelectContent>
                     </Select>
                 </div>
             </CardHeader>
 
-            <div className="flex-1 overflow-hidden bg-gradient-to-b from-gray-50/50 to-white/50 dark:from-gray-950/50 dark:to-gray-900/50 relative">
-                <ScrollArea className="h-full px-4 py-6" ref={scrollRef}>
-                    <div className="space-y-6 max-w-3xl mx-auto">
-                        {messages.length === 0 && (
-                            <div className="text-center text-muted-foreground mt-20 flex flex-col items-center">
-                                <div className="h-20 w-20 bg-gradient-to-br from-gray-100 to-gray-50 dark:from-gray-800/50 dark:to-gray-900/50 rounded-full flex items-center justify-center mb-6 shadow-md border border-gray-100 dark:border-gray-800">
-                                    <Bot className="h-10 w-10 text-primary opacity-80" />
-                                </div>
-                                <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Ready to chat</h3>
-                                <p className="max-w-xs mx-auto">Select a restaurant and send a message to start.</p>
-                            </div>
-                        )}
-                        {messages.map((m) => (
-                            <div key={m.id} className={cn(
-                                "flex gap-4 max-w-[85%]",
-                                m.role === "user" ? "ml-auto flex-row-reverse" : "mr-auto"
-                            )}>
-                                <div className={cn(
-                                    "w-10 h-10 rounded-full flex items-center justify-center shrink-0 shadow-sm border border-white/20",
-                                    m.role === "user"
-                                        ? "bg-gradient-to-br from-gray-800 to-gray-900 text-white dark:from-gray-700 dark:to-gray-800"
-                                        : "bg-primary text-primary-foreground"
-                                )}>
-                                    {m.role === "user" ? <User className="h-5 w-5" /> : <Bot className="h-5 w-5" />}
-                                </div>
-                                <div className={cn(
-                                    "p-4 rounded-2xl text-sm shadow-md",
-                                    m.role === "user"
-                                        ? "bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-tr-sm border border-gray-100 dark:border-gray-700"
-                                        : "bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 text-gray-900 dark:text-gray-100 rounded-tl-sm"
-                                )}>
-                                    <p className="leading-relaxed">{m.content}</p>
-                                </div>
-                            </div>
-                        ))}
-                        {isLoading && (
-                            <div className="flex gap-4 mr-auto max-w-[85%]">
-                                <div className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-sm">
-                                    <Bot className="h-5 w-5" />
-                                </div>
-                                <div className="bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-2xl rounded-tl-sm p-4 shadow-md flex items-center gap-2">
-                                    <span className="text-xs font-medium text-gray-500 animate-pulse">Assistant is typing</span>
-                                    <div className="flex gap-1">
-                                        <span className="w-1 h-1 bg-primary/40 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
-                                        <span className="w-1 h-1 bg-primary/40 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
-                                        <span className="w-1 h-1 bg-primary/40 rounded-full animate-bounce"></span>
+            <div className="flex-1 overflow-hidden relative group">
+                {/* Background Grid Accent */}
+                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-[0.03] dark:opacity-[0.05] pointer-events-none" />
+
+                <ScrollArea className="h-full px-8 py-10 custom-scrollbar" ref={scrollRef}>
+                    <div className="space-y-8 max-w-4xl mx-auto pb-4">
+                        <AnimatePresence initial={false}>
+                            {messages.length === 0 && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    className="text-center mt-20 flex flex-col items-center"
+                                >
+                                    <div className="h-24 w-24 glass rounded-3xl flex items-center justify-center mb-8 shadow-2xl animate-float border-white/20">
+                                        <Bot className="h-12 w-12 text-primary" />
                                     </div>
-                                </div>
-                            </div>
-                        )}
+                                    <h3 className="text-2xl font-black text-gray-900 dark:text-white mb-3 tracking-tight">WAITING FOR INPUT</h3>
+                                    <p className="max-w-xs mx-auto text-muted-foreground font-medium leading-relaxed opacity-70">
+                                        Select a business node above to initiate the RAG-augmented synthesis protocol.
+                                    </p>
+                                    <div className="flex items-center gap-2 mt-8 text-[10px] text-muted-foreground/40 font-mono">
+                                        <Terminal className="h-3 w-3" />
+                                        <span>SYSTEM_ID: MAFAL_NEURAL_V2</span>
+                                    </div>
+                                </motion.div>
+                            )}
+
+                            {messages.map((m) => (
+                                <motion.div
+                                    key={m.id}
+                                    initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                                    className={cn(
+                                        "flex gap-4 group/msg",
+                                        m.role === "user" ? "flex-row-reverse text-right" : "text-left"
+                                    )}
+                                >
+                                    <div className={cn(
+                                        "w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 shadow-lg border-2",
+                                        m.role === "user"
+                                            ? "bg-black text-white border-white/10 dark:bg-zinc-900"
+                                            : "bg-primary text-white border-white/20"
+                                    )}>
+                                        {m.role === "user" ? <User className="h-6 w-6" /> : <Bot className="h-6 w-6" />}
+                                    </div>
+                                    <div className={cn(
+                                        "max-w-[75%] p-5 rounded-[2rem] text-sm leading-relaxed transition-all duration-300",
+                                        m.role === "user"
+                                            ? "bg-black text-white dark:bg-zinc-900 rounded-tr-none shadow-xl border border-white/5"
+                                            : "glass rounded-tl-none shadow-2xl dark:text-gray-100"
+                                    )}>
+                                        <p className={cn(m.role === "assistant" && "font-medium")}>{m.content}</p>
+                                        <div className={cn(
+                                            "mt-2 text-[9px] uppercase tracking-widest font-bold opacity-0 group-hover/msg:opacity-40 transition-opacity",
+                                            m.role === "user" ? "text-right" : "text-left"
+                                        )}>
+                                            {m.role === "user" ? "SENT VIA PROTOCOL" : "GENERATED BY CLAUDE 3.5"}
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            ))}
+
+                            {isLoading && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    className="flex gap-4"
+                                >
+                                    <div className="w-12 h-12 rounded-2xl bg-primary text-white flex items-center justify-center shadow-lg animate-pulse border-2 border-white/20">
+                                        <Bot className="h-6 w-6" />
+                                    </div>
+                                    <div className="glass rounded-[2rem] rounded-tl-none py-5 px-6 shadow-2xl flex items-center gap-3">
+                                        <div className="flex gap-1.5">
+                                            <span className="w-2 h-2 bg-primary rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+                                            <span className="w-2 h-2 bg-primary rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+                                            <span className="w-2 h-2 bg-primary rounded-full animate-bounce"></span>
+                                        </div>
+                                        <span className="text-[10px] font-black uppercase tracking-widest text-primary/60">Synthesizing Response...</span>
+                                    </div>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
                     </div>
                 </ScrollArea>
+
+                {/* Visual Accent Bottom Gradient */}
+                <div className="absolute bottom-0 inset-x-0 h-20 bg-gradient-to-t from-white/20 dark:from-black/40 to-transparent pointer-events-none z-10" />
             </div>
 
-            <CardFooter className="p-4 border-t border-gray-100 dark:border-gray-800 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md">
+            <CardFooter className="p-8 glass border-t border-white/10 relative z-20">
                 <form
-                    className="flex w-full gap-3 relative"
+                    className="flex w-full gap-4 relative"
                     onSubmit={(e) => { e.preventDefault(); handleSend(); }}
                 >
+                    <div className="absolute left-6 top-1/2 -translate-y-1/2 text-muted-foreground/30 pointer-events-none font-mono text-[10px]">
+                        CMD {">"}
+                    </div>
                     <Input
-                        placeholder="Type a message as a customer..."
+                        placeholder="Type message for synthesis..."
                         value={input}
                         onChange={e => setInput(e.target.value)}
                         disabled={isLoading}
-                        className="flex-1 py-6 pl-6 pr-12 rounded-full border-gray-200 dark:border-gray-700 focus-visible:ring-primary/20 shadow-inner bg-gray-50 dark:bg-gray-950"
+                        className="flex-1 h-14 pl-14 pr-16 rounded-[1.75rem] border-white/10 dark:border-white/5 focus-visible:ring-primary/20 shadow-inner bg-black/[0.02] dark:bg-white/[0.02] font-medium text-base transition-all"
                     />
                     <Button
                         type="submit"
                         size="icon"
                         disabled={isLoading || !input.trim()}
                         className={cn(
-                            "absolute right-2 top-1.5 h-9 w-9 rounded-full transition-all duration-300 shadow-md",
+                            "absolute right-2 top-2 h-10 w-10 rounded-2xl transition-all duration-500 shadow-xl",
                             input.trim()
-                                ? "bg-primary text-primary-foreground hover:bg-primary/90 hover:scale-105 hover:shadow-primary/20"
-                                : "bg-gray-200 dark:bg-gray-800 text-gray-400"
+                                ? "bg-primary text-white hover:bg-primary/90 hover:scale-110 hover:shadow-primary/40 rotate-0"
+                                : "bg-muted text-muted-foreground opacity-50 grayscale"
                         )}
                     >
-                        {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                        {isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
                     </Button>
                 </form>
             </CardFooter>

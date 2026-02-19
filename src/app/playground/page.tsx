@@ -4,7 +4,6 @@ import { Sparkles, MessageSquare, ShieldCheck, Zap, Bot, Terminal, Activity, Bra
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
-import { motion } from "framer-motion"
 
 export const dynamic = "force-dynamic"
 
@@ -81,8 +80,8 @@ export default async function PlaygroundPage() {
             icon: MessageSquare,
             title: "Logic Verification",
             desc: "Test complex ordering logic, price overrides, and dynamic menu weighting.",
-            color: "text-blue-500",
-            bg: "bg-blue-500/10",
+            color: "text-primary",
+            bg: "bg-primary/10",
             tag: "CORE"
           },
           {
@@ -97,8 +96,8 @@ export default async function PlaygroundPage() {
             icon: Sparkles,
             title: "Smart RAG",
             desc: "Fine-tune vector retrieval parameters and semantic matching thresholds.",
-            color: "text-purple-500",
-            bg: "bg-purple-500/10",
+            color: "text-muted-foreground",
+            bg: "bg-white/5",
             tag: "AI"
           }
         ].map((feature, i) => (

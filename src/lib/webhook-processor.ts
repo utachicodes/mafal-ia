@@ -120,7 +120,7 @@ Customer Name: ${currentMeta.name || "Guest"}
 Customer Location: ${currentMeta.locationText || "Unknown"}
     `.trim()
 
-        const aiRes = await AIClient.generateResponse(history, context, menu, restaurant.name)
+        const aiRes = await AIClient.generateResponse(history, context, menu, restaurant.name, restaurant.id)
         let replyText = stripBold(aiRes.response)
 
         if (aiRes.orderQuote) {

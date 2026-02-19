@@ -28,7 +28,7 @@ import { cn } from "@/lib/utils"
 
 export const dynamic = "force-dynamic"
 
-export default async function RestaurantsPage() {
+export default async function BusinessesPage() {
   const session = await getServerSession(authOptions)
 
   if (!session?.user) {
@@ -50,11 +50,11 @@ export default async function RestaurantsPage() {
       {/* Page Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div className="space-y-1">
-          <h1 className="text-4xl font-bold tracking-tight text-gradient">
-            Business Hub
+          <h1 className="text-6xl font-black tracking-tighter text-gradient py-2">
+            BUSINESS HUB
           </h1>
-          <p className="text-muted-foreground text-lg">
-            Manage your network of restaurant branches and AI knowledge bases
+          <p className="text-muted-foreground text-lg font-medium opacity-70">
+            Orchestrate your network of business entities and AI knowledge nodes
           </p>
         </div>
         <Button asChild className="rounded-xl px-6 h-12 bg-primary hover:bg-primary/90 text-white shadow-xl shadow-primary/20 transition-all">
@@ -88,7 +88,7 @@ export default async function RestaurantsPage() {
       ) : (
         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
           {restaurants.map((res) => (
-            <Card key={res.id} className="glass border-white/10 hover:border-primary/40 transition-all duration-500 overflow-hidden group shadow-xl">
+            <Card key={res.id} className="glass border-white/10 hover:border-primary/40 transition-all duration-500 overflow-hidden group shadow-xl neural-border">
               <div className="h-2 bg-primary/5 transition-colors group-hover:bg-primary/20" />
               <CardHeader className="p-6 pb-4">
                 <div className="flex justify-between items-start">
@@ -169,8 +169,8 @@ export default async function RestaurantsPage() {
               <div className="h-16 w-16 rounded-3xl bg-white/5 flex items-center justify-center mb-6 text-muted-foreground group-hover:text-primary group-hover:bg-primary/10 group-hover:border-primary/20 border border-white/5 transition-all group-hover:scale-110 duration-500">
                 <Plus className="h-8 w-8" />
               </div>
-              <p className="font-bold text-lg text-foreground mb-1 group-hover:text-primary transition-colors">Add New Entity</p>
-              <p className="text-xs text-muted-foreground text-center max-w-[180px] leading-relaxed">Scale your operation by adding a new restaurant node.</p>
+              <p className="font-bold text-lg text-foreground mb-1 group-hover:text-primary transition-colors">Add New Entity/Node</p>
+              <p className="text-xs text-muted-foreground text-center max-w-[180px] leading-relaxed">Scale your operation by adding a new business node.</p>
             </Card>
           </Link>
         </div>

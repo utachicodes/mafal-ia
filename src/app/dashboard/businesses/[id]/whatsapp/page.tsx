@@ -28,7 +28,9 @@ export default async function BusinessWhatsAppPage({ params }: BusinessWhatsAppP
         notFound()
     }
 
-    const webhookUrl = `http://localhost:3005/api/whatsapp?restaurantId=${id}`
+    const baseUrl = process.env.NEXTAUTH_URL
+        || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000")
+    const webhookUrl = `${baseUrl}/api/whatsapp`
 
     return (
         <div className="space-y-8 py-2 h-full">

@@ -40,12 +40,18 @@ class ApiBridge {
         return response.json();
     }
 
-    // AI Inference Endpoints
-    async processChat(message: string, restaurantId: string, context: any = {}) {
-        return this.request('/ai/chat', {
+    // AI Inference Endpoints — calls the real Next.js chatbot route
+    async processChat(message: string, businessId: string, _context: any = {}) {
+        const response = await fetch(`/api/chatbots/${businessId}/messages`, {
             method: 'POST',
-            body: JSON.stringify({ message, restaurantId, context }),
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ from: 'SIMULATOR', text: message }),
         });
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.error || `API Request failed: ${response.statusText}`);
+        }
+        return response.json();
     }
 
     // Menu Retrieval / Search
