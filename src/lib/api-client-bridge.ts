@@ -40,7 +40,7 @@ class ApiBridge {
         return response.json();
     }
 
-    // AI Inference Endpoints — calls the real Next.js chatbot route
+    // AI Inference Endpoints — calls the Next.js chatbot route (always available)
     async processChat(message: string, businessId: string, _context: any = {}) {
         const response = await fetch(`/api/chatbots/${businessId}/messages`, {
             method: 'POST',

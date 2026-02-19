@@ -9,14 +9,13 @@ export const env = {
   LAM_API_BASE_URL: process.env.LAM_API_BASE_URL || "",
   LAM_API_KEY: process.env.LAM_API_KEY || "",
   LAM_SENDER_ID: process.env.LAM_SENDER_ID || "",
-  GROQ_API_KEY: process.env.GROQ_API_KEY || "",
 } as const
 
 // Validation function to ensure required environment variables are set
 export function validateEnv() {
-  const requiredVars = ["GROQ_API_KEY", "DATABASE_URL"] as const
+  const required = ["DATABASE_URL"] as const
 
-  for (const varName of requiredVars) {
+  for (const varName of required) {
     if (!env[varName]) {
       throw new Error(`${varName} environment variable is required`)
     }

@@ -60,7 +60,7 @@ Respond with a JSON object containing "items" which is an array of valid menu it
       `
 
       const validationResult = await llm.generate(validationPrompt, {
-        model: "llama-3.3-70b-versatile",
+        model: "claude-sonnet-4-6",
         json: true
       })
 

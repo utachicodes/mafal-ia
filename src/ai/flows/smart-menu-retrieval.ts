@@ -94,7 +94,7 @@ Provide helpful information about these items in response to the customer's quer
 Be concise but informative. Speak naturally.
     `
 
-    const informationResult = await llm.generate(informationPrompt, { model: "llama-3.1-8b-instant" })
+    const informationResult = await llm.generate(informationPrompt, { model: "claude-haiku-4-5-20251001" })
 
     return {
       information: informationResult.trim(),

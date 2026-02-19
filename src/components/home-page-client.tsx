@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -260,7 +259,7 @@ export default function HomeClient() {
                 {t.hero.stats.map((stat, i) => (
                   <div key={i} className="text-center">
                     <div className="text-2xl font-bold text-primary">{stat.value}</div>
-                    <div className="text-sm text-gray-600 dark:text-gray-400">{stat.label}</div>
+                    <div className="text-sm text-muted-foreground">{stat.label}</div>
                   </div>
                 ))}
               </motion.div>
@@ -628,7 +627,7 @@ export default function HomeClient() {
               <Button
                 size="lg"
                 variant="outline"
-                className="bg-transparent border-2 border-white text-white hover:bg-white/10 px-10 py-6 text-lg font-semibold transition-all"
+                className="bg-transparent border-2 border-primary/30 text-foreground hover:bg-primary/10 px-10 py-6 text-lg font-semibold transition-all"
               >
                 {t.cta.ctaSecondary}
               </Button>
@@ -638,40 +637,40 @@ export default function HomeClient() {
       </section>
 
       {/* Footer */}
-      <footer className="py-12 bg-black text-white border-t border-border">
+      <footer className="py-12 bg-background text-foreground border-t border-border">
         <div className="container mx-auto px-6">
           <div className="grid md:grid-cols-4 gap-8">
             <div>
               <Logo className="h-10 mb-4" />
-              <p className="text-sm text-gray-400">
+              <p className="text-sm text-muted-foreground">
                 {t.footer.tagline}
               </p>
             </div>
             <div>
               <h4 className="font-semibold mb-4">{t.footer.product}</h4>
-              <ul className="space-y-2 text-sm text-gray-400">
-                <li><a href="#features" className="hover:text-white transition-colors">{t.footer.features}</a></li>
-                <li><a href="#how" className="hover:text-white transition-colors">{t.footer.howItWorks}</a></li>
-                <li><a href="#pricing" className="hover:text-white transition-colors">{t.footer.pricing}</a></li>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li><a href="#features" className="hover:text-foreground transition-colors">{t.footer.features}</a></li>
+                <li><a href="#how" className="hover:text-foreground transition-colors">{t.footer.howItWorks}</a></li>
+                <li><a href="#pricing" className="hover:text-foreground transition-colors">{t.footer.pricing}</a></li>
               </ul>
             </div>
             <div>
               <h4 className="font-semibold mb-4">{t.footer.company}</h4>
-              <ul className="space-y-2 text-sm text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">{t.footer.about}</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">{t.footer.blog}</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">{t.footer.contact}</a></li>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li><a href="#" className="hover:text-foreground transition-colors">{t.footer.about}</a></li>
+                <li><a href="#" className="hover:text-foreground transition-colors">{t.footer.blog}</a></li>
+                <li><a href="#" className="hover:text-foreground transition-colors">{t.footer.contact}</a></li>
               </ul>
             </div>
             <div>
               <h4 className="font-semibold mb-4">{t.footer.legal}</h4>
-              <ul className="space-y-2 text-sm text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">{t.footer.privacy}</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">{t.footer.terms}</a></li>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li><a href="#" className="hover:text-foreground transition-colors">{t.footer.privacy}</a></li>
+                <li><a href="#" className="hover:text-foreground transition-colors">{t.footer.terms}</a></li>
               </ul>
             </div>
           </div>
-          <div className="mt-12 pt-8 border-t border-gray-800 text-center text-sm text-gray-400">
+          <div className="mt-12 pt-8 border-t border-border text-center text-sm text-muted-foreground">
             <p>{t.footer.copyright}</p>
           </div>
         </div>
