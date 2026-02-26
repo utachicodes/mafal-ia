@@ -9,20 +9,20 @@ datasource db {
 
 // B2B2C User Management
 model User {
-  id            String       @id @default(cuid())
-  email         String       @unique
-  name          String?
-  role          UserRole     @default(RESTAURANT_OWNER)
-  plan          Plan         @default(STANDARD)
-  passwordHash  String
-  
+  id                String     @id @default(cuid())
+  email             String     @unique
+  name              String?
+  role              UserRole   @default(BUSINESS_OWNER)
+  plan              Plan       @default(STANDARD)
+  passwordHash      String
+
   // Relations
-  ownedRestaurants Restaurant[] @relation("RestaurantOwner")
-  createdRestaurants Restaurant[] @relation("RestaurantCreator")
-  
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
-  
+  ownedBusinesses   Business[] @relation("BusinessOwner")
+  createdBusinesses Business[] @relation("BusinessCreator")
+
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+
   @@index([email])
 }
 
@@ -32,8 +32,8 @@ enum Plan {
 }
 
 enum UserRole {
-  ADMIN              // Mafalia employees - full access
-  RESTAURANT_OWNER   // Restaurant clients - read-only dashboard
+  ADMIN          // Mafalia employees - full access
+  BUSINESS_OWNER // Business clients - read-only dashboard
 }
 
 enum BusinessType {
@@ -52,7 +52,7 @@ model users_sync {
   raw_json   Json
 }
 
-model Restaurant {
+model Business {
   id                    String         @id @default(cuid())
   name                  String
   description           String
@@ -78,26 +78,28 @@ model Restaurant {
   activitySector        String?
   verificationCode      String?
   isVerified            Boolean        @default(false)
-  
+
   // LAM Integration
-  lamApiKey             String?        // L'Africa Mobile API Key
+  lamApiKey             String?
   lamBaseUrl            String?        @default("https://waba.lafricamobile.com")
-  
+
   // B2B2C Fields
-  ownerId               String?        // Restaurant owner (client) - read-only access
-  owner                 User?          @relation("RestaurantOwner", fields: [ownerId], references: [id])
-  createdById           String?        // Mafalia employee who onboarded this restaurant
-  createdBy             User?          @relation("RestaurantCreator", fields: [createdById], references: [id])
-  
+  ownerId               String?
+  owner                 User?          @relation("BusinessOwner", fields: [ownerId], references: [id])
+  createdById           String?
+  createdBy             User?          @relation("BusinessCreator", fields: [createdById], references: [id])
+
   createdAt             DateTime       @default(now())
   updatedAt             DateTime       @updatedAt
   apiKeyCreatedAt       DateTime?
   apiKeyHash            String?
   apiKeyRevokedAt       DateTime?
+
   conversations         Conversation[]
   menuItems             MenuItem[]
   messageLogs           MessageLog[]
   orders                Order[]
+  knowledgeDocs         KnowledgeDoc[]
 
   @@index([userId])
   @@index([ownerId])
@@ -105,37 +107,37 @@ model Restaurant {
 }
 
 model MenuItem {
-  id           String     @id @default(cuid())
-  restaurantId String
-  name         String
-  description  String
-  price        Int
-  category     String?
-  isAvailable  Boolean    @default(true)
-  imageUrl     String?
-  embedding    Json?
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @default(now()) @updatedAt
-  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+  id          String   @id @default(cuid())
+  businessId  String
+  name        String
+  description String
+  price       Int
+  category    String?
+  isAvailable Boolean  @default(true)
+  imageUrl    String?
+  embedding   Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now()) @updatedAt
+  business    Business @relation(fields: [businessId], references: [id])
 }
 
 model Conversation {
-  id           String     @id @default(cuid())
-  restaurantId String
-  phoneNumber  String
-  messages     Json
-  metadata     Json?      // Stores session state (pending orders, delivery info, etc.)
-  lastActive   DateTime   @default(now())
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
-  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+  id          String   @id @default(cuid())
+  businessId  String
+  phoneNumber String
+  messages    Json
+  metadata    Json?
+  lastActive  DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  business    Business @relation(fields: [businessId], references: [id])
 
-  @@index([restaurantId, phoneNumber])
+  @@index([businessId, phoneNumber])
 }
 
 model Order {
   id           String      @id @default(cuid())
-  restaurantId String
+  businessId   String
   customerName String
   phoneNumber  String
   items        Json
@@ -144,14 +146,14 @@ model Order {
   status       OrderStatus @default(pending)
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt
-  restaurant   Restaurant  @relation(fields: [restaurantId], references: [id])
+  business     Business    @relation(fields: [businessId], references: [id])
 
-  @@index([restaurantId, createdAt])
+  @@index([businessId, createdAt])
 }
 
 model MessageLog {
   id                String           @id @default(cuid())
-  restaurantId      String
+  businessId        String
   phoneNumber       String
   whatsappMessageId String
   direction         MessageDirection
@@ -164,10 +166,37 @@ model MessageLog {
   raw               Json?
   createdAt         DateTime         @default(now())
   updatedAt         DateTime         @updatedAt
-  restaurant        Restaurant       @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  business          Business         @relation(fields: [businessId], references: [id], onDelete: Cascade)
 
-  @@index([restaurantId, createdAt])
+  @@index([businessId, createdAt])
   @@index([whatsappMessageId])
+}
+
+model KnowledgeDoc {
+  id          String           @id @default(cuid())
+  businessId  String
+  business    Business         @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  filename    String
+  mimeType    String
+  contentText String
+  chunks      KnowledgeChunk[]
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  @@index([businessId])
+}
+
+model KnowledgeChunk {
+  id         String       @id @default(cuid())
+  docId      String
+  doc        KnowledgeDoc @relation(fields: [docId], references: [id], onDelete: Cascade)
+  businessId String
+  content    String
+  embedding  Json?
+  chunkIndex Int
+  createdAt  DateTime     @default(now())
+
+  @@index([businessId])
 }
 
 enum OrderStatus {
@@ -178,7 +207,6 @@ enum OrderStatus {
   cancelled
 }
 
-
 enum MessageDirection {
   inbound
   outbound
@@ -186,14 +214,13 @@ enum MessageDirection {
 
 model SystemLog {
   id        String   @id @default(cuid())
-  level     String   // INFO, WARN, ERROR
+  level     String
   message   String
   metadata  Json?
-  source    String   // e.g., "API", "Webhook", "Auth"
+  source    String
   timestamp DateTime @default(now())
 
   @@index([level])
   @@index([source])
   @@index([timestamp])
 }
-
