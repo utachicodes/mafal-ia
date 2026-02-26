@@ -1,5 +1,5 @@
 import { ChatSimulator } from "@/src/components/chat-simulator"
-import { RestaurantService } from "@/src/lib/restaurant-service"
+import { BusinessService } from "@/src/lib/business-service"
 import { Sparkles, MessageSquare, ShieldCheck, Zap, ArrowLeft, Terminal, Bot, Globe, ChevronRight } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -15,7 +15,7 @@ export const dynamic = "force-dynamic"
 
 export default async function BusinessPreviewPage({ params }: PreviewPageProps) {
     const { id } = await params
-    const restaurant = await RestaurantService.getRestaurantById(id)
+    const restaurant = await BusinessService.getBusinessById(id)
 
     if (!restaurant) {
         notFound()

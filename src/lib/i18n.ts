@@ -43,7 +43,7 @@ export const translations = {
         },
         trust: {
             title: "Trusted by businesses across Africa",
-            restaurant: "Restaurants",
+            restaurant: "Businesses",
             shop: "Retail Shops",
             cafe: "Cafés",
             bakery: "Bakeries",
@@ -195,7 +195,7 @@ export const translations = {
         },
         trust: {
             title: "Approuvé par des entreprises à travers l'Afrique",
-            restaurant: "Restaurants",
+            restaurant: "Businesses",
             shop: "Boutiques",
             cafe: "Cafés",
             bakery: "Boulangeries",

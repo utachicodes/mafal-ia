@@ -1,7 +1,7 @@
 "use client"
 
 import { ThemeProvider } from "./theme-provider"
-import { RestaurantsProvider } from "@/src/hooks/use-restaurants"
+import { BusinesssProvider } from "@/src/hooks/use-businesses"
 import { ErrorBoundary } from "@/src/components/error-boundary"
 import { I18nProvider } from "@/src/context/i18n"
 import { SessionProvider } from "next-auth/react"
@@ -16,11 +16,11 @@ export function Providers({ children }: ProvidersProps) {
     <SessionProvider>
       <ThemeProvider>
         <ErrorBoundary>
-          <RestaurantsProvider>
+          <BusinessesProvider>
             <I18nProvider>
               {children}
             </I18nProvider>
-          </RestaurantsProvider>
+          </BusinessesProvider>
         </ErrorBoundary>
         <Toaster />
       </ThemeProvider>

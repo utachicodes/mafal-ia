@@ -7,7 +7,7 @@ export class AIClient {
     restaurantContext: string,
     menuItems: MenuItem[],
     restaurantName: string,
-    restaurantId: string = "",
+    businessId: string = "",
   ) {
     // Server-side: dynamically import Genkit flow runner
     // Ensure flows are registered and get concrete flow refs
@@ -22,7 +22,7 @@ export class AIClient {
         restaurantContext,
         menuItems,
         restaurantName,
-        restaurantId,
+        businessId,
       })
 
       const timeoutPromise = new Promise((_, reject) =>
@@ -44,12 +44,12 @@ export class AIClient {
     }
   }
 
-  static async getMenuInformation(query: string, menuItems: MenuItem[], restaurantId?: string) {
-    // If we have a restaurantId, try a vector search for better semantic matching
-    if (restaurantId) {
+  static async getMenuInformation(query: string, menuItems: MenuItem[], businessId?: string) {
+    // If we have a businessId, try a vector search for better semantic matching
+    if (businessId) {
       try {
         const { searchMenuItemsByVector } = await import("@/src/lib/embeddings")
-        const results = await searchMenuItemsByVector(restaurantId, query, 3)
+        const results = await searchMenuItemsByVector(businessId, query, 3)
         if (results && results.length > 0) {
           // Return the top result or a formatted summary
           const best = results[0]

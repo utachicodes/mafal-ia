@@ -95,7 +95,7 @@ export default async function OrdersPage() {
                   <tr>
                     <th className="px-8 py-4 uppercase tracking-wider text-[10px]">Order ID</th>
                     <th className="px-8 py-4 uppercase tracking-wider text-[10px]">Customer</th>
-                    <th className="px-8 py-4 uppercase tracking-wider text-[10px]">Restaurant</th>
+                    <th className="px-8 py-4 uppercase tracking-wider text-[10px]">Business</th>
                     <th className="px-8 py-4 uppercase tracking-wider text-[10px] text-right">Total</th>
                     <th className="px-8 py-4 uppercase tracking-wider text-[10px] text-center">Status</th>
                     <th className="px-8 py-4 uppercase tracking-wider text-[10px] text-right">Date</th>

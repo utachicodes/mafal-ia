@@ -8,7 +8,7 @@ import { CheckCircle2, XCircle, AlertCircle, ExternalLink, Copy } from "lucide-r
 import { useToast } from "@/hooks/use-toast"
 
 interface WhatsAppIntegrationStatusProps {
-  restaurantId: string
+  businessId: string
   phoneNumber?: string
   phoneNumberId?: string
   accessToken?: string
@@ -18,7 +18,7 @@ interface WhatsAppIntegrationStatusProps {
 }
 
 export function WhatsAppIntegrationStatus({
-  restaurantId,
+  businessId,
   phoneNumber,
   phoneNumberId,
   accessToken,

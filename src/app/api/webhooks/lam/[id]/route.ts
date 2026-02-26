@@ -9,11 +9,11 @@ export async function POST(
     request: NextRequest,
     { params }: { params: { id: string } }
 ) {
-    const restaurantId = params.id
+    const businessId = params.id
 
     try {
         const body = await request.json()
-        console.log(`[LAM Webhook] Received for restaurant ${restaurantId}:`, JSON.stringify(body))
+        console.log(`[LAM Webhook] Received for restaurant ${businessId}:`, JSON.stringify(body))
 
         // LAM often forwards messages in a format like:
         // { "from": "22177...", "text": "hello", "id": "...", "name": "..." }
@@ -29,13 +29,13 @@ export async function POST(
             return NextResponse.json({ error: "No sender number" }, { status: 400 })
         }
 
-        await processUnifiedMessage(restaurantId, phoneNumber, messageId, text, {
+        await processUnifiedMessage(businessId, phoneNumber, messageId, text, {
             contactName
         })
 
         return NextResponse.json({ ok: true })
     } catch (error) {
-        console.error(`[LAM Webhook] Error for ${restaurantId}:`, error)
+        console.error(`[LAM Webhook] Error for ${businessId}:`, error)
         return NextResponse.json({ ok: false }, { status: 500 })
     }
 }

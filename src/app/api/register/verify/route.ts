@@ -5,14 +5,14 @@ export async function POST(req: Request) {
   try {
     const prisma = await getPrisma();
     const body = await req.json();
-    const { restaurantId, otp } = body;
+    const { businessId, otp } = body;
 
-    if (!restaurantId || !otp) {
+    if (!businessId || !otp) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
-    const restaurant = await prisma.restaurant.findUnique({
-      where: { id: restaurantId },
+    const restaurant = await prisma.business.findUnique({
+      where: { id: businessId },
     });
 
     if (!restaurant) {
@@ -24,8 +24,8 @@ export async function POST(req: Request) {
     }
 
     // OTP valid, verify restaurant
-    await prisma.restaurant.update({
-      where: { id: restaurantId },
+    await prisma.business.update({
+      where: { id: businessId },
       data: {
         isVerified: true,
         verificationCode: null, // Clear OTP

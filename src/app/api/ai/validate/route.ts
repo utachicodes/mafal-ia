@@ -11,7 +11,7 @@ export async function POST(req: Request) {
     if (!result.valid) {
       return NextResponse.json({ ok: false, error: result.reason || "Invalid API key" }, { status: 401 })
     }
-    return NextResponse.json({ ok: true, restaurantId: result.restaurantId })
+    return NextResponse.json({ ok: true, businessId: result.businessId })
   } catch (e: any) {
     return NextResponse.json({ ok: false, error: e?.message || "Validation failed" }, { status: 500 })
   }

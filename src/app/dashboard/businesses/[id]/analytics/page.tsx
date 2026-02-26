@@ -17,7 +17,7 @@ import {
     Zap
 } from "lucide-react"
 import Link from "next/link"
-import { RestaurantService } from "@/src/lib/restaurant-service"
+import { BusinessService } from "@/src/lib/business-service"
 import { notFound } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { motion } from "framer-motion"
@@ -30,7 +30,7 @@ export const dynamic = "force-dynamic"
 
 export default async function BusinessAnalyticsPage({ params }: BusinessAnalyticsPageProps) {
     const { id } = await params
-    const restaurant = await RestaurantService.getRestaurantById(id)
+    const restaurant = await BusinessService.getBusinessById(id)
 
     if (!restaurant) {
         notFound()

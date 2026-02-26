@@ -55,16 +55,16 @@ class ApiBridge {
     }
 
     // Menu Retrieval / Search
-    async searchMenu(query: string, restaurantId: string) {
+    async searchMenu(query: string, businessId: string) {
         return this.request('/menu/search', {
             method: 'GET',
-            params: { q: query, restaurantId },
+            params: { q: query, businessId },
         });
     }
 
     // Analytics Engine
-    async getAnalytics(restaurantId: string, timeframe: string = '30d') {
-        return this.request(`/analytics/${restaurantId}`, {
+    async getAnalytics(businessId: string, timeframe: string = '30d') {
+        return this.request(`/analytics/${businessId}`, {
             method: 'GET',
             params: { timeframe },
         });

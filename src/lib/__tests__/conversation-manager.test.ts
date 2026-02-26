@@ -50,11 +50,11 @@ describe("ConversationManager.getConversation", () => {
     expect(result[0].timestamp).toBeInstanceOf(Date)
   })
 
-  it("queries by restaurantId and phoneNumber", async () => {
+  it("queries by businessId and phoneNumber", async () => {
     mockPrisma.conversation.findFirst.mockResolvedValue(null)
     await ConversationManager.getConversation(RESTAURANT_ID, PHONE)
     expect(mockPrisma.conversation.findFirst).toHaveBeenCalledWith(
-      expect.objectContaining({ where: { restaurantId: RESTAURANT_ID, phoneNumber: PHONE } })
+      expect.objectContaining({ where: { businessId: RESTAURANT_ID, phoneNumber: PHONE } })
     )
   })
 })
@@ -71,7 +71,7 @@ describe("ConversationManager.addMessage", () => {
 
     expect(mockPrisma.conversation.create).toHaveBeenCalledOnce()
     const createCall = mockPrisma.conversation.create.mock.calls[0][0]
-    expect(createCall.data.restaurantId).toBe(RESTAURANT_ID)
+    expect(createCall.data.businessId).toBe(RESTAURANT_ID)
     expect(createCall.data.phoneNumber).toBe(PHONE)
     expect(createCall.data.messages).toHaveLength(1)
   })
@@ -209,7 +209,7 @@ describe("ConversationManager.clearConversation", () => {
     mockPrisma.conversation.deleteMany.mockResolvedValue({ count: 1 })
     await ConversationManager.clearConversation(RESTAURANT_ID, PHONE)
     expect(mockPrisma.conversation.deleteMany).toHaveBeenCalledWith({
-      where: { restaurantId: RESTAURANT_ID, phoneNumber: PHONE }
+      where: { businessId: RESTAURANT_ID, phoneNumber: PHONE }
     })
   })
 

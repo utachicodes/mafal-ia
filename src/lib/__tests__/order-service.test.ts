@@ -18,7 +18,7 @@ vi.mock("@/src/lib/db", () => ({
 import { OrderService } from "@/src/lib/order-service"
 
 const BASE_PARAMS = {
-  restaurantId: "rest-1",
+  businessId: "rest-1",
   phoneNumber: "+221771234567",
   total: 5000,
   itemsSummary: "2x Thieboudienne",
@@ -28,7 +28,7 @@ const BASE_PARAMS = {
 function makeOrderRecord(overrides: Record<string, any> = {}) {
   return {
     id: "order-abc",
-    restaurantId: "rest-1",
+    businessId: "rest-1",
     phoneNumber: "+221771234567",
     customerName: "",
     total: 5000,
@@ -44,11 +44,11 @@ function makeOrderRecord(overrides: Record<string, any> = {}) {
 describe("OrderService.createOrder", () => {
   beforeEach(() => vi.clearAllMocks())
 
-  it("creates order with correct restaurantId and phoneNumber", async () => {
+  it("creates order with correct businessId and phoneNumber", async () => {
     mockPrisma.order.create.mockResolvedValue(makeOrderRecord())
     await OrderService.createOrder(BASE_PARAMS)
     const callArg = mockPrisma.order.create.mock.calls[0][0]
-    expect(callArg.data.restaurantId).toBe("rest-1")
+    expect(callArg.data.businessId).toBe("rest-1")
     expect(callArg.data.phoneNumber).toBe("+221771234567")
   })
 
@@ -153,7 +153,7 @@ describe("OrderService.listByPhone", () => {
     expect(result).toHaveLength(2)
     expect(mockPrisma.order.findMany).toHaveBeenCalledWith(
       expect.objectContaining({
-        where: { restaurantId: "rest-1", phoneNumber: "+221771234567" },
+        where: { businessId: "rest-1", phoneNumber: "+221771234567" },
         orderBy: { createdAt: "desc" },
       })
     )

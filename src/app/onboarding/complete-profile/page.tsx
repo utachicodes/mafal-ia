@@ -100,7 +100,7 @@ export default function CompleteProfilePage() {
                                 </SelectTrigger>
                                 <SelectContent className="glass border-white/10">
                                     <SelectItem value="Fast Food">Fast Food</SelectItem>
-                                    <SelectItem value="Restaurant">Restaurant (Service à table)</SelectItem>
+                                    <SelectItem value="Business">Restaurant (Service à table)</SelectItem>
                                     <SelectItem value="Boulangerie">Boulangerie / Pâtisserie</SelectItem>
                                     <SelectItem value="Traiteur">Traiteur</SelectItem>
                                     <SelectItem value="Autre">Autre</SelectItem>

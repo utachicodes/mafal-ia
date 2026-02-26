@@ -19,13 +19,13 @@ export async function POST(req: Request) {
     const body = await req.json()
     const prisma = await getPrisma()
 
-    const restaurantId: string = String(body.restaurantId)
+    const businessId: string = String(body.businessId)
     const customerName: string = String(body.customerName)
     const phoneNumber: string = String(body.phoneNumber)
     const items: Array<{ itemName: string; quantity: number; price: number; specs?: any }> = body.items || []
     const notes: string | null = body.notes ? String(body.notes) : null
 
-    if (!restaurantId || !customerName || !phoneNumber || !Array.isArray(items) || items.length === 0) {
+    if (!businessId || !customerName || !phoneNumber || !Array.isArray(items) || items.length === 0) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
     }
 
@@ -33,7 +33,7 @@ export async function POST(req: Request) {
 
     const created = await prisma.order.create({
       data: {
-        restaurantId,
+        businessId,
         customerName,
         phoneNumber,
         items,

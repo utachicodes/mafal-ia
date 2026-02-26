@@ -5,7 +5,7 @@ export type OrderRecord = Order
 
 // DTO accepted by WhatsApp flow when confirming an order
 export type CreateOrderParams = {
-  restaurantId: string
+  businessId: string
   phoneNumber: string
   total: number
   itemsSummary: string // human-readable summary
@@ -38,7 +38,7 @@ export class OrderService {
 
     const createdOrder = await prisma.order.create({
       data: {
-        restaurantId: params.restaurantId,
+        businessId: params.businessId,
         customerName: params.customerName ?? "",
         phoneNumber: params.phoneNumber,
         items: itemsJson as any,
@@ -56,10 +56,10 @@ export class OrderService {
     })
   }
 
-  static async listByPhone(restaurantId: string, phoneNumber: string): Promise<OrderRecord[]> {
+  static async listByPhone(businessId: string, phoneNumber: string): Promise<OrderRecord[]> {
     const prisma = await getPrisma()
     return prisma.order.findMany({
-      where: { restaurantId, phoneNumber },
+      where: { businessId, phoneNumber },
       orderBy: { createdAt: "desc" },
     })
   }

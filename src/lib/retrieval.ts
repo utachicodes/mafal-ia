@@ -21,10 +21,10 @@ function lexicalScore(query: string, text: string): number {
   return s
 }
 
-export async function retrieveMenuItems(restaurantId: string, query: string, k = 5): Promise<RetrievedItem[]> {
+export async function retrieveMenuItems(businessId: string, query: string, k = 5): Promise<RetrievedItem[]> {
   const prisma = await getPrisma()
   const items = await prisma.menuItem.findMany({
-    where: { restaurantId, isAvailable: true },
+    where: { businessId, isAvailable: true },
     select: { id: true, name: true, description: true, price: true, category: true, isAvailable: true, embedding: true },
     take: 200,
   })

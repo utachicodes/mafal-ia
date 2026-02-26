@@ -3,7 +3,7 @@ import { hashApiKey } from "@/src/lib/api-key"
 
 export interface ApiKeyValidationResult {
   valid: boolean
-  restaurantId?: string
+  businessId?: string
   reason?: string
 }
 
@@ -28,7 +28,7 @@ export async function validateApiKey(apiKey: string): Promise<ApiKeyValidationRe
   try {
     const prisma = await getPrisma()
     const hash = hashApiKey(apiKey)
-    const restaurant = await prisma.restaurant.findFirst({
+    const restaurant = await prisma.business.findFirst({
       where: {
         apiKeyHash: hash,
         apiKeyRevokedAt: null,
@@ -38,7 +38,7 @@ export async function validateApiKey(apiKey: string): Promise<ApiKeyValidationRe
     if (!restaurant) {
       return { valid: false, reason: "Invalid or revoked API key" }
     }
-    return { valid: true, restaurantId: restaurant.id }
+    return { valid: true, businessId: restaurant.id }
   } catch (e: any) {
     return { valid: false, reason: e?.message || "Validation error" }
   }

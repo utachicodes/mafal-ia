@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { RestaurantService } from "@/src/lib/restaurant-service"
+import { BusinessService } from "@/src/lib/business-service"
 
 export const runtime = "nodejs"
 
@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
 
     if (!name) return NextResponse.json({ ok: false, error: "name_required" }, { status: 400 })
 
-    const created = await RestaurantService.createRestaurant({
+    const created = await BusinessService.createRestaurant({
       id: "temp", // ignored by service
       name,
       description: description || "",

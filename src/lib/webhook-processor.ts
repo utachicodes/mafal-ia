@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { AIClient } from "@/src/lib/ai-client"
 import { WhatsAppClient } from "@/src/lib/whatsapp-client"
-import { RestaurantService } from "@/src/lib/restaurant-service"
+import { BusinessService } from "@/src/lib/business-service"
 import type { ChatMessage, MenuItem } from "@/lib/data"
 import { ConversationManager } from "@/src/lib/conversation-manager"
 import { OrderService } from "@/src/lib/order-service"
@@ -24,7 +24,7 @@ function normalizeMenu(r: any): MenuItem[] {
 }
 
 export async function processUnifiedMessage(
-    restaurantId: string,
+    businessId: string,
     phoneNumber: string,
     messageId: string,
     messageText: string,
@@ -35,10 +35,10 @@ export async function processUnifiedMessage(
     }
 ) {
     try {
-        const restaurant = await RestaurantService.getRestaurantById(restaurantId)
+        const restaurant = await BusinessService.getBusinessById(businessId)
 
         if (!restaurant || !restaurant.isActive) {
-            console.warn(`Restaurant ${restaurantId} not found or inactive`)
+            console.warn(`Restaurant ${businessId} not found or inactive`)
             return
         }
 
@@ -70,7 +70,7 @@ export async function processUnifiedMessage(
         if (currentMeta.pendingOrder) {
             if (["yes", "y", "confirm", "oui"].includes(normalized)) {
                 const order = await OrderService.createOrder({
-                    restaurantId: restaurant.id,
+                    businessId: restaurant.id,
                     phoneNumber,
                     total: currentMeta.pendingOrder.total,
                     itemsSummary: currentMeta.pendingOrder.itemsSummary,
@@ -157,6 +157,6 @@ Customer Location: ${currentMeta.locationText || "Unknown"}
         }
 
     } catch (error) {
-        console.error(`[WebhookProcessor] Error for restaurant ${restaurantId}:`, error)
+        console.error(`[WebhookProcessor] Error for restaurant ${businessId}:`, error)
     }
 }

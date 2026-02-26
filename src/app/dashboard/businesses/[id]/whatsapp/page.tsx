@@ -11,7 +11,7 @@ import {
     RefreshCw
 } from "lucide-react"
 import Link from "next/link"
-import { RestaurantService } from "@/src/lib/restaurant-service"
+import { BusinessService } from "@/src/lib/business-service"
 import { notFound } from "next/navigation"
 
 interface BusinessWhatsAppPageProps {
@@ -22,7 +22,7 @@ export const dynamic = "force-dynamic"
 
 export default async function BusinessWhatsAppPage({ params }: BusinessWhatsAppPageProps) {
     const { id } = await params
-    const restaurant = await RestaurantService.getRestaurantById(id)
+    const restaurant = await BusinessService.getBusinessById(id)
 
     if (!restaurant) {
         notFound()

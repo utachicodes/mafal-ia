@@ -13,7 +13,7 @@ export default function DisabledWhatsAppSettingsPage() {
         </p>
         <div className="mt-6 rounded border p-4 bg-card">
           <p className="text-sm">
-            After onboarding, copy your endpoint at <code>/api/chatbots/[restaurantId]/messages</code>
+            After onboarding, copy your endpoint at <code>/api/chatbots/[businessId]/messages</code>
             and configure your external webhook to POST events there.
           </p>
         </div>

@@ -6,9 +6,9 @@ vi.mock("next/server", () => ({
   NextResponse: { json: vi.fn((data: any, init: any) => ({ data, init })) },
 }))
 
-vi.mock("@/src/lib/restaurant-service", () => ({
-  RestaurantService: {
-    getRestaurantById: vi.fn(),
+vi.mock("@/src/lib/business-service", () => ({
+  BusinessService: {
+    getBusinessById: vi.fn(),
   },
 }))
 
@@ -41,7 +41,7 @@ vi.mock("@/src/lib/whatsapp-client", () => ({
 }))
 
 import { processUnifiedMessage } from "../webhook-processor"
-import { RestaurantService } from "@/src/lib/restaurant-service"
+import { BusinessService } from "@/src/lib/business-service"
 import { ConversationManager } from "@/src/lib/conversation-manager"
 import { OrderService } from "@/src/lib/order-service"
 import { AIClient } from "@/src/lib/ai-client"
@@ -73,7 +73,7 @@ const MSG_ID = "msg-test-001"
 beforeEach(() => {
   vi.clearAllMocks()
 
-  vi.mocked(RestaurantService.getRestaurantById).mockResolvedValue(mockRestaurant as any)
+  vi.mocked(BusinessService.getBusinessById).mockResolvedValue(mockRestaurant as any)
   vi.mocked(ConversationManager.getMetadata).mockResolvedValue({} as any)
   vi.mocked(ConversationManager.getConversation).mockResolvedValue([] as any)
   vi.mocked(ConversationManager.addMessage).mockResolvedValue(undefined as any)
@@ -106,7 +106,7 @@ describe("processUnifiedMessage — pending order confirmation", () => {
     expect(OrderService.createOrder).toHaveBeenCalledOnce()
     expect(OrderService.createOrder).toHaveBeenCalledWith(
       expect.objectContaining({
-        restaurantId: "rest-1",
+        businessId: "rest-1",
         phoneNumber: PHONE,
         total: 5000,
       })
@@ -193,7 +193,7 @@ describe("processUnifiedMessage — normal message flow", () => {
   })
 
   it("returns early when restaurant is not found", async () => {
-    vi.mocked(RestaurantService.getRestaurantById).mockResolvedValue(null as any)
+    vi.mocked(BusinessService.getBusinessById).mockResolvedValue(null as any)
 
     await processUnifiedMessage("rest-missing", PHONE, MSG_ID, "hello", {})
 
@@ -202,7 +202,7 @@ describe("processUnifiedMessage — normal message flow", () => {
   })
 
   it("returns early when restaurant is inactive", async () => {
-    vi.mocked(RestaurantService.getRestaurantById).mockResolvedValue({
+    vi.mocked(BusinessService.getBusinessById).mockResolvedValue({
       ...mockRestaurant,
       isActive: false,
     } as any)

@@ -16,7 +16,7 @@ export const AnalyticsService = {
         const totalRevenue = revenueResult._sum.total || 0
 
         // 2. Active Restaurants
-        const activeRestaurants = await prisma.restaurant.count({
+        const activeRestaurants = await prisma.business.count({
             where: {
                 isActive: true,
             },

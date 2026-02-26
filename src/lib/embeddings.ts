@@ -69,7 +69,7 @@ export async function generateMenuItemEmbedding(item: {
  * Semantic search using vector similarity (requires pgvector extension)
  */
 export async function searchMenuItemsByVector(
-  restaurantId: string,
+  businessId: string,
   query: string,
   limit: number = 5
 ): Promise<any[]> {
@@ -90,7 +90,7 @@ export async function searchMenuItemsByVector(
         "isAvailable",
         1 - (embedding::vector <=> ${JSON.stringify(queryEmbedding)}::vector) AS similarity
       FROM "MenuItem"
-      WHERE "restaurantId" = ${restaurantId}
+      WHERE "businessId" = ${businessId}
         AND "isAvailable" = true
         AND embedding IS NOT NULL
       ORDER BY embedding::vector <=> ${JSON.stringify(queryEmbedding)}::vector
@@ -105,7 +105,7 @@ export async function searchMenuItemsByVector(
     // This is still valid logic, not a simulation.
     const fallback = await prisma.menuItem.findMany({
       where: {
-        restaurantId,
+        businessId,
         isAvailable: true,
         OR: [
           { name: { contains: query } },

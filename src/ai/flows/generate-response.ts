@@ -11,7 +11,7 @@ interface GenerateResponseInput {
   restaurantContext: string
   menuItems: MenuItem[]
   restaurantName: string
-  restaurantId: string
+  businessId: string
 }
 
 interface GenerateResponseOutput {
@@ -53,7 +53,7 @@ export const generateResponseFlow = defineFlow(
         }),
       ),
       restaurantName: z.string(),
-      restaurantId: z.string(),
+      businessId: z.string(),
     }),
     outputSchema: z.object({
       response: z.string(),
@@ -68,7 +68,7 @@ export const generateResponseFlow = defineFlow(
       messageCount: input.messages?.length,
       menuCount: input.menuItems?.length
     })
-    const { messages, restaurantContext, menuItems, restaurantName, restaurantId } = input
+    const { messages, restaurantContext, menuItems, restaurantName, businessId } = input
     const messagesTyped = messages as ChatMessage[]
     const menuItemsTyped = menuItems as MenuItem[]
     const lastMessage = messagesTyped[messagesTyped.length - 1]?.content || ""
@@ -123,7 +123,7 @@ export const generateResponseFlow = defineFlow(
     if (intent === "menu_question") {
       try {
         const { retrieveMenuItems } = await import("@/src/lib/retrieval")
-        const results = await retrieveMenuItems(restaurantId, lastMessage, 5)
+        const results = await retrieveMenuItems(businessId, lastMessage, 5)
         if (results.length > 0) {
           toolResponse = results
             .map(r => `- ${r.name}: ${r.description} (${r.price} FCFA)${r.category ? ` [${r.category}]` : ""}`)

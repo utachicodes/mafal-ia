@@ -6,7 +6,7 @@ export const runtime = "nodejs"
 export async function GET() {
   try {
     const prisma = await getPrisma()
-    const restaurants = await prisma.restaurant.findMany({
+    const restaurants = await prisma.business.findMany({
       select: {
         id: true,
         name: true,

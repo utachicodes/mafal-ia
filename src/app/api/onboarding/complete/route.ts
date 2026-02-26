@@ -8,7 +8,7 @@ export async function POST(req: Request) {
         const { z } = await import("zod");
 
         // We assume the user is authenticated at this point? 
-        // Or we pass the restaurantId/userId from the previous step?
+        // Or we pass the businessId/userId from the previous step?
         // Since we redirected to a page, we should rely on Session ideally.
         // However, for simplicity/consistency with the current registration flow which might not have fully established session cookie yet?
         // Actually, `verify` didn't set a session cookie explicitly in the code I saw (NextAuth usually mimics session).
@@ -18,9 +18,9 @@ export async function POST(req: Request) {
         // The user will probably need to Login after verify? Or we auto-login?
         // The prompt says "Aprés l'activation on lui demander...".
         // If the user is not logged in, we can't secure this endpoint easily without a token.
-        // I will assume for this "fast" flow that we might need to pass `restaurantId`?
+        // I will assume for this "fast" flow that we might need to pass `businessId`?
         // Or better, let's assume the frontend will ask the user to login first? No, that breaks flow.
-        // I'll assume we can pass the `userId` or `restaurantId` if we securely return it or set a cookie.
+        // I'll assume we can pass the `userId` or `businessId` if we securely return it or set a cookie.
         // Wait, the `verify` route returns `ok: true`. It does NOT return a token.
         // And `RegisterPage` redirects to `/onboarding/complete-profile`.
         // It doesn't pass state.
@@ -28,7 +28,7 @@ export async function POST(req: Request) {
 
         // ADJUSTMENT: The `verify` logic should ideally log the user in.
         // Since I can't easily change NextAuth logic to auto-login without credentials,
-        // I will make `/onboarding/complete-profile` require a `restaurantId` query param or similar?
+        // I will make `/onboarding/complete-profile` require a `businessId` query param or similar?
         // That's insecure (anyone can update anyone's profile if they guess ID).
         // Better Approach:
         // 1. `register/verify` returns a temporary `onboardingToken`?
@@ -71,17 +71,17 @@ export async function POST(req: Request) {
 
         // Update restaurant
         // Assuming 1 restaurant per user for now or finding the one created recently?
-        // The Schema says `ownedRestaurants`.
+        // The Schema says `ownedBusinesses`.
         // We'll update the first one or we should pass restaurant ID?
         // Safest is to find the restaurant owned by this user.
 
-        const restaurant = await prisma.restaurant.findFirst({
+        const restaurant = await prisma.business.findFirst({
             where: { userId: user.id }
         });
 
         if (!restaurant) return NextResponse.json({ error: "Restaurant not found" }, { status: 404 });
 
-        await prisma.restaurant.update({
+        await prisma.business.update({
             where: { id: restaurant.id },
             data: {
                 ownerAgeRange,

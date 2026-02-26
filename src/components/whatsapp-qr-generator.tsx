@@ -9,11 +9,11 @@ import { useToast } from "@/hooks/use-toast"
 
 interface WhatsAppQRGeneratorProps {
   phoneNumber: string
-  restaurantId: string
+  businessId: string
   onQRGenerated?: (qrData: string) => void
 }
 
-export function WhatsAppQRGenerator({ phoneNumber, restaurantId, onQRGenerated }: WhatsAppQRGeneratorProps) {
+export function WhatsAppQRGenerator({ phoneNumber, businessId, onQRGenerated }: WhatsAppQRGeneratorProps) {
   const [qrCodeDataURL, setQrCodeDataURL] = useState<string>("")
   const [isGenerating, setIsGenerating] = useState(false)
   const [qrData, setQrData] = useState<string>("")
@@ -26,7 +26,7 @@ export function WhatsAppQRGenerator({ phoneNumber, restaurantId, onQRGenerated }
     const baseURL = "https://web.whatsapp.com/send"
     const params = new URLSearchParams({
       phone: phoneNumber.replace(/\D/g, ""), // Remove non-digits
-      text: `Hello! I'm connecting to ${restaurantId} restaurant chatbot.`
+      text: `Hello! I'm connecting to ${businessId} restaurant chatbot.`
     })
     return `${baseURL}?${params.toString()}`
   }
@@ -80,7 +80,7 @@ export function WhatsAppQRGenerator({ phoneNumber, restaurantId, onQRGenerated }
     if (!qrCodeDataURL) return
 
     const link = document.createElement("a")
-    link.download = `whatsapp-qr-${restaurantId}-${Date.now()}.png`
+    link.download = `whatsapp-qr-${businessId}-${Date.now()}.png`
     link.href = qrCodeDataURL
     document.body.appendChild(link)
     link.click()

@@ -2,7 +2,7 @@ import { type NextRequest, NextResponse } from "next/server"
 import crypto from "crypto"
 import { getPrisma } from "@/src/lib/db"
 import { processUnifiedMessage } from "@/src/lib/webhook-processor"
-import { RestaurantService } from "@/src/lib/restaurant-service"
+import { BusinessService } from "@/src/lib/business-service"
 import { logger } from "@/src/lib/logger"
 
 export const runtime = "nodejs"
@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
     }
 
     const prisma = await getPrisma()
-    const match = await prisma.restaurant.findFirst({ where: { webhookVerifyToken: token } })
+    const match = await prisma.business.findFirst({ where: { webhookVerifyToken: token } })
     if (match) {
       return new Response(challenge, { status: 200 })
     }
@@ -61,10 +61,10 @@ export async function POST(request: NextRequest) {
       // Let's try to resolve via `to` (the business number) if available.
 
       const businessPhoneNumber = body.to || message.to
-      const restaurant = await RestaurantService.getRestaurantByPhoneNumber(businessPhoneNumber)
+      const restaurant = await BusinessService.getBusinessByPhoneNumber(businessPhoneNumber)
 
       if (restaurant) {
-        logger.info(`Received LAM message for ${restaurant.name}`, { from: message.from, restaurantId: restaurant.id }, "WEBHOOK_LAM")
+        logger.info(`Received LAM message for ${restaurant.name}`, { from: message.from, businessId: restaurant.id }, "WEBHOOK_LAM")
         console.log(`[LAM Webhook] Received message for ${restaurant.name} (${businessPhoneNumber})`)
         const messageText = message.text?.body || message.text || ""
         await processUnifiedMessage(restaurant.id, message.from, message.id, messageText, {
@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
       const message = value.messages[0]
       const businessPhoneNumberId = value.metadata?.phone_number_id
 
-      const restaurant = await RestaurantService.getRestaurantByPhoneNumber(businessPhoneNumberId)
+      const restaurant = await BusinessService.getBusinessByPhoneNumber(businessPhoneNumberId)
       if (!restaurant) return NextResponse.json({ ok: true })
 
       const contactName = value.contacts?.[0]?.profile?.name

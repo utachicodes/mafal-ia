@@ -5,11 +5,11 @@ import { subDays, startOfDay, format } from "date-fns"
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url)
-    const restaurantId = searchParams.get("restaurantId")
+    const businessId = searchParams.get("businessId")
 
     const prisma = await getPrisma()
 
-    const whereClause = restaurantId ? { restaurantId } : {}
+    const whereClause = businessId ? { businessId } : {}
 
     // 1. Total Conversations
     const totalConversations = await prisma.conversation.count({

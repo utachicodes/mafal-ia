@@ -49,7 +49,7 @@ describe("AIClient.generateResponse", () => {
         restaurantContext: "Some context",
         menuItems: MENU_ITEMS,
         restaurantName: "Chez Fatou",
-        restaurantId: "rest-1",
+        businessId: "rest-1",
       })
     )
     expect(result).toEqual(flowResult)
@@ -74,14 +74,14 @@ describe("AIClient.generateResponse", () => {
     expect(result.response).toContain("difficulté technique")
   })
 
-  it("uses empty restaurantId as default", async () => {
+  it("uses empty businessId as default", async () => {
     mockRunFlow.mockResolvedValue({ response: "OK", language: "fr", intent: "greeting" })
 
     await AIClient.generateResponse(MESSAGES, "context", MENU_ITEMS, "Chez Fatou")
 
     expect(mockRunFlow).toHaveBeenCalledWith(
       mockGenerateResponseFlow,
-      expect.objectContaining({ restaurantId: "" })
+      expect.objectContaining({ businessId: "" })
     )
   })
 })
@@ -106,7 +106,7 @@ describe("AIClient.getMenuInformation", () => {
     expect(result).toBeNull()
   })
 
-  it("uses vector search when restaurantId is provided", async () => {
+  it("uses vector search when businessId is provided", async () => {
     const { searchMenuItemsByVector } = await import("@/src/lib/embeddings")
     const mockSearch = vi.mocked(searchMenuItemsByVector)
     mockSearch.mockResolvedValue([

@@ -5,17 +5,17 @@ import { llm } from "@/lib/llm"
 export async function POST(req: Request) {
     try {
         const body = await req.json()
-        const { restaurantId, message, sessionId } = body
+        const { businessId, message, sessionId } = body
 
-        if (!restaurantId || !message) {
+        if (!businessId || !message) {
             return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
         }
 
         const prisma = await getPrisma()
 
         // 1. Fetch Restaurant Context & Menu
-        const restaurant = await prisma.restaurant.findUnique({
-            where: { id: restaurantId },
+        const restaurant = await prisma.business.findUnique({
+            where: { id: businessId },
             include: { menuItems: { where: { isAvailable: true } } }
         })
 

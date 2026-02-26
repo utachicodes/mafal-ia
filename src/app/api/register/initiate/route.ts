@@ -50,12 +50,12 @@ export async function POST(req: Request) {
         email: proxyEmail,
         passwordHash: hashedPin,
         name: name,
-        role: "RESTAURANT_OWNER",
+        role: "BUSINESS_OWNER",
         plan: "STANDARD"
       }
     });
 
-    const restaurant = await prisma.restaurant.create({
+    const restaurant = await prisma.business.create({
       data: {
         name,
         whatsappNumber,
@@ -68,7 +68,7 @@ export async function POST(req: Request) {
       },
     });
 
-    return NextResponse.json({ ok: true, restaurantId: restaurant.id });
+    return NextResponse.json({ ok: true, businessId: restaurant.id });
   } catch (error: any) {
     console.error("Registration initiate error:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });

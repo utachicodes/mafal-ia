@@ -7,16 +7,16 @@
     "dashboard": "Tableau de bord"
   },
   "hero": {
-    "badge": "Chatbots WhatsApp B2B pour restaurants",
-    "title": "Assistant WhatsApp pour votre restaurant",
+    "badge": "Chatbots WhatsApp B2B pour businesss",
+    "title": "Assistant WhatsApp pour votre business",
     "subtitle": "Renseignez votre compte, connectez votre numéro WhatsApp Business et laissez Mafal-IA répondre, recommander et prendre des commandes — menu à l’appui, multilingue.",
-    "ctaPrimary": "Créer mon restaurant",
+    "ctaPrimary": "Créer mon business",
     "ctaSecondary": "Voir comment ça marche"
   },
   "features": {
     "heading": "Pensé pour l’échelle, conçu pour la clarté",
     "menu": "IA consciente du menu",
-    "menuDesc": "Comprend vos plats, prix et disponibilités par restaurant.",
+    "menuDesc": "Comprend vos plats, prix et disponibilités par business.",
     "multi": "Multilingue",
     "multiDesc": "Français et anglais pris en charge, avec un ton concis.",
     "wa": "Natif WhatsApp",
@@ -26,13 +26,13 @@
   },
   "steps": {
     "heading": "Trois étapes pour être en ligne",
-    "s1": {"title": "Créer le restaurant", "desc": "Ajoutez votre profil et importez le menu en JSON."},
+    "s1": {"title": "Créer le business", "desc": "Ajoutez votre profil et importez le menu en JSON."},
     "s2": {"title": "Connecter WhatsApp", "desc": "Définissez phone_number_id et l’access token. Vérifiez le webhook."},
     "s3": {"title": "Lancer & suivre", "desc": "Testez les chats et suivez commandes et analytics."}
   },
   "cta": {
     "heading": "Prêt pour le lancement ?",
-    "desc": "Mafal-IA est pensé pour la production, dédié aux restaurants B2B.",
+    "desc": "Mafal-IA est pensé pour la production, dédié aux businesss B2B.",
     "button": "Commencer"
   },
   "footer": {

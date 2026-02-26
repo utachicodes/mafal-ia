@@ -97,7 +97,7 @@ export default function NewBusinessPage() {
                                     <label className="cursor-pointer">
                                         <input type="radio" name="businessType" value="RESTAURANT" className="peer sr-only" defaultChecked />
                                         <div className="rounded-xl border-2 border-white/10 p-4 hover:bg-white/5 peer-checked:border-primary peer-checked:bg-primary/5 transition-all text-center">
-                                            <span className="block font-bold">Restaurant</span>
+                                            <span className="block font-bold">Business</span>
                                             <span className="text-xs text-muted-foreground">Menu & Dishes</span>
                                         </div>
                                     </label>

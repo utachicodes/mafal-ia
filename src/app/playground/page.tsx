@@ -1,5 +1,5 @@
 import { ChatSimulator } from "@/src/components/chat-simulator"
-import { RestaurantService } from "@/src/lib/restaurant-service"
+import { BusinessService } from "@/src/lib/business-service"
 import { MessageSquare, ShieldCheck, Search } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils"
 export const dynamic = "force-dynamic"
 
 export default async function PlaygroundPage() {
-  const restaurants = await RestaurantService.getAllRestaurants()
+  const restaurants = await BusinessService.getAllRestaurants()
   const simpleRestaurants = restaurants.map(r => ({ id: r.id, name: r.name }))
 
   return (

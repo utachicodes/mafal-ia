@@ -1,7 +1,7 @@
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/src/lib/auth"
 import { redirect } from "next/navigation"
-import { RestaurantService } from "@/src/lib/restaurant-service"
+import { BusinessService } from "@/src/lib/business-service"
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -39,7 +39,7 @@ export default async function BusinessesPage() {
   let error = null
 
   try {
-    restaurants = await RestaurantService.getAllRestaurants((session.user as any).id)
+    restaurants = await BusinessService.getAllRestaurants((session.user as any).id)
   } catch (e: any) {
     console.error("Failed to load restaurants:", e)
     error = e.message || "Failed to load"
@@ -98,7 +98,7 @@ export default async function BusinessesPage() {
                     </CardTitle>
                     <div className="flex items-center gap-2 text-muted-foreground text-xs font-medium uppercase tracking-widest">
                       <MapPin className="h-3 w-3 text-primary" />
-                      {res.cuisine || "Restaurant"}
+                      {res.cuisine || "Business"}
                     </div>
                   </div>
                   <DropdownMenu>

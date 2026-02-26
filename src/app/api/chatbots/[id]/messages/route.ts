@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { AIClient } from "@/src/lib/ai-client"
-import { RestaurantService } from "@/src/lib/restaurant-service"
+import { BusinessService } from "@/src/lib/business-service"
 import { ConversationManager } from "@/src/lib/conversation-manager"
 import { estimateDelivery, formatEstimate } from "@/src/lib/delivery"
 
@@ -10,8 +10,8 @@ function stripBold(s: string) {
   return s.replace(/\*\*(.*?)\*\*/g, "$1").replace(/__(.*?)__/g, "$1")
 }
 
-async function processMessage(restaurantId: string, from: string, text: string) {
-  const restaurant = await RestaurantService.getRestaurantById(restaurantId)
+async function processMessage(businessId: string, from: string, text: string) {
+  const restaurant = await BusinessService.getBusinessById(businessId)
   if (!restaurant || !restaurant.isActive) return null
 
   const meta = await ConversationManager.getMetadata(restaurant.id, from)
@@ -83,7 +83,7 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
       return NextResponse.json({ ok: false, error: "from and text are required" }, { status: 400 })
     }
 
-    const restaurant = await RestaurantService.getRestaurantById(id)
+    const restaurant = await BusinessService.getBusinessById(id)
     if (!restaurant) {
       return NextResponse.json({ ok: false, error: "restaurant_not_found" }, { status: 404 })
     }

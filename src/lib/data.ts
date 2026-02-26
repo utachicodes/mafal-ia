@@ -38,7 +38,7 @@ export interface ApiCredentials {
   lamBaseUrl?: string
 }
 
-export interface Restaurant {
+export interface Business {
   id: string
   name: string
   description: string
@@ -54,3 +54,6 @@ export interface Restaurant {
   createdAt: Date
   updatedAt: Date
 }
+
+// Legacy alias — remove after all imports updated
+export type Restaurant = Business

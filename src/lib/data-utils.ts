@@ -5,7 +5,7 @@ export function validateMenuItem(item: Partial<MenuItem>): item is MenuItem {
   return !!(item.id && item.name && item.description && typeof item.price === "number" && item.price > 0)
 }
 
-export function validateRestaurant(restaurant: Partial<Restaurant>): restaurant is Restaurant {
+export function validateRestaurant(restaurant: Partial<Business>): restaurant is Restaurant {
   return !!(
     restaurant.id &&
     restaurant.name &&

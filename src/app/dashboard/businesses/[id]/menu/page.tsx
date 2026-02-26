@@ -43,7 +43,7 @@ type MenuItem = {
 export default function RestaurantMenuPage() {
   const params = useParams<{ id: string }>()
   const router = useRouter()
-  const restaurantId = useMemo(() => String(params?.id || ""), [params])
+  const businessId = useMemo(() => String(params?.id || ""), [params])
 
   const [loading, setLoading] = useState(false)
   const [items, setItems] = useState<MenuItem[]>([])
@@ -69,11 +69,11 @@ export default function RestaurantMenuPage() {
   })
 
   async function load() {
-    if (!restaurantId) return
+    if (!businessId) return
     setLoading(true)
     setError(null)
     try {
-      const res = await fetch(`/api/restaurants/${restaurantId}/menu`, { cache: "no-store" })
+      const res = await fetch(`/api/restaurants/${businessId}/menu`, { cache: "no-store" })
       const data = await res.json()
       if (!res.ok || !data.ok) throw new Error(data?.error || "Failed to load menu")
       setItems(data.items || [])
@@ -86,7 +86,7 @@ export default function RestaurantMenuPage() {
 
   useEffect(() => {
     load()
-  }, [restaurantId])
+  }, [businessId])
 
   const filteredItems = useMemo(() => {
     return items.filter(it =>
@@ -97,7 +97,7 @@ export default function RestaurantMenuPage() {
 
   async function onCreate(e: React.FormEvent) {
     e.preventDefault()
-    if (!restaurantId) return
+    if (!businessId) return
     setLoading(true)
     setError(null)
     try {
@@ -108,7 +108,7 @@ export default function RestaurantMenuPage() {
         category: form.category.trim() || undefined,
         isAvailable: Boolean(form.isAvailable),
       }
-      const res = await fetch(`/api/restaurants/${restaurantId}/menu`, {
+      const res = await fetch(`/api/restaurants/${businessId}/menu`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -138,7 +138,7 @@ export default function RestaurantMenuPage() {
 
   async function onSaveEdit(e: React.FormEvent) {
     e.preventDefault()
-    if (!restaurantId || !editingId) return
+    if (!businessId || !editingId) return
     setLoading(true)
     setError(null)
     try {
@@ -150,7 +150,7 @@ export default function RestaurantMenuPage() {
         isAvailable: Boolean(editForm.isAvailable),
       }
 
-      const res = await fetch(`/api/restaurants/${restaurantId}/menu/${editingId}`, {
+      const res = await fetch(`/api/restaurants/${businessId}/menu/${editingId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -170,7 +170,7 @@ export default function RestaurantMenuPage() {
     if (!confirm("Confirm removal of this menu item from logic engine?")) return
     setLoading(true)
     try {
-      const res = await fetch(`/api/restaurants/${restaurantId}/menu/${id}`, { method: "DELETE" })
+      const res = await fetch(`/api/restaurants/${businessId}/menu/${id}`, { method: "DELETE" })
       if (!res.ok) throw new Error("Deletion failed")
       await load()
     } catch (e: any) {
@@ -183,7 +183,7 @@ export default function RestaurantMenuPage() {
   async function toggleAvailability(it: MenuItem) {
     setLoading(true)
     try {
-      const res = await fetch(`/api/restaurants/${restaurantId}/menu/${it.id}`, {
+      const res = await fetch(`/api/restaurants/${businessId}/menu/${it.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ isAvailable: !it.isAvailable }),

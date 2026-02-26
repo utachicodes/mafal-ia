@@ -1,4 +1,4 @@
-import type { Restaurant } from "@/lib/data"
+import type { Business } from "@/lib/data"
 
 // Local storage keys
 const STORAGE_KEYS = {
@@ -8,7 +8,7 @@ const STORAGE_KEYS = {
 
 // Storage utilities for persistence (even though we're using in-memory for now)
 export class LocalStorage {
-  static saveRestaurants(restaurants: Restaurant[]): void {
+  static saveRestaurants(restaurants: Business[]): void {
     try {
       if (typeof window !== "undefined") {
         localStorage.setItem(STORAGE_KEYS.RESTAURANTS, JSON.stringify(restaurants))
@@ -18,7 +18,7 @@ export class LocalStorage {
     }
   }
 
-  static loadRestaurants(): Restaurant[] | null {
+  static loadRestaurants(): Business[] | null {
     try {
       if (typeof window !== "undefined") {
         const stored = localStorage.getItem(STORAGE_KEYS.RESTAURANTS)
@@ -72,11 +72,11 @@ export class LocalStorage {
 }
 
 // Export/Import utilities
-export function exportRestaurantData(restaurant: Restaurant): string {
+export function exportRestaurantData(restaurant: Business): string {
   return JSON.stringify(restaurant, null, 2)
 }
 
-export function importRestaurantData(jsonString: string): Restaurant {
+export function importRestaurantData(jsonString: string): Business {
   try {
     const parsed = JSON.parse(jsonString)
 
