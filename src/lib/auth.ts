@@ -1,9 +1,8 @@
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { PrismaClient, UserRole } from "@prisma/client";
+import { UserRole } from "@prisma/client";
 import bcrypt from "bcryptjs";
-
-const prisma = new PrismaClient();
+import { getPrisma } from "@/src/lib/db";
 
 export const authOptions: NextAuthOptions = {
     providers: [
@@ -17,6 +16,8 @@ export const authOptions: NextAuthOptions = {
                 if (!credentials?.email || !credentials?.password) {
                     throw new Error("Email and password required");
                 }
+
+                const prisma = await getPrisma();
 
                 // Find user
                 const user = await prisma.user.findUnique({
@@ -65,9 +66,6 @@ export const authOptions: NextAuthOptions = {
             return session;
         },
     },
-    /*  pages: {
-        signIn: "/admin/login", 
-    }, */
     session: {
         strategy: "jwt",
     },

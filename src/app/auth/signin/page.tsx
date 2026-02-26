@@ -2,14 +2,24 @@
 
 import { useState } from "react"
 import { motion } from "framer-motion"
-import { Mail, Lock, LogIn, Github, AlertCircle } from "lucide-react"
+import { Mail, Lock, LogIn, ArrowLeft, Eye, EyeOff } from "lucide-react"
+import Image from "next/image"
 import Link from "next/link"
 import { signIn } from "next-auth/react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Logo } from "@/src/components/logo"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { cn } from "@/lib/utils"
+
+// Partner logos - using reliable public URLs
+const trustedLogos: Array<{ name: string; src: string }> = [
+  { name: "MTN", src: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/MTN_Group_Logo.svg/120px-MTN_Group_Logo.svg.png" },
+  { name: "Orange", src: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Orange_logo.svg/120px-Orange_logo.svg.png" },
+  { name: "Wave", src: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Wave_logo.png/120px-Wave_logo.png" },
+  { name: "Jumia", src: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Jumia_logo.svg/120px-Jumia_logo.svg.png" },
+  { name: "Flutterwave", src: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Flutterwave_Logo.png/120px-Flutterwave_Logo.png" },
+  { name: "UBA", src: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/United_Bank_for_Africa_logo.svg/120px-United_Bank_for_Africa_logo.svg.png" },
+]
 
 export default function LoginPage() {
   const router = useRouter()
@@ -21,6 +31,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState("")
   const [loading, setLoading] = useState(false)
   const [loginError, setLoginError] = useState(error ? "Authentication failed. Please try again." : "")
+  const [showPassword, setShowPassword] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -36,42 +47,105 @@ export default function LoginPage() {
       })
 
       if (result?.error) {
-        setLoginError("Invalid email or password")
+        setLoginError("Email ou mot de passe incorrect")
       } else {
         router.push(callbackUrl)
         router.refresh()
       }
     } catch (err) {
-      setLoginError("An unexpected error occurred")
+      setLoginError("Une erreur inattendue s'est produite")
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col justify-center items-center p-6 relative overflow-hidden">
-      {/* Ambient Background */}
-      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/10 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-accent/10 rounded-full blur-[120px] pointer-events-none" />
-
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
-        className="w-full max-w-[440px] z-10"
-      >
-        <div className="text-center mb-10">
-          <Link href="/" className="inline-flex items-center gap-3 mb-6 group">
-            <div className="p-3 rounded-2xl bg-primary/10 group-hover:bg-primary/20 transition-all duration-500 scale-110">
-              <Logo className="h-8 w-auto" />
-            </div>
-            <span className="font-bold text-3xl tracking-tighter text-gradient">Mafal-IA</span>
+    <div className="min-h-screen flex">
+      {/* Left Side - Red Background */}
+      <div className="hidden lg:flex lg:w-1/2 bg-primary flex-col justify-between p-12 text-primary-foreground relative overflow-hidden">
+        {/* Logo */}
+        <div className="relative z-10">
+          <Link href="/" className="inline-flex items-center">
+            <Logo className="h-10 w-auto" />
           </Link>
-          <h1 className="text-3xl font-bold tracking-tight mb-2">Welcome back</h1>
-          <p className="text-muted-foreground">Sign in to manage your businesses</p>
         </div>
 
-        <div className={cn("glass border-white/10 p-8 rounded-[2rem] shadow-2xl relative overflow-hidden neural-border bg-card text-card-foreground")}>
+        {/* Main Content */}
+        <div className="relative z-10 max-w-md">
+          <h1 className="text-4xl font-bold mb-4">
+            Content de vous revoir
+          </h1>
+          <p className="text-lg opacity-90 leading-relaxed">
+            Connectez-vous pour accéder à votre tableau de bord et suivre vos performances.
+          </p>
+        </div>
+
+        {/* Trust Section */}
+        <div className="relative z-10">
+          <p className="text-xs font-medium opacity-70 mb-4">
+            La plateforme des partenaires commerciaux Mafalia
+          </p>
+          <div className="marquee">
+            <div className="marquee-track" style={{ gap: '1rem' }}>
+              {[...trustedLogos, ...trustedLogos].map((logo, i) => (
+                <div
+                  key={`${logo.name}-${i}`}
+                  className="flex h-10 items-center justify-center rounded-lg bg-white/10 px-3 backdrop-blur-sm"
+                >
+                  <Image
+                    src={logo.src}
+                    alt={logo.name}
+                    width={80}
+                    height={24}
+                    className="h-5 w-auto object-contain brightness-0 invert"
+                    unoptimized
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Decorative circles */}
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-white/5 rounded-full -translate-x-1/3 translate-y-1/3" />
+        <div className="absolute top-1/4 right-0 w-48 h-48 bg-white/5 rounded-full translate-x-1/3" />
+      </div>
+
+      {/* Right Side - White Background */}
+      <div className="w-full lg:w-1/2 bg-background flex flex-col justify-center p-6 md:p-12 lg:p-16">
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+          className="w-full max-w-md mx-auto"
+        >
+          {/* Mobile Logo */}
+          <div className="lg:hidden mb-8">
+            <Link href="/" className="inline-flex items-center">
+              <Logo className="h-10 w-auto" />
+            </Link>
+          </div>
+
+          {/* Back Link */}
+          <Link 
+            href="/" 
+            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-8"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Retour à l'accueil
+          </Link>
+
+          {/* Heading */}
+          <div className="mb-8">
+            <h2 className="text-3xl font-bold tracking-tight text-foreground mb-2">
+              Connexion
+            </h2>
+            <p className="text-muted-foreground">
+              Accédez à votre tableau de bord partenaire
+            </p>
+          </div>
+
+          {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-5">
             {loginError && (
               <motion.div
@@ -79,80 +153,104 @@ export default function LoginPage() {
                 animate={{ opacity: 1, height: "auto" }}
                 className="p-4 rounded-xl bg-destructive/10 border border-destructive/20 flex items-center gap-3 text-destructive text-sm font-medium"
               >
-                <AlertCircle className="h-4 w-4 shrink-0" />
+                <Mail className="h-4 w-4 shrink-0" />
                 {loginError}
               </motion.div>
             )}
 
             <div className="space-y-2">
-              <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">Email address</label>
-              <div className="relative group">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
+              <label className="text-sm font-semibold text-foreground">Adresse email</label>
+              <div className="relative">
                 <Input
                   type="email"
-                  placeholder="name@business.com"
+                  placeholder="votre@email.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="pl-12 h-14 bg-white/5 border-white/10 rounded-2xl focus:ring-primary/50 transition-all text-base"
+                  className="h-12 rounded-xl border-border bg-background px-4"
                   required
                 />
               </div>
             </div>
 
             <div className="space-y-2">
-              <div className="flex justify-between items-center ml-1">
-                <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Password</label>
-                <Link href="#" className="text-xs font-bold text-primary hover:underline">Forgot password?</Link>
+              <div className="flex justify-between items-center">
+                <label className="text-sm font-semibold text-foreground">Mot de passe</label>
+                <Link href="#" className="text-xs font-medium text-primary hover:underline">
+                  Mot de passe oublié ?
+                </Link>
               </div>
-              <div className="relative group">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
+              <div className="relative">
                 <Input
-                  type="password"
-                  placeholder="••••••••"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Votre mot de passe"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="pl-12 h-14 bg-white/5 border-white/10 rounded-2xl focus:ring-primary/50 transition-all text-base"
+                  className="h-12 rounded-xl border-border bg-background px-4 pr-12"
                   required
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                </button>
               </div>
             </div>
 
             <Button
               type="submit"
-              className="w-full h-14 rounded-2xl bg-primary hover:bg-primary/90 text-white font-bold text-lg shadow-xl shadow-primary/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
+              className="w-full h-12 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-base"
               disabled={loading}
             >
               {loading ? (
                 <div className="flex items-center gap-2">
                   <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  Signing in...
+                  Connexion...
                 </div>
               ) : (
                 <div className="flex items-center gap-2">
-                  Sign In <LogIn className="h-5 w-5" />
+                  Se connecter <LogIn className="h-5 w-5" />
                 </div>
               )}
             </Button>
           </form>
 
-          <div className="mt-8 flex items-center gap-4">
-            <div className="h-px bg-white/10 flex-1" />
-            <span className="text-xs text-muted-foreground font-medium">or</span>
-            <div className="h-px bg-white/10 flex-1" />
-          </div>
+          {/* Register Link */}
+          <p className="text-center mt-8 text-sm text-muted-foreground">
+            Vous n&apos;avez pas de compte ?{" "}
+            <Link href="/register" className="text-primary font-semibold hover:underline">
+              S&apos;inscrire
+            </Link>
+          </p>
 
-          <div className="mt-6">
-            <Button variant="outline" className="w-full h-14 rounded-2xl glass border-white/10 hover:bg-white/5 transition-all text-base font-semibold gap-3">
-              <Github className="h-5 w-5" />
-              Continue with GitHub
-            </Button>
+          {/* Mobile Trust Logos */}
+          <div className="lg:hidden mt-10">
+            <p className="text-xs font-medium text-muted-foreground text-center mb-4">
+              La plateforme des partenaires commerciaux Mafalia
+            </p>
+            <div className="marquee">
+              <div className="marquee-track" style={{ gap: '0.75rem' }}>
+                {[...trustedLogos, ...trustedLogos].map((logo, i) => (
+                  <div
+                    key={`${logo.name}-${i}`}
+                    className="flex h-10 items-center justify-center rounded-lg border border-border bg-muted px-3"
+                  >
+                    <Image
+                      src={logo.src}
+                      alt={logo.name}
+                      width={80}
+                      height={24}
+                      className="h-5 w-auto object-contain opacity-70"
+                      unoptimized
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
-        </div>
-
-        <p className="text-center mt-8 text-muted-foreground">
-          Don't have an account? <Link href="/register" className="text-primary font-bold hover:underline">Create one</Link>
-        </p>
-      </motion.div>
+        </motion.div>
+      </div>
     </div>
   )
 }

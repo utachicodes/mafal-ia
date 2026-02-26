@@ -30,6 +30,7 @@ import {
 } from "lucide-react";
 import { WhatsAppMockup } from "@/src/components/whatsapp-mockup";
 import { useEffect } from "react";
+import Image from "next/image";
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 20 },
@@ -62,6 +63,52 @@ export default function HomeClient() {
   const { data: session } = useSession();
   const { language } = useLanguage();
   const t = translations[language];
+
+  const partnerLogos: Array<{ name: string; src?: string }> = [
+    { name: "Flowbot", src: "/partners/flowbot.jpeg" },
+    { name: "L'Africa Mobile", src: "/partners/lam.jpeg" },
+    { name: "Mixx", src: "/partners/mixx.jpeg" },
+    { name: "Orange Money", src: "/partners/orangemoney.jpeg" },
+    { name: "Paps", src: "/partners/paps.jpeg" },
+    { name: "Wave", src: "/partners/wave.jpeg" },
+    { name: "Yango", src: "/partners/yango.jpeg" },
+  ];
+
+  const OrbitLogo = ({ name, src }: { name: string; src?: string }) => {
+    if (!src) {
+      return (
+        <span className="text-[11px] font-semibold text-[#062b2a] tracking-tight">
+          {name}
+        </span>
+      );
+    }
+
+    return (
+      <Image
+        src={src}
+        alt={name}
+        width={84}
+        height={28}
+        className="h-6 w-auto object-contain"
+      />
+    );
+  };
+
+  const PartnerLogo = ({ name, src }: { name: string; src?: string }) => {
+    if (!src) {
+      return <span className="text-xs font-semibold text-muted-foreground">{name}</span>;
+    }
+
+    return (
+      <Image
+        src={src}
+        alt={name}
+        width={120}
+        height={32}
+        className="h-5 w-auto object-contain opacity-80"
+      />
+    );
+  };
 
   // Update HTML dir attribute for RTL support
   useEffect(() => {
@@ -150,15 +197,6 @@ export default function HomeClient() {
       business: t.testimonials.testimonial3.business,
       quote: t.testimonials.testimonial3.quote,
     }
-  ];
-
-  const trustLogos = [
-    { icon: <ShoppingCart className="h-8 w-8" />, label: t.trust.restaurant },
-    { icon: <Package className="h-8 w-8" />, label: t.trust.shop },
-    { icon: <Bot className="h-8 w-8" />, label: t.trust.cafe },
-    { icon: <Store className="h-8 w-8" />, label: t.trust.bakery },
-    { icon: <TrendingUp className="h-8 w-8" />, label: t.trust.groceryStore },
-    { icon: <Zap className="h-8 w-8" />, label: t.trust.fastFood },
   ];
 
   return (
@@ -285,31 +323,41 @@ export default function HomeClient() {
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
-            className="text-center text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-12"
+            className="text-center text-sm font-semibold text-muted-foreground uppercase tracking-wider"
           >
             {t.trust.title}
           </motion.p>
 
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={staggerContainer}
-            className="grid grid-cols-3 md:grid-cols-6 gap-8 items-center"
-          >
-            {trustLogos.map((item, i) => (
-              <motion.div
-                key={i}
-                variants={fadeInUp}
-                className="text-center"
+          <div className="mt-3 flex flex-wrap items-center justify-center gap-1.5">
+            {[
+              t.trust.restaurant,
+              t.trust.shop,
+              t.trust.cafe,
+              t.trust.bakery,
+              t.trust.groceryStore,
+              t.trust.fastFood,
+            ].map((label) => (
+              <span
+                key={label}
+                className="rounded-full border border-border bg-background px-2.5 py-0.5 text-[11px] font-medium text-muted-foreground"
               >
-                <div className="w-20 h-20 mx-auto bg-card rounded-xl shadow-sm border border-border flex items-center justify-center text-primary">
-                  {item.icon}
-                </div>
-                <p className="text-xs text-muted-foreground mt-2 font-medium">{item.label}</p>
-              </motion.div>
+                {label}
+              </span>
             ))}
-          </motion.div>
+          </div>
+
+          <div className="mt-6 marquee">
+            <div className="marquee-track" style={{ gap: '0.75rem' }}>
+              {[...partnerLogos, ...partnerLogos].map((logo, i) => (
+                <div
+                  key={`${logo.name}-${i}`}
+                  className="flex h-10 items-center justify-center rounded-lg border border-border bg-card px-3"
+                >
+                  <PartnerLogo name={logo.name} src={logo.src} />
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
 
@@ -604,33 +652,87 @@ export default function HomeClient() {
       </section>
 
       {/* Final CTA */}
-      <section className="py-24">
+      <section className="py-20 md:py-24">
         <div className="container mx-auto px-6">
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0, y: 12 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="bg-gradient-to-r from-primary to-primary/80 rounded-3xl p-12 md:p-16 text-center text-primary-foreground shadow-2xl"
+            transition={{ duration: 0.5, ease: "easeOut" }}
+            className="relative overflow-hidden rounded-3xl border border-border bg-primary text-primary-foreground"
           >
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              {t.cta.title}
-            </h2>
-            <p className="text-xl mb-10 opacity-90 max-w-2xl mx-auto">
-              {t.cta.description}
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/onboarding">
-                <Button size="lg" className="bg-background text-foreground hover:bg-accent px-10 py-6 text-lg font-semibold shadow-lg hover:shadow-xl transition-all">
-                  {t.cta.ctaPrimary}
-                </Button>
-              </Link>
-              <Button
-                size="lg"
-                variant="outline"
-                className="bg-transparent border-2 border-primary/30 text-foreground hover:bg-primary/10 px-10 py-6 text-lg font-semibold transition-all"
-              >
-                {t.cta.ctaSecondary}
-              </Button>
+            <div
+              className="absolute inset-0 opacity-20"
+              style={{
+                backgroundImage:
+                  "linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.06) 1px, transparent 1px)",
+                backgroundSize: "48px 48px",
+              }}
+            />
+
+            <div className="relative grid gap-12 lg:grid-cols-2 items-center p-10 md:p-14 lg:p-16">
+              <div className="max-w-xl">
+                <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight">
+                  {t.cta.title}
+                </h2>
+                <p className="mt-5 text-base md:text-lg text-primary-foreground/80 leading-relaxed">
+                  {t.cta.description}
+                </p>
+                <div className="mt-8 flex flex-col sm:flex-row gap-3">
+                  <Link href="/onboarding">
+                    <Button
+                      size="lg"
+                      className="bg-background text-foreground hover:bg-accent px-8 py-6 text-base font-semibold shadow-lg"
+                    >
+                      {t.cta.ctaPrimary}
+                    </Button>
+                  </Link>
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="border-primary-foreground/30 bg-transparent text-primary-foreground hover:bg-primary-foreground/10 px-8 py-6 text-base font-semibold"
+                  >
+                    {t.cta.ctaSecondary}
+                  </Button>
+                </div>
+              </div>
+
+              <div className="relative mx-auto w-full max-w-[520px]">
+                <div className="relative aspect-square w-full">
+                  <div className="absolute inset-0 rounded-full border border-white/10" />
+                  <div className="absolute inset-[10%] rounded-full border border-white/10" />
+                  <div className="absolute inset-[22%] rounded-full border border-white/10" />
+
+                  <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+                    <div className="flex h-20 w-20 items-center justify-center rounded-full bg-white/10 border border-white/15 backdrop-blur-sm">
+                      <Logo className="h-10 w-auto" />
+                    </div>
+                  </div>
+
+                  {[
+                    { top: "6%", left: "50%", logo: partnerLogos[0] },
+                    { top: "22%", left: "86%", logo: partnerLogos[1] },
+                    { top: "54%", left: "92%", logo: partnerLogos[3] },
+                    { top: "84%", left: "72%", logo: partnerLogos[4] },
+                    { top: "90%", left: "36%", logo: partnerLogos[2] },
+                    { top: "64%", left: "10%", logo: partnerLogos[5] },
+                    { top: "30%", left: "12%", logo: partnerLogos[6] },
+                  ].map((item, idx) => (
+                    <div
+                      key={idx}
+                      className="absolute -translate-x-1/2 -translate-y-1/2"
+                      style={{ top: item.top, left: item.left }}
+                    >
+                      <div className="flex h-14 w-14 items-center justify-center rounded-full bg-white border border-white/10 shadow-sm px-2">
+                        <OrbitLogo name={item.logo.name} src={item.logo.src} />
+                      </div>
+                    </div>
+                  ))}
+
+                  <div className="absolute -left-6 -top-6 h-36 w-36 rounded-full bg-white/5 blur-2xl" />
+                  <div className="absolute -right-10 -bottom-10 h-48 w-48 rounded-full bg-white/5 blur-2xl" />
+                </div>
+              </div>
             </div>
           </motion.div>
         </div>

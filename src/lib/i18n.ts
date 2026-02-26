@@ -278,9 +278,9 @@ export const translations = {
             },
         },
         cta: {
-            title: 'Prêt à transformer votre business ?',
-            description: 'Rejoignez les commerçants qui utilisent Mafal-IA pour automatiser leurs ventes et grandir. Configuration simple en 15 minutes.',
-            ctaPrimary: 'Créer mon compte gratuitement',
+            title: 'Vendez directement sur WhatsApp, automatisez et encaissez en un clic',
+            description: 'Fini les pertes de temps et les conversations qui n\'aboutissent pas ! Automatisez vos échanges avec vos clients, envoyez vos catalogues, relancez automatiquement les ventes abandonnées et recevez les paiements directement via WhatsApp. Simple, rapide et sécurisé : transformez chaque message en vente.',
+            ctaPrimary: 'Ouvrir un compte',
             ctaSecondary: 'Parler à un conseiller',
         },
         pricingSection: {

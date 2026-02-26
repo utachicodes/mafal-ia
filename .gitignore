@@ -19,6 +19,13 @@ yarn-error.log*
 # env files
 .env*
 
+# local backups / secrets
+env_bak_utf8.txt
+root_env_utf8.txt
+
+# local AI tooling config (may contain secrets)
+.claude/
+
 # vercel
 .vercel
 

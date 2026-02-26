@@ -4,11 +4,40 @@ import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import Link from "next/link"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Loader2, Smartphone, ShieldCheck, Zap, ArrowRight, Globe, AlertCircle } from "lucide-react"
+import { Loader2, ArrowRight, AlertCircle, ArrowLeft } from "lucide-react"
 import { Logo } from "@/src/components/logo"
+
+// Partner logos - using reliable public URLs
+const trustedLogos: Array<{ name: string; src: string }> = [
+  {
+    name: "MTN",
+    src: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/MTN_Group_Logo.svg/120px-MTN_Group_Logo.svg.png",
+  },
+  {
+    name: "Orange",
+    src: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Orange_logo.svg/120px-Orange_logo.svg.png",
+  },
+  {
+    name: "Wave",
+    src: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Wave_logo.png/120px-Wave_logo.png",
+  },
+  {
+    name: "Jumia",
+    src: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Jumia_logo.svg/120px-Jumia_logo.svg.png",
+  },
+  {
+    name: "Flutterwave",
+    src: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Flutterwave_Logo.png/120px-Flutterwave_Logo.png",
+  },
+  {
+    name: "UBA",
+    src: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/United_Bank_for_Africa_logo.svg/120px-United_Bank_for_Africa_logo.svg.png",
+  },
+]
 
 export default function RegisterPage() {
   const router = useRouter()
@@ -50,11 +79,11 @@ export default function RegisterPage() {
 
   const initiateRegistration = async () => {
     if (formData.pin !== confirmPin) {
-      setError("PINs do not match");
+      setError("Les PIN ne correspondent pas")
       return;
     }
     if (formData.pin.length < 4) {
-      setError("PIN must be at least 4 digits");
+      setError("Le PIN doit contenir au moins 4 chiffres")
       return;
     }
 
@@ -97,180 +126,195 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col lg:flex-row relative overflow-hidden">
-      {/* Ambient Backgrounds */}
-      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/10 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-accent/10 rounded-full blur-[120px] pointer-events-none" />
-
-      {/* Left Section: Branding */}
-      <div className="hidden lg:flex flex-col justify-between p-16 w-[45%] bg-white/5 backdrop-blur-3xl border-r border-white/10 relative z-10">
-        <div className="space-y-12">
-          <Link href="/" className="inline-flex items-center gap-3 group">
-            <div className="p-3 rounded-2xl bg-primary/10 group-hover:bg-primary/20 transition-all duration-500 scale-110">
-              <Logo className="h-10 w-auto" />
-            </div>
-            <span className="font-bold text-3xl tracking-tighter text-gradient">Mafal-IA</span>
+    <div className="min-h-screen flex">
+      {/* Left Side - Red Background */}
+      <div className="hidden lg:flex lg:w-1/2 bg-primary flex-col justify-between p-12 text-primary-foreground relative overflow-hidden">
+        <div className="relative z-10">
+          <Link href="/" className="inline-flex items-center">
+            <Logo className="h-10 w-auto" />
           </Link>
+        </div>
 
-          <div className="space-y-6">
-            <motion.h1
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="text-6xl font-bold tracking-tight leading-[0.9] text-white"
-            >
-              Grow Your Business <br />
-              <span className="text-primary italic font-light">with WhatsApp</span>
-            </motion.h1>
-            <p className="text-xl text-muted-foreground leading-relaxed max-w-md">
-              Join hundreds of restaurants using Mafal-IA to automate orders and serve customers 24/7.
-            </p>
-          </div>
+        <div className="relative z-10 max-w-md">
+          <h1 className="text-4xl font-bold mb-4">Créer votre compte</h1>
+          <p className="text-lg opacity-90 leading-relaxed">
+            Rejoignez Mafalia et commencez à automatiser vos échanges sur WhatsApp.
+          </p>
+        </div>
 
-          <div className="grid gap-6 pt-12">
-            {[
-              { icon: Zap, label: "Live in Minutes", desc: "Set up your chatbot in under 5 minutes" },
-              { icon: ShieldCheck, label: "Secure & Private", desc: "Your data is encrypted and protected" },
-              { icon: Globe, label: "Multilingual", desc: "English, French, Arabic and more" }
-            ].map((feature, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.1 }}
-                className="flex gap-4 items-start p-6 rounded-3xl bg-white/[0.03] border border-white/5 hover:bg-white/5 transition-colors"
-              >
-                <div className="p-3 rounded-2xl bg-primary/10 text-primary border border-primary/20">
-                  <feature.icon className="h-5 w-5" />
+        <div className="relative z-10">
+          <p className="text-xs font-medium opacity-70 mb-4">La plateforme des partenaires commerciaux Mafalia</p>
+          <div className="marquee">
+            <div className="marquee-track" style={{ gap: "1rem" }}>
+              {[...trustedLogos, ...trustedLogos].map((logo, i) => (
+                <div
+                  key={`${logo.name}-${i}`}
+                  className="flex h-10 items-center justify-center rounded-lg bg-white/10 px-3 backdrop-blur-sm"
+                >
+                  <Image
+                    src={logo.src}
+                    alt={logo.name}
+                    width={80}
+                    height={24}
+                    className="h-5 w-auto object-contain brightness-0 invert"
+                    unoptimized
+                  />
                 </div>
-                <div>
-                  <div className="font-bold text-white uppercase text-xs tracking-widest">{feature.label}</div>
-                  <div className="text-muted-foreground text-sm">{feature.desc}</div>
-                </div>
-              </motion.div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
 
-        <div className="text-muted-foreground text-sm font-medium tracking-tight">
-          © 2026 Mafal-IA. All Rights Reserved.
-        </div>
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-white/5 rounded-full -translate-x-1/3 translate-y-1/3" />
+        <div className="absolute top-1/4 right-0 w-48 h-48 bg-white/5 rounded-full translate-x-1/3" />
       </div>
 
-      {/* Right Section: Registration Form */}
-      <div className="flex-1 flex flex-col justify-center items-center p-8 lg:p-16 z-20">
+      {/* Right Side - White Background */}
+      <div className="w-full lg:w-1/2 bg-background flex flex-col justify-center p-6 md:p-12 lg:p-16">
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          className="w-full max-w-[480px] space-y-10"
+          transition={{ duration: 0.5, ease: "easeOut" }}
+          className="w-full max-w-md mx-auto"
         >
-          <div className="lg:hidden text-center mb-12">
-            <Logo className="h-12 w-auto mx-auto" />
+          <div className="lg:hidden mb-8">
+            <Link href="/" className="inline-flex items-center">
+              <Logo className="h-10 w-auto" />
+            </Link>
           </div>
 
-          <div className="space-y-3">
-            <h2 className="text-4xl font-bold tracking-tight text-white">
-              Create Your Account
-            </h2>
-            <p className="text-muted-foreground text-lg">
-              Enter your restaurant details to get started.
-            </p>
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-8"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Retour à l&apos;accueil
+          </Link>
+
+          <div className="mb-8">
+            <h2 className="text-3xl font-bold tracking-tight text-foreground mb-2">Inscription</h2>
+            <p className="text-muted-foreground">Créez votre compte partenaire en quelques secondes.</p>
           </div>
 
-          <div className="glass border-white/10 rounded-[2.5rem] p-10 shadow-2xl space-y-8 relative overflow-hidden">
-            <div className="absolute top-0 right-0 p-8 opacity-5">
-              <Smartphone className="h-40 w-40" />
-            </div>
-
+          <div className="space-y-5">
             <AnimatePresence mode="wait">
               {error && (
                 <motion.div
                   initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
+                  animate={{ opacity: 1, height: "auto" }}
                   exit={{ opacity: 0, height: 0 }}
-                  className="bg-red-500/10 text-red-400 p-4 rounded-2xl text-sm border border-red-500/20 font-bold flex items-center gap-3"
+                  className="p-4 rounded-xl bg-destructive/10 border border-destructive/20 flex items-center gap-3 text-destructive text-sm font-medium"
                 >
-                  <AlertCircle className="h-5 w-5" />
+                  <AlertCircle className="h-4 w-4 shrink-0" />
                   {error}
                 </motion.div>
               )}
             </AnimatePresence>
 
-            <div className="space-y-6 relative z-10">
-              <div className="space-y-2">
-                <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Restaurant Name</Label>
-                <Input
-                  placeholder="e.g. Mafal Grillhouse"
-                  value={formData.name}
-                  onChange={(e) => handleChange("name", e.target.value)}
-                  className="h-14 bg-white/5 border-white/10 rounded-2xl px-6 focus:ring-primary/50 transition-all text-base"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">WhatsApp Number</Label>
-                <div className="relative">
-                  <div className="absolute left-6 top-1/2 -translate-y-1/2 flex items-center gap-2 pr-4 border-r border-white/10 text-sm font-bold text-white">
-                    {formData.country === 'Senegal' ? '🇸🇳 +221' :
-                      formData.country === 'Ivory Coast' ? '🇨🇮 +225' :
-                        formData.country === 'Nigeria' ? '🇳🇬 +234' : '🌍'}
-                  </div>
-                  <Input
-                    placeholder="77 000 00 00"
-                    type="tel"
-                    value={formData.whatsappNumber}
-                    onChange={(e) => handleChange("whatsappNumber", e.target.value)}
-                    className="h-14 pl-[7.5rem] bg-white/5 border-white/10 rounded-2xl pr-6 focus:ring-primary/50 transition-all text-base"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">PIN</Label>
-                  <Input
-                    type="password"
-                    placeholder="••••"
-                    maxLength={6}
-                    value={formData.pin}
-                    onChange={(e) => handleChange("pin", e.target.value)}
-                    className="h-14 bg-white/5 border-white/10 rounded-2xl px-6 focus:ring-primary/50 transition-all text-center tracking-[0.5em] text-xl font-bold"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Confirm PIN</Label>
-                  <Input
-                    type="password"
-                    placeholder="••••"
-                    maxLength={6}
-                    value={confirmPin}
-                    onChange={(e) => setConfirmPin(e.target.value)}
-                    className="h-14 bg-white/5 border-white/10 rounded-2xl px-6 focus:ring-primary/50 transition-all text-center tracking-[0.5em] text-xl font-bold"
-                  />
-                </div>
-              </div>
-
-              <Button
-                className="w-full h-16 rounded-2xl bg-primary hover:bg-primary/90 text-white font-black uppercase text-xs tracking-widest shadow-2xl shadow-primary/30 transition-all hover:scale-[1.02] active:scale-[0.98] mt-4"
-                onClick={handleNext}
-                disabled={!isFormValid() || loading}
-              >
-                {loading ? (
-                  <div className="flex items-center gap-2">
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Creating account...
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-2">
-                    Get Started <ArrowRight className="h-4 w-4" />
-                  </div>
-                )}
-              </Button>
+            <div className="space-y-2">
+              <Label className="text-sm font-semibold text-foreground">Nom du restaurant</Label>
+              <Input
+                placeholder="Ex: Chez Fatou"
+                value={formData.name}
+                onChange={(e) => handleChange("name", e.target.value)}
+                className="h-12 rounded-xl border-border bg-background px-4"
+              />
             </div>
 
-            <div className="text-center">
-              <p className="text-sm text-muted-foreground">
-                Already have an account? <Link href="/auth/signin" className="text-primary font-bold hover:underline">Sign in</Link>
-              </p>
+            <div className="space-y-2">
+              <Label className="text-sm font-semibold text-foreground">Numéro WhatsApp</Label>
+              <div className="relative">
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-2 pr-3 border-r border-border text-sm font-semibold text-foreground">
+                  {formData.country === "Senegal"
+                    ? "🇸🇳 +221"
+                    : formData.country === "Ivory Coast"
+                      ? "🇨🇮 +225"
+                      : formData.country === "Nigeria"
+                        ? "🇳🇬 +234"
+                        : "🌍"}
+                </div>
+                <Input
+                  placeholder="77 000 00 00"
+                  type="tel"
+                  value={formData.whatsappNumber}
+                  onChange={(e) => handleChange("whatsappNumber", e.target.value)}
+                  className="h-12 rounded-xl border-border bg-background pl-[7.25rem] pr-4"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label className="text-sm font-semibold text-foreground">PIN</Label>
+                <Input
+                  type="password"
+                  placeholder="••••"
+                  maxLength={6}
+                  value={formData.pin}
+                  onChange={(e) => handleChange("pin", e.target.value)}
+                  className="h-12 rounded-xl border-border bg-background px-4 text-center tracking-[0.35em] font-semibold"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-sm font-semibold text-foreground">Confirmer</Label>
+                <Input
+                  type="password"
+                  placeholder="••••"
+                  maxLength={6}
+                  value={confirmPin}
+                  onChange={(e) => setConfirmPin(e.target.value)}
+                  className="h-12 rounded-xl border-border bg-background px-4 text-center tracking-[0.35em] font-semibold"
+                />
+              </div>
+            </div>
+
+            <Button
+              className="w-full h-12 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-base"
+              onClick={handleNext}
+              disabled={!isFormValid() || loading}
+            >
+              {loading ? (
+                <div className="flex items-center gap-2">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Inscription...
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  S&apos;inscrire <ArrowRight className="h-5 w-5" />
+                </div>
+              )}
+            </Button>
+          </div>
+
+          <p className="text-center mt-8 text-sm text-muted-foreground">
+            Vous avez déjà un compte ?{" "}
+            <Link href="/auth/signin" className="text-primary font-semibold hover:underline">
+              Connexion
+            </Link>
+          </p>
+
+          <div className="lg:hidden mt-10">
+            <p className="text-xs font-medium text-muted-foreground text-center mb-4">
+              La plateforme des partenaires commerciaux Mafalia
+            </p>
+            <div className="marquee">
+              <div className="marquee-track" style={{ gap: "0.75rem" }}>
+                {[...trustedLogos, ...trustedLogos].map((logo, i) => (
+                  <div
+                    key={`${logo.name}-${i}`}
+                    className="flex h-10 items-center justify-center rounded-lg border border-border bg-muted px-3"
+                  >
+                    <Image
+                      src={logo.src}
+                      alt={logo.name}
+                      width={80}
+                      height={24}
+                      className="h-5 w-auto object-contain opacity-70"
+                      unoptimized
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </motion.div>

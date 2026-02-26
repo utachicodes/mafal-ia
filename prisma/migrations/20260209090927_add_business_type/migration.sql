@@ -1,29 +1,48 @@
+-- CreateEnum
+CREATE TYPE "Plan" AS ENUM ('STANDARD', 'PREMIUM');
+
+-- CreateEnum
+CREATE TYPE "UserRole" AS ENUM ('ADMIN', 'RESTAURANT_OWNER');
+
+-- CreateEnum
+CREATE TYPE "BusinessType" AS ENUM ('RESTAURANT', 'RETAIL', 'SERVICE');
+
+-- CreateEnum
+CREATE TYPE "OrderStatus" AS ENUM ('pending', 'confirmed', 'preparing', 'delivered', 'cancelled');
+
+-- CreateEnum
+CREATE TYPE "MessageDirection" AS ENUM ('inbound', 'outbound');
+
 -- CreateTable
 CREATE TABLE "User" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "name" TEXT,
-    "role" TEXT NOT NULL DEFAULT 'RESTAURANT_OWNER',
-    "plan" TEXT NOT NULL DEFAULT 'STANDARD',
+    "role" "UserRole" NOT NULL DEFAULT 'RESTAURANT_OWNER',
+    "plan" "Plan" NOT NULL DEFAULT 'STANDARD',
     "passwordHash" TEXT NOT NULL,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "users_sync" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "name" TEXT,
     "email" TEXT,
-    "created_at" DATETIME NOT NULL,
-    "updated_at" DATETIME NOT NULL,
-    "deleted_at" DATETIME,
-    "raw_json" JSONB NOT NULL
+    "created_at" TIMESTAMP(3) NOT NULL,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+    "deleted_at" TIMESTAMP(3),
+    "raw_json" JSONB NOT NULL,
+
+    CONSTRAINT "users_sync_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "Restaurant" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "description" TEXT NOT NULL,
     "cuisine" TEXT NOT NULL,
@@ -35,7 +54,7 @@ CREATE TABLE "Restaurant" (
     "supportedLanguages" JSONB NOT NULL,
     "isActive" BOOLEAN NOT NULL DEFAULT true,
     "isConcierge" BOOLEAN NOT NULL DEFAULT false,
-    "businessType" TEXT NOT NULL DEFAULT 'RESTAURANT',
+    "businessType" "BusinessType" NOT NULL DEFAULT 'RESTAURANT',
     "userId" TEXT NOT NULL,
     "welcomeMessage" TEXT NOT NULL DEFAULT '',
     "businessHours" TEXT NOT NULL DEFAULT '',
@@ -52,18 +71,18 @@ CREATE TABLE "Restaurant" (
     "lamBaseUrl" TEXT DEFAULT 'https://waba.lafricamobile.com',
     "ownerId" TEXT,
     "createdById" TEXT,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL,
-    "apiKeyCreatedAt" DATETIME,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "apiKeyCreatedAt" TIMESTAMP(3),
     "apiKeyHash" TEXT,
-    "apiKeyRevokedAt" DATETIME,
-    CONSTRAINT "Restaurant_ownerId_fkey" FOREIGN KEY ("ownerId") REFERENCES "User" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
-    CONSTRAINT "Restaurant_createdById_fkey" FOREIGN KEY ("createdById") REFERENCES "User" ("id") ON DELETE SET NULL ON UPDATE CASCADE
+    "apiKeyRevokedAt" TIMESTAMP(3),
+
+    CONSTRAINT "Restaurant_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "MenuItem" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "restaurantId" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "description" TEXT NOT NULL,
@@ -72,44 +91,49 @@ CREATE TABLE "MenuItem" (
     "isAvailable" BOOLEAN NOT NULL DEFAULT true,
     "imageUrl" TEXT,
     "embedding" JSONB,
-    CONSTRAINT "MenuItem_restaurantId_fkey" FOREIGN KEY ("restaurantId") REFERENCES "Restaurant" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "MenuItem_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "Conversation" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "restaurantId" TEXT NOT NULL,
     "phoneNumber" TEXT NOT NULL,
     "messages" JSONB NOT NULL,
     "metadata" JSONB,
-    "lastActive" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL,
-    CONSTRAINT "Conversation_restaurantId_fkey" FOREIGN KEY ("restaurantId") REFERENCES "Restaurant" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+    "lastActive" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Conversation_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "Order" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "restaurantId" TEXT NOT NULL,
     "customerName" TEXT NOT NULL,
     "phoneNumber" TEXT NOT NULL,
     "items" JSONB NOT NULL,
     "total" INTEGER NOT NULL,
     "notes" TEXT,
-    "status" TEXT NOT NULL DEFAULT 'pending',
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL,
-    CONSTRAINT "Order_restaurantId_fkey" FOREIGN KEY ("restaurantId") REFERENCES "Restaurant" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+    "status" "OrderStatus" NOT NULL DEFAULT 'pending',
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Order_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "MessageLog" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "restaurantId" TEXT NOT NULL,
     "phoneNumber" TEXT NOT NULL,
     "whatsappMessageId" TEXT NOT NULL,
-    "direction" TEXT NOT NULL,
+    "direction" "MessageDirection" NOT NULL,
     "messageType" TEXT,
     "templateName" TEXT,
     "status" TEXT NOT NULL,
@@ -117,19 +141,22 @@ CREATE TABLE "MessageLog" (
     "errorTitle" TEXT,
     "errorDetail" TEXT,
     "raw" JSONB,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL,
-    CONSTRAINT "MessageLog_restaurantId_fkey" FOREIGN KEY ("restaurantId") REFERENCES "Restaurant" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "MessageLog_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "SystemLog" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "level" TEXT NOT NULL,
     "message" TEXT NOT NULL,
     "metadata" JSONB,
     "source" TEXT NOT NULL,
-    "timestamp" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+    "timestamp" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "SystemLog_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
@@ -167,3 +194,21 @@ CREATE INDEX "SystemLog_source_idx" ON "SystemLog"("source");
 
 -- CreateIndex
 CREATE INDEX "SystemLog_timestamp_idx" ON "SystemLog"("timestamp");
+
+-- AddForeignKey
+ALTER TABLE "Restaurant" ADD CONSTRAINT "Restaurant_ownerId_fkey" FOREIGN KEY ("ownerId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Restaurant" ADD CONSTRAINT "Restaurant_createdById_fkey" FOREIGN KEY ("createdById") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "MenuItem" ADD CONSTRAINT "MenuItem_restaurantId_fkey" FOREIGN KEY ("restaurantId") REFERENCES "Restaurant"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Conversation" ADD CONSTRAINT "Conversation_restaurantId_fkey" FOREIGN KEY ("restaurantId") REFERENCES "Restaurant"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Order" ADD CONSTRAINT "Order_restaurantId_fkey" FOREIGN KEY ("restaurantId") REFERENCES "Restaurant"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "MessageLog" ADD CONSTRAINT "MessageLog_restaurantId_fkey" FOREIGN KEY ("restaurantId") REFERENCES "Restaurant"("id") ON DELETE CASCADE ON UPDATE CASCADE;
