@@ -14,9 +14,14 @@ vi.mock("@genkit-ai/googleai", () => ({
 vi.mock("@/src/lib/db", () => ({
   getPrisma: vi.fn(),
 }))
+// Mock embeddings so getEmbedding is spyable
+vi.mock("@/src/lib/embeddings", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../embeddings")>()
+  return { ...actual, getEmbedding: vi.fn().mockResolvedValue(new Array(768).fill(0.1)) }
+})
 
-import { cosineSim, fallbackEmbed } from "../embeddings"
-import { retrieveMenuItems } from "../retrieval"
+import { cosineSim, fallbackEmbed, getEmbedding } from "../embeddings"
+import { retrieveMenuItems, retrieveKnowledge } from "../retrieval"
 import { getPrisma } from "@/src/lib/db"
 
 describe("cosineSim", () => {
@@ -138,5 +143,39 @@ describe("retrieveMenuItems", () => {
       expect(item).toHaveProperty("price")
       expect(item).toHaveProperty("score")
     }
+  })
+})
+
+describe("retrieveKnowledge", () => {
+  it("returns top-k chunks ranked by cosine similarity", async () => {
+    const mockChunks = [
+      { id: "c1", businessId: "b1", docId: "d1", content: "Our return policy is 30 days.", embedding: [1, 0, 0], chunkIndex: 0, createdAt: new Date() },
+      { id: "c2", businessId: "b1", docId: "d1", content: "We ship to all regions.", embedding: [0, 1, 0], chunkIndex: 1, createdAt: new Date() },
+      { id: "c3", businessId: "b1", docId: "d1", content: "Contact us at support@example.com", embedding: [0, 0, 1], chunkIndex: 2, createdAt: new Date() },
+    ]
+
+    vi.mocked(getPrisma).mockResolvedValue({
+      knowledgeChunk: {
+        findMany: vi.fn().mockResolvedValue(mockChunks),
+      },
+    } as any)
+
+    // getEmbedding returns a vector close to chunk c1
+    vi.mocked(getEmbedding).mockResolvedValue([1, 0, 0])
+
+    const results = await retrieveKnowledge("b1", "return policy", 2)
+
+    expect(results).toHaveLength(2)
+    expect(results[0].content).toBe("Our return policy is 30 days.")
+    expect(results[0].score).toBeCloseTo(1, 2)
+  })
+
+  it("returns empty array when no chunks exist", async () => {
+    vi.mocked(getPrisma).mockResolvedValue({
+      knowledgeChunk: { findMany: vi.fn().mockResolvedValue([]) },
+    } as any)
+
+    const results = await retrieveKnowledge("b1", "anything", 3)
+    expect(results).toEqual([])
   })
 })

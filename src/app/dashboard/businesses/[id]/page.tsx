@@ -11,7 +11,8 @@ import {
     ShoppingBag,
     ExternalLink,
     ChevronRight,
-    Shield
+    Shield,
+    BookOpen
 } from "lucide-react"
 import Link from "next/link"
 import { BusinessService } from "@/src/lib/business-service"
@@ -58,8 +59,15 @@ export default async function RestaurantDashboardPage({ params }: RestaurantPage
             href: `/dashboard/businesses/${id}/whatsapp`,
         },
         {
+            title: "Knowledge Base",
+            description: "Upload documents to enrich your chatbot's knowledge",
+            icon: BookOpen,
+            color: "text-primary",
+            href: `/dashboard/businesses/${id}/knowledge`,
+        },
+        {
             title: "Settings",
-            description: "Configure your restaurant profile and chatbot",
+            description: "Configure your business profile and chatbot",
             icon: Settings,
             color: "text-muted-foreground",
             href: `/dashboard/businesses/${id}/settings`,

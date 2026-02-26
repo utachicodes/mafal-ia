@@ -40,6 +40,10 @@ vi.mock("@/src/lib/whatsapp-client", () => ({
   },
 }))
 
+vi.mock("@/src/lib/retrieval", () => ({
+  retrieveKnowledge: vi.fn().mockResolvedValue([]),
+}))
+
 import { processUnifiedMessage } from "../webhook-processor"
 import { BusinessService } from "@/src/lib/business-service"
 import { ConversationManager } from "@/src/lib/conversation-manager"

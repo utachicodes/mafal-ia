@@ -5,6 +5,7 @@ import { BusinessService } from "@/src/lib/business-service"
 import type { ChatMessage, MenuItem } from "@/lib/data"
 import { ConversationManager } from "@/src/lib/conversation-manager"
 import { OrderService } from "@/src/lib/order-service"
+import { retrieveKnowledge } from "@/src/lib/retrieval"
 
 const stripBold = (s: string) => s.replace(/\*\*(.*?)\*\*/g, "$1").replace(/__(.*?)__/g, "$1")
 
@@ -110,6 +111,13 @@ export async function processUnifiedMessage(
 
         const history = await ConversationManager.getConversation(restaurant.id, phoneNumber)
         const menu = normalizeMenu(restaurant)
+
+        // Retrieve relevant knowledge base chunks for this query
+        const knowledgeChunks = await retrieveKnowledge(restaurant.id, messageText, 3)
+        const knowledgeSection = knowledgeChunks.length > 0
+          ? `\n\n## Business Knowledge Base\n${knowledgeChunks.map(c => c.content).join("\n\n")}`
+          : ""
+
         const context = `
 Restaurant: ${restaurant.name}
 Description: ${restaurant.description}
@@ -117,7 +125,7 @@ Cuisine: ${restaurant.cuisine}
 Hours: ${restaurant.chatbotContext?.businessHours || "Not specified"}
 Delivery: ${restaurant.chatbotContext?.deliveryInfo || "Available"}
 Customer Name: ${currentMeta.name || "Guest"}
-Customer Location: ${currentMeta.locationText || "Unknown"}
+Customer Location: ${currentMeta.locationText || "Unknown"}${knowledgeSection}
     `.trim()
 
         const aiRes = await AIClient.generateResponse(history, context, menu, restaurant.name, restaurant.id)
