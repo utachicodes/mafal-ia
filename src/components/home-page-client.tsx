@@ -100,7 +100,7 @@ export default function HomeClient() {
         alt={name}
         width={84}
         height={28}
-        className="h-6 w-auto object-contain"
+        className="h-6 w-auto object-contain [mix-blend-mode:multiply]"
       />
     );
   };
@@ -116,7 +116,7 @@ export default function HomeClient() {
         alt={name}
         width={120}
         height={40}
-        className="h-8 w-auto object-contain opacity-90 dark:opacity-70"
+        className="h-9 w-auto object-contain [mix-blend-mode:multiply] dark:[mix-blend-mode:screen] grayscale hover:grayscale-0 opacity-70 hover:opacity-100 transition-all duration-300"
       />
     );
   };
@@ -361,12 +361,12 @@ export default function HomeClient() {
         </div>
 
         {/* Row 1 — left to right */}
-        <div className="marquee mb-4">
-          <div className="marquee-track" style={{ gap: '1rem' }}>
+        <div className="marquee mb-6">
+          <div className="marquee-track" style={{ gap: '3rem' }}>
             {[...partnerLogos, ...partnerLogos].map((logo, i) => (
               <div
                 key={`r1-${logo.name}-${i}`}
-                className="flex h-14 w-36 items-center justify-center rounded-xl border border-border bg-card/80 backdrop-blur-sm px-4 shadow-sm hover:border-primary/40 hover:shadow-md transition-all duration-200 flex-shrink-0"
+                className="flex items-center justify-center flex-shrink-0"
               >
                 <PartnerLogo name={logo.name} src={logo.src} />
               </div>
@@ -376,11 +376,11 @@ export default function HomeClient() {
 
         {/* Row 2 — right to left */}
         <div className="marquee">
-          <div className="marquee-track-reverse" style={{ gap: '1rem' }}>
+          <div className="marquee-track-reverse" style={{ gap: '3rem' }}>
             {[...partnerLogos2, ...partnerLogos2].map((logo, i) => (
               <div
                 key={`r2-${logo.name}-${i}`}
-                className="flex h-14 w-36 items-center justify-center rounded-xl border border-border bg-card/80 backdrop-blur-sm px-4 shadow-sm hover:border-primary/40 hover:shadow-md transition-all duration-200 flex-shrink-0"
+                className="flex items-center justify-center flex-shrink-0"
               >
                 <PartnerLogo name={logo.name} src={logo.src} />
               </div>
@@ -751,7 +751,7 @@ export default function HomeClient() {
                       className="absolute -translate-x-1/2 -translate-y-1/2"
                       style={{ top: item.top, left: item.left }}
                     >
-                      <div className="flex h-14 w-14 items-center justify-center rounded-full bg-white border border-white/10 shadow-sm px-2">
+                      <div className="flex h-14 w-14 items-center justify-center rounded-full bg-white/90 border border-white/20 shadow-md px-2">
                         <OrbitLogo name={item.logo.name} src={item.logo.src} />
                       </div>
                     </div>

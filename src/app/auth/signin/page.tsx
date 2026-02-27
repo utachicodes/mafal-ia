@@ -90,7 +90,7 @@ export default function LoginPage() {
               {[...trustedLogos, ...trustedLogos].map((logo, i) => (
                 <div
                   key={`${logo.name}-${i}`}
-                  className="flex h-10 items-center justify-center rounded-lg bg-white/10 px-3 backdrop-blur-sm"
+                  className="flex items-center justify-center px-3"
                 >
                   <Image
                     src={logo.src}
@@ -234,14 +234,14 @@ export default function LoginPage() {
                 {[...trustedLogos, ...trustedLogos].map((logo, i) => (
                   <div
                     key={`${logo.name}-${i}`}
-                    className="flex h-10 items-center justify-center rounded-lg border border-border bg-muted px-3"
+                    className="flex items-center justify-center px-3"
                   >
                     <Image
                       src={logo.src}
                       alt={logo.name}
                       width={80}
                       height={24}
-                      className="h-5 w-auto object-contain opacity-70"
+                      className="h-5 w-auto object-contain [mix-blend-mode:multiply] dark:[mix-blend-mode:screen] grayscale opacity-60"
                       unoptimized
                     />
                   </div>
