@@ -35,13 +35,14 @@ export function ApiCredentials({ restaurant }: ApiCredentialsProps) {
   useEffect(() => {
     const loadCredentials = async () => {
       try {
-        const res = await fetch(`/api/restaurants/${restaurant.id}/credentials`)
+        const res = await fetch(`/api/businesses/${restaurant.id}`)
         if (res.ok) {
           const data = await res.json()
-          setPhoneId(data.whatsappPhoneNumberId || "")
-          setAccessToken(data.whatsappAccessToken || "")
-          setAppSecret(data.whatsappAppSecret || "")
-          setVerifyToken(data.webhookVerifyToken || "")
+          const creds = data.apiCredentials ?? {}
+          setPhoneId(creds.whatsappPhoneNumberId || "")
+          setAccessToken(creds.whatsappAccessToken || "")
+          setAppSecret(creds.whatsappAppSecret || "")
+          setVerifyToken(creds.webhookVerifyToken || "")
         }
       } catch (error) {
         console.error("Failed to load credentials:", error)
@@ -96,7 +97,7 @@ export function ApiCredentials({ restaurant }: ApiCredentialsProps) {
                 onClick={async () => {
                   setSavingPhoneId(true)
                   try {
-                    const res = await fetch(`/api/restaurants/${restaurant.id}`, {
+                    const res = await fetch(`/api/businesses/${restaurant.id}`, {
                       method: "PATCH",
                       headers: { "Content-Type": "application/json" },
                       body: JSON.stringify({ apiCredentials: { whatsappPhoneNumberId: phoneId } }),
@@ -127,7 +128,7 @@ export function ApiCredentials({ restaurant }: ApiCredentialsProps) {
               <Button
                 variant="default"
                 onClick={async () => {
-                  const res = await fetch(`/api/restaurants/${restaurant.id}`, {
+                  const res = await fetch(`/api/businesses/${restaurant.id}`, {
                     method: "PATCH",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ apiCredentials: { whatsappAccessToken: accessToken } }),
@@ -148,7 +149,7 @@ export function ApiCredentials({ restaurant }: ApiCredentialsProps) {
               <Button
                 variant="default"
                 onClick={async () => {
-                  const res = await fetch(`/api/restaurants/${restaurant.id}`, {
+                  const res = await fetch(`/api/businesses/${restaurant.id}`, {
                     method: "PATCH",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ apiCredentials: { whatsappAppSecret: appSecret } }),
@@ -169,7 +170,7 @@ export function ApiCredentials({ restaurant }: ApiCredentialsProps) {
               <Button
                 variant="default"
                 onClick={async () => {
-                  const res = await fetch(`/api/restaurants/${restaurant.id}`, {
+                  const res = await fetch(`/api/businesses/${restaurant.id}`, {
                     method: "PATCH",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ apiCredentials: { webhookVerifyToken: verifyToken } }),
@@ -186,7 +187,7 @@ export function ApiCredentials({ restaurant }: ApiCredentialsProps) {
                 variant="outline"
                 onClick={async () => {
                   try {
-                    const res = await fetch(`/api/restaurants/${restaurant.id}/credentials/generate-verify-token`, { method: "POST" })
+                    const res = await fetch(`/api/businesses/${restaurant.id}/credentials/generate-verify-token`, { method: "POST" })
                     if (!res.ok) throw new Error("Failed to generate token")
                     const data = await res.json()
                     setVerifyToken(data.webhookVerifyToken)
@@ -227,13 +228,13 @@ export function ApiCredentials({ restaurant }: ApiCredentialsProps) {
             <h4 className="font-medium">Webhook URL</h4>
             <div className="flex gap-2">
               <code className="flex-1 p-3 bg-muted rounded-md text-sm break-all">
-                {typeof window !== "undefined" ? `${window.location.origin}/api/whatsapp` : "/api/whatsapp"}
+                {typeof window !== "undefined" ? `${window.location.origin}/api/webhook/whatsapp` : "/api/webhook/whatsapp"}
               </code>
               <Button
                 variant="outline"
                 size="icon"
                 onClick={() => {
-                  const url = typeof window !== "undefined" ? `${window.location.origin}/api/whatsapp` : "/api/whatsapp"
+                  const url = typeof window !== "undefined" ? `${window.location.origin}/api/webhook/whatsapp` : "/api/webhook/whatsapp"
                   navigator.clipboard.writeText(url)
                   toast({ title: "Copied", description: "Webhook URL copied to clipboard" })
                 }}
@@ -280,7 +281,7 @@ export function ApiCredentials({ restaurant }: ApiCredentialsProps) {
                     try {
                       setIsTestingVerify(true)
                       setVerifyResult(null)
-                      const res = await fetch(`/api/restaurants/${restaurant.id}/credentials/test-verify`, { method: "POST" })
+                      const res = await fetch(`/api/businesses/${restaurant.id}/credentials/test-verify`, { method: "POST" })
                       const data = await res.json()
                       setVerifyResult({ status: data.status, ok: data.ok, body: data.body, passed: Boolean(data.passed), url: data.requestedUrl })
                       if (data.passed) {
@@ -318,7 +319,7 @@ export function ApiCredentials({ restaurant }: ApiCredentialsProps) {
                     try {
                       setIsTestingSigned(true)
                       setSignedResult(null)
-                      const res = await fetch(`/api/restaurants/${restaurant.id}/credentials/test-signed-post`, { method: "POST" })
+                      const res = await fetch(`/api/businesses/${restaurant.id}/credentials/test-signed-post`, { method: "POST" })
                       const data = await res.json()
                       setSignedResult({ status: data.status, ok: Boolean(data.ok), body: String(data.body ?? "") })
                       if (data.ok) {

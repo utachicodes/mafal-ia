@@ -16,7 +16,7 @@ function deriveBaseUrl(headers: Headers): string {
 export async function GET(req: Request) {
   const base = deriveBaseUrl(new Headers(req.headers))
   const alias = `${base}/webhook/whatsapp`
-  const canonical = `${base}/api/whatsapp`
+  const canonical = `${base}/api/webhook/whatsapp`
 
   return NextResponse.json({
     ok: true,

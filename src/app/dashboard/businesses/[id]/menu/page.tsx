@@ -73,7 +73,7 @@ export default function RestaurantMenuPage() {
     setLoading(true)
     setError(null)
     try {
-      const res = await fetch(`/api/restaurants/${businessId}/menu`, { cache: "no-store" })
+      const res = await fetch(`/api/businesses/${businessId}/menu`, { cache: "no-store" })
       const data = await res.json()
       if (!res.ok || !data.ok) throw new Error(data?.error || "Failed to load menu")
       setItems(data.items || [])
@@ -108,7 +108,7 @@ export default function RestaurantMenuPage() {
         category: form.category.trim() || undefined,
         isAvailable: Boolean(form.isAvailable),
       }
-      const res = await fetch(`/api/restaurants/${businessId}/menu`, {
+      const res = await fetch(`/api/businesses/${businessId}/menu`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -150,7 +150,7 @@ export default function RestaurantMenuPage() {
         isAvailable: Boolean(editForm.isAvailable),
       }
 
-      const res = await fetch(`/api/restaurants/${businessId}/menu/${editingId}`, {
+      const res = await fetch(`/api/businesses/${businessId}/menu/${editingId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -170,7 +170,7 @@ export default function RestaurantMenuPage() {
     if (!confirm("Confirm removal of this menu item from logic engine?")) return
     setLoading(true)
     try {
-      const res = await fetch(`/api/restaurants/${businessId}/menu/${id}`, { method: "DELETE" })
+      const res = await fetch(`/api/businesses/${businessId}/menu/${id}`, { method: "DELETE" })
       if (!res.ok) throw new Error("Deletion failed")
       await load()
     } catch (e: any) {
@@ -183,7 +183,7 @@ export default function RestaurantMenuPage() {
   async function toggleAvailability(it: MenuItem) {
     setLoading(true)
     try {
-      const res = await fetch(`/api/restaurants/${businessId}/menu/${it.id}`, {
+      const res = await fetch(`/api/businesses/${businessId}/menu/${it.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ isAvailable: !it.isAvailable }),

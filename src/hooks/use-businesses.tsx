@@ -2,7 +2,7 @@
 
 import type React from "react"
 import { createContext, useContext, useState, useCallback, useEffect } from "react"
-import { type Restaurant } from "@/lib/data"
+import { type Business, type Restaurant } from "@/lib/data"
 import { LocalStorage } from "@/src/lib/storage"
 
 interface RestaurantsContextType {
@@ -23,7 +23,7 @@ export function BusinessesProvider({ children }: { children: React.ReactNode }) 
   useEffect(() => {
     const loadData = async () => {
       try {
-        const response = await fetch("/api/restaurants")
+        const response = await fetch("/api/businesses")
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`)
         }
@@ -92,7 +92,7 @@ export function BusinessesProvider({ children }: { children: React.ReactNode }) 
     }
 
     try {
-      const response = await fetch("/api/restaurants", {
+      const response = await fetch("/api/businesses", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(sanitizedPayload),
@@ -120,7 +120,7 @@ export function BusinessesProvider({ children }: { children: React.ReactNode }) 
     )
 
     try {
-      const response = await fetch(`/api/restaurants/${id}`, {
+      const response = await fetch(`/api/businesses/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updates),
@@ -141,7 +141,7 @@ export function BusinessesProvider({ children }: { children: React.ReactNode }) 
     setRestaurants((prev) => prev.filter((restaurant) => restaurant.id !== id))
 
     try {
-      const response = await fetch(`/api/restaurants/${id}`, {
+      const response = await fetch(`/api/businesses/${id}`, {
         method: "DELETE",
       })
 

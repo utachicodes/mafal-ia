@@ -43,7 +43,7 @@ export default function ApiKeyManager({ businessId: initialRestaurantId }: { bus
     ;(async () => {
       try {
         setLoadingRestaurants(true)
-        const res = await fetch("/api/restaurants")
+        const res = await fetch("/api/businesses")
         if (!res.ok) throw new Error(await res.text())
         const data = (await res.json()) as RestaurantSummary[]
         if (!cancelled) {
@@ -73,7 +73,7 @@ export default function ApiKeyManager({ businessId: initialRestaurantId }: { bus
     ;(async () => {
       try {
         setFetchingDetails(true)
-        const res = await fetch(`/api/restaurants/${selectedId}`)
+        const res = await fetch(`/api/businesses/${selectedId}`)
         if (!res.ok) throw new Error(await res.text())
         const data = (await res.json()) as RestaurantDetails
         if (!cancelled) setDetails(data)
@@ -97,7 +97,7 @@ export default function ApiKeyManager({ businessId: initialRestaurantId }: { bus
     setGenerating(true)
     setPlaintextKey(null)
     try {
-      const res = await fetch(`/api/restaurants/${selectedId}/api-key`, { method: "POST" })
+      const res = await fetch(`/api/businesses/${selectedId}/api-key`, { method: "POST" })
       if (!res.ok) throw new Error(await res.text())
       const data = await res.json()
       setPlaintextKey(data.apiKey)
@@ -118,7 +118,7 @@ export default function ApiKeyManager({ businessId: initialRestaurantId }: { bus
     setError(null)
     setRevoking(true)
     try {
-      const res = await fetch(`/api/restaurants/${selectedId}/api-key`, { method: "DELETE" })
+      const res = await fetch(`/api/businesses/${selectedId}/api-key`, { method: "DELETE" })
       if (!res.ok) throw new Error(await res.text())
       await refreshDetails()
       setPlaintextKey(null)
@@ -134,7 +134,7 @@ export default function ApiKeyManager({ businessId: initialRestaurantId }: { bus
   async function refreshDetails() {
     if (!selectedId) return
     try {
-      const res = await fetch(`/api/restaurants/${selectedId}`)
+      const res = await fetch(`/api/businesses/${selectedId}`)
       if (!res.ok) throw new Error(await res.text())
       const data = await res.json()
       setDetails(data)

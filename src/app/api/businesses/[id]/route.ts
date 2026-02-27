@@ -2,9 +2,9 @@ import { NextResponse } from "next/server"
 import { BusinessService } from "@/src/lib/business-service"
 import { getPrisma } from "@/src/lib/db"
 
-export async function GET(req: Request, { params }: { params: { id: string } }) {
+export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const id = params.id
+    const { id } = await params
     const restaurant = await BusinessService.getBusinessById(id)
     if (!restaurant) return NextResponse.json({ error: "Restaurant not found" }, { status: 404 })
     return NextResponse.json(restaurant)
@@ -13,13 +13,12 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
   }
 }
 
-export async function PATCH(req: Request, { params }: { params: { id: string } }) {
+export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await params
     const prisma = await getPrisma()
-    const existing = await prisma.business.findUnique({ where: { id: params.id }, select: { userId: true, whatsappPhoneNumberId: true, webhookVerifyToken: true, whatsappAppSecret: true } })
+    const existing = await prisma.business.findUnique({ where: { id }, select: { userId: true, whatsappPhoneNumberId: true, webhookVerifyToken: true, whatsappAppSecret: true } })
     if (!existing) return NextResponse.json({ error: "Restaurant not found" }, { status: 404 })
-
-    const id = params.id
     const body = await req.json()
 
     // Only allow specific fields to be updated via this endpoint
@@ -94,7 +93,7 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
       }
     }
 
-    const ok = await BusinessService.updateRestaurant(id, updates)
+    const ok = await BusinessService.updateBusiness(id, updates)
     if (!ok) return NextResponse.json({ error: "Restaurant not found" }, { status: 404 })
 
     return NextResponse.json({ success: true })

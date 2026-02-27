@@ -44,7 +44,7 @@ export function ChatbotContext({ restaurant }: ChatbotContextProps) {
       }
 
       // Persist to API for consistency
-      await fetch(`/api/restaurants/${restaurant.id}`, {
+      await fetch(`/api/businesses/${restaurant.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

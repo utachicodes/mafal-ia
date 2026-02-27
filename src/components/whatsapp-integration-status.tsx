@@ -30,7 +30,7 @@ export function WhatsAppIntegrationStatus({
   const [isTestingWebhook, setIsTestingWebhook] = useState(false)
   const { toast } = useToast()
 
-  const webhookURL = typeof window !== "undefined" ? `${window.location.origin}/api/whatsapp` : "/api/whatsapp"
+  const webhookURL = typeof window !== "undefined" ? `${window.location.origin}/api/webhook/whatsapp` : "/api/webhook/whatsapp"
 
   const testWebhook = async () => {
     setIsTestingWebhook(true)
@@ -111,7 +111,7 @@ export function WhatsAppIntegrationStatus({
       required: true
     },
     {
-      label: "Restaurant Active",
+      label: "Business Active",
       value: isActive ? "Yes" : "No",
       status: isActive,
       required: true

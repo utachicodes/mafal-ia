@@ -7,15 +7,15 @@ import {
     Webhook,
     ShieldCheck,
     Smartphone,
-    Copy,
     RefreshCw
 } from "lucide-react"
 import Link from "next/link"
 import { BusinessService } from "@/src/lib/business-service"
 import { notFound } from "next/navigation"
+import { CopyButton } from "@/src/components/business/copy-button"
 
 interface BusinessWhatsAppPageProps {
-    params: { id: string }
+    params: Promise<{ id: string }>
 }
 
 export const dynamic = "force-dynamic"
@@ -30,7 +30,7 @@ export default async function BusinessWhatsAppPage({ params }: BusinessWhatsAppP
 
     const baseUrl = process.env.NEXTAUTH_URL
         || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000")
-    const webhookUrl = `${baseUrl}/api/whatsapp`
+    const webhookUrl = `${baseUrl}/api/webhook/whatsapp`
 
     return (
         <div className="space-y-8 py-2 h-full">
@@ -69,13 +69,11 @@ export default async function BusinessWhatsAppPage({ params }: BusinessWhatsAppP
                     <CardContent className="space-y-4">
                         <div className="p-3 rounded-lg bg-gray-50 dark:bg-gray-900 font-mono text-xs break-all flex justify-between items-center group border border-gray-100 dark:border-gray-800">
                             <span className="text-gray-600 dark:text-gray-400">{webhookUrl}</span>
-                            <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <Copy className="h-3 w-3" />
-                            </Button>
+                            <CopyButton value={webhookUrl} className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity" />
                         </div>
                         <div className="flex items-center gap-2 text-xs text-muted-foreground">
                             <ShieldCheck className="h-3.5 w-3.5 text-green-500" />
-                            <span>Verify Token: <strong>mafalia_secret_token</strong></span>
+                            <span>Verify Token: <strong>{restaurant.apiCredentials?.webhookVerifyToken || <span className="text-amber-600 font-normal">Not configured — set in Credentials tab</span>}</strong></span>
                         </div>
                     </CardContent>
                     <CardFooter className="bg-gray-50/50 dark:bg-gray-900/50 border-t border-gray-100 dark:border-gray-800 py-3">

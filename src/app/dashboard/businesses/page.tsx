@@ -39,7 +39,7 @@ export default async function BusinessesPage() {
   let error = null
 
   try {
-    restaurants = await BusinessService.getAllRestaurants((session.user as any).id)
+    restaurants = await BusinessService.getAllBusinesses((session.user as any).id)
   } catch (e: any) {
     console.error("Failed to load restaurants:", e)
     error = e.message || "Failed to load"

@@ -10,10 +10,10 @@ export const runtime = "nodejs"
 
 export async function GET() {
   try {
-    const list = await BusinessService.getAllRestaurants()
+    const list = await BusinessService.getAllBusinesses()
     return NextResponse.json(list)
   } catch (err: any) {
-    console.error("GET /api/restaurants failed:", err)
+    console.error("GET /api/businesses failed:", err)
     // Fallback: return empty list so client can proceed without server DB
     return NextResponse.json([])
   }
@@ -132,10 +132,10 @@ export async function POST(req: Request) {
       // createdAt/updatedAt set by service/DB
     } as any
 
-    const created = await BusinessService.createRestaurant(payload as any)
+    const created = await BusinessService.createBusiness(payload as any)
     return NextResponse.json(created, { status: 201 })
   } catch (err: any) {
-    console.error("POST /api/restaurants failed:", err)
+    console.error("POST /api/businesses failed:", err)
     return NextResponse.json({ error: "internal_error", message: err?.message || "Failed to create restaurant" }, { status: 500 })
   }
 }

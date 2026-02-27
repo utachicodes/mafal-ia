@@ -25,7 +25,7 @@ export default function NewBusinessPage() {
         const businessType = formData.get("businessType")
 
         try {
-            const res = await fetch("/api/restaurants", {
+            const res = await fetch("/api/businesses", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({

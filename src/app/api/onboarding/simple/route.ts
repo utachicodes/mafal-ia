@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
 
     if (!name) return NextResponse.json({ ok: false, error: "name_required" }, { status: 400 })
 
-    const created = await BusinessService.createRestaurant({
+    const created = await BusinessService.createBusiness({
       id: "temp", // ignored by service
       name,
       description: description || "",

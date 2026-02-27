@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils"
 export const dynamic = "force-dynamic"
 
 export default async function PlaygroundPage() {
-  const restaurants = await BusinessService.getAllRestaurants()
+  const restaurants = await BusinessService.getAllBusinesses()
   const simpleRestaurants = restaurants.map(r => ({ id: r.id, name: r.name }))
 
   return (

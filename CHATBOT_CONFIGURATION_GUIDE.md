@@ -4,7 +4,7 @@ Miniane u can use this guide to set up a mock restaurant so the WhatsApp chatbot
 
 ## Requirements
 
-- __Restaurant profile__: basic info used by `app/api/whatsapp/route.ts` and `RestaurantService`.
+- __Restaurant profile__: basic info used by `app/api/webhook/whatsapp/route.ts` and `RestaurantService`.
 - __Menu items__: so the bot can answer prices and totals.
 - __chatbotContext__: short instructions for tone and behavior.
 - __Environment variables__: API keys for Genkit and WhatsApp.
@@ -25,7 +25,7 @@ Fill these fields for each restaurant:
 - `menu`: list of items (see schema below)
 - `chatbotContext`: tone/behavior (see examples)
 
-These values are used in `app/api/whatsapp/route.ts` to build `restaurantContext`, which is sent to the AI flows through `src/lib/ai-client.ts`.
+These values are used in `app/api/webhook/whatsapp/route.ts` to build `restaurantContext`, which is sent to the AI flows through `src/lib/ai-client.ts`.
 
 ## Menu schema (minimal)
 
@@ -85,8 +85,8 @@ Role: Order-taker for {{restaurantName}}.
 
 ## How it works
 
-- `app/api/whatsapp/route.ts`
-  - Verifies webhook and extracts text + `phone_number_id`.
+- `app/api/webhook/whatsapp/route.ts`
+  - Verifies webhook and extracts text + `phone_number_id` (supports both Meta and LAM formats).
   - Finds the restaurant with `RestaurantService.getRestaurantByPhoneNumber()`.
   - Builds `restaurantContext` (hours, delivery, location, fees, ETA).
   - Calls Genkit flows (via `AIClient`) with `chatbotContext`, `restaurantContext`, the user message, and recent history.
@@ -107,7 +107,8 @@ Role: Order-taker for {{restaurantName}}.
 - Add a `chatbotContext`
 
 2) Environment variables (`.env.local`):
-- `GOOGLE_GENKIT_API_KEY`
+- `ANTHROPIC_API_KEY` (required — primary LLM for language detection and responses)
+- `GOOGLE_GENKIT_API_KEY` (optional — embeddings; bag-of-words fallback used if absent)
 - `WHATSAPP_ACCESS_TOKEN`, `WHATSAPP_APP_SECRET`, `WHATSAPP_VERIFY_TOKEN`
 - Optional for DB mode: `DATABASE_URL`
 
@@ -115,7 +116,7 @@ Role: Order-taker for {{restaurantName}}.
 - `npm run dev`
   
 
-4) Link your Meta webhook to `/api/whatsapp` and verify using `WHATSAPP_VERIFY_TOKEN`.
+4) Link your Meta webhook to `/api/webhook/whatsapp` and verify using `WHATSAPP_VERIFY_TOKEN`.
 
 ## Optional: Chat API for non‑WhatsApp simulation
 
@@ -157,18 +158,20 @@ Common causes:
 - Unsupported message types: stickers/images without text.
 
 Fixes:
-- Verify routing IDs and log inbound payload in `app/api/whatsapp/route.ts`.
+- Verify routing IDs and log inbound payload in `app/api/webhook/whatsapp/route.ts`.
 - Provide a minimal but clear `chatbotContext` (see examples).
 - Ensure at least a few valid menu items.
 - Use `AIClient` for server-only flow execution; do not import `src/ai/flows/*` in client components.
 
 ## Env variables (quick ref)
 
-- `GOOGLE_GENKIT_API_KEY`: required for AI flows (`src/ai/config.ts`).
+- `ANTHROPIC_API_KEY`: required — powers language detection (`claude-haiku-4-5`) and responses (`claude-sonnet-4-6`).
+- `GOOGLE_GENKIT_API_KEY`: optional — Google AI embeddings for RAG; bag-of-words fallback used when absent.
 - `WHATSAPP_ACCESS_TOKEN`: required to send replies (`src/lib/whatsapp-client.ts`).
-- `WHATSAPP_APP_SECRET`: validates `X-Hub-Signature-256` (`src/lib/webhook-validator.ts`).
-- `WHATSAPP_VERIFY_TOKEN`: used during webhook setup.
+- `WHATSAPP_APP_SECRET`: validates `X-Hub-Signature-256` on inbound webhooks.
+- `WHATSAPP_VERIFY_TOKEN`: used during Meta webhook setup (`/api/webhook/whatsapp`).
 - `DATABASE_URL`: for Prisma/PostgreSQL.
+- `LAM_API_KEY`, `LAM_API_BASE_URL`: optional — L'Africa Mobile provider credentials.
 
 Note: For production and normal testing, ensure `DEMO_MODE` is not set or is `false`.
 

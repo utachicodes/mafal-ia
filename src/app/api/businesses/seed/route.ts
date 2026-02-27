@@ -42,7 +42,7 @@ export async function POST(req: Request) {
       },
     }
 
-    const created = await BusinessService.createRestaurant(sample as any)
+    const created = await BusinessService.createBusiness(sample as any)
     return NextResponse.json({ ok: true, restaurant: created })
   } catch (e: any) {
     console.error("Seed restaurant failed:", e)
