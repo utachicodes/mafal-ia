@@ -197,17 +197,33 @@
     }
   }
 
+  @keyframes marquee-reverse {
+    0% {
+      transform: translateX(-50%);
+    }
+
+    100% {
+      transform: translateX(0);
+    }
+  }
+
   .marquee {
     @apply relative overflow-hidden;
-    mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
   }
 
   .marquee-track {
-    @apply flex w-max items-center gap-10;
-    animation: marquee 26s linear infinite;
+    @apply flex w-max items-center;
+    animation: marquee 30s linear infinite;
   }
 
-  .marquee:hover .marquee-track {
+  .marquee-track-reverse {
+    @apply flex w-max items-center;
+    animation: marquee-reverse 30s linear infinite;
+  }
+
+  .marquee:hover .marquee-track,
+  .marquee:hover .marquee-track-reverse {
     animation-play-state: paused;
   }
 }

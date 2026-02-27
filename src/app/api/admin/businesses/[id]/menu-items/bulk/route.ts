@@ -1,13 +1,11 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/src/lib/auth";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { getPrisma } from "@/src/lib/db";
 
 export async function POST(
     req: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         const session = await getServerSession(authOptions);
@@ -16,6 +14,7 @@ export async function POST(
             return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
         }
 
+        const { id } = await params;
         const body = await req.json();
         const { items } = body;
 
@@ -46,7 +45,7 @@ export async function POST(
                 }
 
                 return {
-                    businessId: params.id,
+                    businessId: id,
                     name: item.name,
                     description: item.description || item.name,
                     price: parseInt(item.price) || 0,
@@ -62,10 +61,7 @@ export async function POST(
             })
         );
 
-        // Bulk create menu items
-        // Note: createMany might not support setting vector fields directly if they are unsupported types,
-        // but if using a standard float[] or Json, it works. 
-        // We'll proceed assuming standard support or that deployment handles the migration.
+        const prisma = await getPrisma();
         const created = await prisma.menuItem.createMany({
             data: itemsWithEmbeddings,
         });

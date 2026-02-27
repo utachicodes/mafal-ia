@@ -6,7 +6,7 @@ import { getPrisma } from "@/src/lib/db";
 
 export async function PATCH(
     request: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         const prisma = await getPrisma();
@@ -15,7 +15,7 @@ export async function PATCH(
             return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
         }
 
-        const id = params.id;
+        const { id } = await params;
         const body = await request.json();
         const { lamApiKey, lamBaseUrl } = body;
 

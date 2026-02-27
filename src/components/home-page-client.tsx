@@ -65,13 +65,24 @@ export default function HomeClient() {
   const t = translations[language];
 
   const partnerLogos: Array<{ name: string; src?: string }> = [
-    { name: "Flowbot", src: "/partners/flowbot.jpeg" },
-    { name: "L'Africa Mobile", src: "/partners/lam.jpeg" },
-    { name: "Mixx", src: "/partners/mixx.jpeg" },
-    { name: "Orange Money", src: "/partners/orangemoney.jpeg" },
-    { name: "Paps", src: "/partners/paps.jpeg" },
     { name: "Wave", src: "/partners/wave.jpeg" },
+    { name: "Orange Money", src: "/partners/orangemoney.jpeg" },
+    { name: "Djamo", src: "/partners/djamo.jpeg" },
+    { name: "L'Africa Mobile", src: "/partners/lam.jpeg" },
     { name: "Yango", src: "/partners/yango.jpeg" },
+    { name: "Paps", src: "/partners/paps.jpeg" },
+    { name: "Flowbot", src: "/partners/flowbot.jpeg" },
+    { name: "Mixx", src: "/partners/mixx.jpeg" },
+  ];
+
+  const partnerLogos2: Array<{ name: string; src?: string }> = [
+    { name: "Samirpay", src: "/partners/samirpay.jpeg" },
+    { name: "Senhub", src: "/partners/senhub.jpeg" },
+    { name: "JobTech", src: "/partners/jobtech.jpeg" },
+    { name: "OST", src: "/partners/ost.jpeg" },
+    { name: "HTC", src: "/partners/htc.jpeg" },
+    { name: "YAS", src: "/partners/yas.jpeg" },
+    { name: "Bug", src: "/partners/bug.jpeg" },
   ];
 
   const OrbitLogo = ({ name, src }: { name: string; src?: string }) => {
@@ -104,8 +115,8 @@ export default function HomeClient() {
         src={src}
         alt={name}
         width={120}
-        height={32}
-        className="h-5 w-auto object-contain opacity-80"
+        height={40}
+        className="h-8 w-auto object-contain opacity-90 dark:opacity-70"
       />
     );
   };
@@ -316,47 +327,64 @@ export default function HomeClient() {
         </div>
       </section>
 
-      {/* Trust Badge Section */}
-      <section className="py-16 bg-muted/20">
+      {/* Partner Logos Carousel Section */}
+      <section className="py-20 bg-muted/30 border-y border-border overflow-hidden">
         <div className="container mx-auto px-6">
-          <motion.p
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-center text-sm font-semibold text-muted-foreground uppercase tracking-wider"
+            transition={{ duration: 0.5 }}
+            className="text-center mb-10"
           >
-            {t.trust.title}
-          </motion.p>
-
-          <div className="mt-3 flex flex-wrap items-center justify-center gap-1.5">
-            {[
-              t.trust.restaurant,
-              t.trust.shop,
-              t.trust.cafe,
-              t.trust.bakery,
-              t.trust.groceryStore,
-              t.trust.fastFood,
-            ].map((label) => (
-              <span
-                key={label}
-                className="rounded-full border border-border bg-background px-2.5 py-0.5 text-[11px] font-medium text-muted-foreground"
-              >
-                {label}
-              </span>
-            ))}
-          </div>
-
-          <div className="mt-6 marquee">
-            <div className="marquee-track" style={{ gap: '0.75rem' }}>
-              {[...partnerLogos, ...partnerLogos].map((logo, i) => (
-                <div
-                  key={`${logo.name}-${i}`}
-                  className="flex h-10 items-center justify-center rounded-lg border border-border bg-card px-3"
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground/70">
+              {t.trust.title}
+            </p>
+            <div className="mt-3 flex flex-wrap items-center justify-center gap-2">
+              {[
+                t.trust.restaurant,
+                t.trust.shop,
+                t.trust.cafe,
+                t.trust.bakery,
+                t.trust.groceryStore,
+                t.trust.fastFood,
+              ].map((label) => (
+                <span
+                  key={label}
+                  className="rounded-full border border-border bg-background px-3 py-1 text-[11px] font-medium text-muted-foreground"
                 >
-                  <PartnerLogo name={logo.name} src={logo.src} />
-                </div>
+                  {label}
+                </span>
               ))}
             </div>
+          </motion.div>
+        </div>
+
+        {/* Row 1 — left to right */}
+        <div className="marquee mb-4">
+          <div className="marquee-track" style={{ gap: '1rem' }}>
+            {[...partnerLogos, ...partnerLogos].map((logo, i) => (
+              <div
+                key={`r1-${logo.name}-${i}`}
+                className="flex h-14 w-36 items-center justify-center rounded-xl border border-border bg-card/80 backdrop-blur-sm px-4 shadow-sm hover:border-primary/40 hover:shadow-md transition-all duration-200 flex-shrink-0"
+              >
+                <PartnerLogo name={logo.name} src={logo.src} />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Row 2 — right to left */}
+        <div className="marquee">
+          <div className="marquee-track-reverse" style={{ gap: '1rem' }}>
+            {[...partnerLogos2, ...partnerLogos2].map((logo, i) => (
+              <div
+                key={`r2-${logo.name}-${i}`}
+                className="flex h-14 w-36 items-center justify-center rounded-xl border border-border bg-card/80 backdrop-blur-sm px-4 shadow-sm hover:border-primary/40 hover:shadow-md transition-all duration-200 flex-shrink-0"
+              >
+                <PartnerLogo name={logo.name} src={logo.src} />
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -712,9 +740,9 @@ export default function HomeClient() {
                   {[
                     { top: "6%", left: "50%", logo: partnerLogos[0] },
                     { top: "22%", left: "86%", logo: partnerLogos[1] },
-                    { top: "54%", left: "92%", logo: partnerLogos[3] },
-                    { top: "84%", left: "72%", logo: partnerLogos[4] },
-                    { top: "90%", left: "36%", logo: partnerLogos[2] },
+                    { top: "54%", left: "92%", logo: partnerLogos[2] },
+                    { top: "84%", left: "72%", logo: partnerLogos[3] },
+                    { top: "90%", left: "36%", logo: partnerLogos[4] },
                     { top: "64%", left: "10%", logo: partnerLogos[5] },
                     { top: "30%", left: "12%", logo: partnerLogos[6] },
                   ].map((item, idx) => (

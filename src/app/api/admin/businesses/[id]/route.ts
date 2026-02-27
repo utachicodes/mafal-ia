@@ -1,17 +1,14 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/src/lib/auth";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { getPrisma } from "@/src/lib/db";
 
 export async function GET(
-    request: Request
+    request: Request,
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
-        // Extract ID from the URL manually since params is not reliably passed in all Next.js versions/route structures in the same way
-        const url = new URL(request.url);
-        const id = url.pathname.split('/').pop();
+        const { id } = await params;
 
         const session = await getServerSession(authOptions);
 
@@ -19,8 +16,7 @@ export async function GET(
             return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
         }
 
-        if (!id) return NextResponse.json({ error: "No ID provided" }, { status: 400 });
-
+        const prisma = await getPrisma();
         const restaurant = await prisma.business.findUnique({
             where: { id },
             include: {

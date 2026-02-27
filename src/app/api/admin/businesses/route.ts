@@ -1,11 +1,8 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/src/lib/auth";
-import { PrismaClient } from "@prisma/client";
-
+import { getPrisma } from "@/src/lib/db";
 import bcrypt from "bcryptjs";
-
-const prisma = new PrismaClient();
 
 export async function GET() {
     try {
@@ -15,6 +12,7 @@ export async function GET() {
             return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
         }
 
+        const prisma = await getPrisma();
         const restaurants = await prisma.business.findMany({
             include: {
                 _count: {
@@ -73,6 +71,7 @@ export async function POST(req: Request) {
             );
         }
 
+        const prisma = await getPrisma();
         // Check if owner already exists
         let owner = await prisma.user.findUnique({
             where: { email: ownerEmail },

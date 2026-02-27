@@ -1,7 +1,7 @@
 "use client"
 
 import { ThemeProvider } from "./theme-provider"
-import { BusinesssProvider } from "@/src/hooks/use-businesses"
+import { BusinessesProvider } from "@/src/hooks/use-businesses"
 import { ErrorBoundary } from "@/src/components/error-boundary"
 import { I18nProvider } from "@/src/context/i18n"
 import { SessionProvider } from "next-auth/react"

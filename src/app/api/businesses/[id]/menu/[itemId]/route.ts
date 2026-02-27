@@ -5,8 +5,9 @@ export const runtime = "nodejs"
 
 // PATCH: update a menu item
 // body: any subset of { name, price, description, category, isAvailable }
-export async function PATCH(req: NextRequest, ctx: { params: { id: string; itemId: string } }) {
+export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: string; itemId: string }> }) {
   try {
+    const { itemId } = await ctx.params
     const body = await req.json().catch(() => ({}))
     const data: any = {}
     if (typeof body.name === "string") data.name = body.name
@@ -16,7 +17,7 @@ export async function PATCH(req: NextRequest, ctx: { params: { id: string; itemI
     if (body.isAvailable !== undefined) data.isAvailable = Boolean(body.isAvailable)
 
     const prisma = await getPrisma()
-    const item = await prisma.menuItem.update({ where: { id: ctx.params.itemId }, data })
+    const item = await prisma.menuItem.update({ where: { id: itemId }, data })
     return NextResponse.json({ ok: true, item })
   } catch (e: any) {
     console.error("[Menu][PATCH]", e)
@@ -25,10 +26,11 @@ export async function PATCH(req: NextRequest, ctx: { params: { id: string; itemI
 }
 
 // DELETE: remove a menu item
-export async function DELETE(_req: NextRequest, ctx: { params: { id: string; itemId: string } }) {
+export async function DELETE(_req: NextRequest, ctx: { params: Promise<{ id: string; itemId: string }> }) {
   try {
+    const { itemId } = await ctx.params
     const prisma = await getPrisma()
-    await prisma.menuItem.delete({ where: { id: ctx.params.itemId } })
+    await prisma.menuItem.delete({ where: { id: itemId } })
     return NextResponse.json({ ok: true })
   } catch (e: any) {
     console.error("[Menu][DELETE]", e)

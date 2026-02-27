@@ -1,13 +1,11 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/src/lib/auth";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { getPrisma } from "@/src/lib/db";
 
 export async function PATCH(
     req: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         const session = await getServerSession(authOptions);
@@ -16,11 +14,13 @@ export async function PATCH(
             return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
         }
 
+        const { id } = await params;
         const body = await req.json();
         const { isActive } = body;
 
+        const prisma = await getPrisma();
         const restaurant = await prisma.business.update({
-            where: { id: params.id },
+            where: { id },
             data: { isActive },
         });
 
