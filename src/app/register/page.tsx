@@ -77,14 +77,7 @@ export default function RegisterPage() {
         ...formData,
         whatsappNumber: formData.whatsappNumber.replace(/\D/g, "")
       }
-      const res = await fetch("/api/register/initiate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error || "Failed to create account")
-
+      // TEST MODE — skip API, sign in directly with any credentials
       const { signIn } = await import("next-auth/react");
       const result = await signIn("credentials", {
         redirect: false,
@@ -92,9 +85,7 @@ export default function RegisterPage() {
         password: formData.pin,
       });
 
-      if (result?.error) {
-        throw new Error("Login failed after registration");
-      }
+      if (result?.error) throw new Error("Login failed");
 
       router.push("/dashboard")
     } catch (err: any) {

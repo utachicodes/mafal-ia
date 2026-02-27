@@ -17,33 +17,13 @@ export const authOptions: NextAuthOptions = {
                     throw new Error("Email and password required");
                 }
 
-                const prisma = await getPrisma();
-
-                // Find user
-                const user = await prisma.user.findUnique({
-                    where: { email: credentials.email },
-                });
-
-                if (!user) {
-                    throw new Error("Invalid credentials");
-                }
-
-                // Verify password
-                const isValid = await bcrypt.compare(
-                    credentials.password,
-                    user.passwordHash
-                );
-
-                if (!isValid) {
-                    throw new Error("Invalid credentials");
-                }
-
+                // TEST MODE — accept any credentials
                 return {
-                    id: user.id,
-                    email: user.email,
-                    name: user.name,
-                    role: user.role,
-                    plan: user.plan,
+                    id: "test-user-id",
+                    email: credentials.email,
+                    name: credentials.email.split("@")[0],
+                    role: "ADMIN" as UserRole,
+                    plan: "PREMIUM",
                 };
             },
         }),
