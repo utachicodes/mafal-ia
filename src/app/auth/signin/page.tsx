@@ -106,21 +106,24 @@ export default function LoginPage() {
           </div>
         </div>
 
-        {/* Partner logos — white silhouettes */}
+        {/* Partner logos */}
         <div className="relative z-10 space-y-3">
           <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-white/50">
             Partenaires de confiance
           </p>
           <div className="marquee">
-            <div className="marquee-track" style={{ gap: "2.5rem" }}>
+            <div className="marquee-track" style={{ gap: "0.75rem" }}>
               {[...partnerLogos, ...partnerLogos].map((logo, i) => (
-                <div key={`${logo.name}-${i}`} className="flex items-center justify-center flex-shrink-0">
+                <div
+                  key={`${logo.name}-${i}`}
+                  className="flex h-10 w-28 items-center justify-center rounded-lg bg-white/90 px-3 flex-shrink-0"
+                >
                   <Image
                     src={logo.src}
                     alt={logo.name}
-                    width={72}
-                    height={24}
-                    className="h-6 w-auto object-contain brightness-0 invert opacity-60"
+                    width={80}
+                    height={28}
+                    className="h-6 w-auto object-contain"
                   />
                 </div>
               ))}
