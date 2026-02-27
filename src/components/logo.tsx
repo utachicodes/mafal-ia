@@ -1,7 +1,13 @@
 import Image from "next/image"
 import { cn } from "@/lib/utils"
 
-export function Logo({ className }: { className?: string }) {
+interface LogoProps {
+  className?: string
+  /** Renders the logo in white — use when placed on colored/dark backgrounds */
+  white?: boolean
+}
+
+export function Logo({ className, white }: LogoProps) {
   return (
     <div className={cn("relative flex items-center", className)}>
       <Image
@@ -9,7 +15,7 @@ export function Logo({ className }: { className?: string }) {
         alt="Mafalia"
         width={120}
         height={40}
-        className="h-full w-auto object-contain"
+        className={cn("h-full w-auto object-contain", white && "brightness-0 invert")}
         priority
       />
     </div>

@@ -733,7 +733,7 @@ export default function HomeClient() {
 
                   <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
                     <div className="flex h-20 w-20 items-center justify-center rounded-full bg-white/10 border border-white/15 backdrop-blur-sm">
-                      <Logo className="h-10 w-auto" />
+                      <Logo className="h-10 w-auto" white />
                     </div>
                   </div>
 

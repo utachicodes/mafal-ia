@@ -11,32 +11,15 @@ import { Label } from "@/components/ui/label"
 import { Loader2, ArrowRight, AlertCircle, ArrowLeft } from "lucide-react"
 import { Logo } from "@/src/components/logo"
 
-// Partner logos - using reliable public URLs
-const trustedLogos: Array<{ name: string; src: string }> = [
-  {
-    name: "MTN",
-    src: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/MTN_Group_Logo.svg/120px-MTN_Group_Logo.svg.png",
-  },
-  {
-    name: "Orange",
-    src: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Orange_logo.svg/120px-Orange_logo.svg.png",
-  },
-  {
-    name: "Wave",
-    src: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Wave_logo.png/120px-Wave_logo.png",
-  },
-  {
-    name: "Jumia",
-    src: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Jumia_logo.svg/120px-Jumia_logo.svg.png",
-  },
-  {
-    name: "Flutterwave",
-    src: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Flutterwave_Logo.png/120px-Flutterwave_Logo.png",
-  },
-  {
-    name: "UBA",
-    src: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/United_Bank_for_Africa_logo.svg/120px-United_Bank_for_Africa_logo.svg.png",
-  },
+const trustedLogos = [
+  { name: "Wave",         src: "/partners/wave.jpeg" },
+  { name: "Orange Money", src: "/partners/orangemoney.jpeg" },
+  { name: "Djamo",        src: "/partners/djamo.jpeg" },
+  { name: "L'Africa Mobile", src: "/partners/lam.jpeg" },
+  { name: "Yango",        src: "/partners/yango.jpeg" },
+  { name: "Paps",         src: "/partners/paps.jpeg" },
+  { name: "Flowbot",      src: "/partners/flowbot.jpeg" },
+  { name: "Mixx",         src: "/partners/mixx.jpeg" },
 ]
 
 export default function RegisterPage() {
@@ -128,72 +111,97 @@ export default function RegisterPage() {
   return (
     <div className="min-h-screen flex">
       {/* Left Side - Red Background */}
-      <div className="hidden lg:flex lg:w-1/2 bg-primary flex-col justify-between p-12 text-primary-foreground relative overflow-hidden">
+      <div className="hidden lg:flex lg:w-[52%] bg-primary flex-col justify-between p-14 text-primary-foreground relative overflow-hidden">
+        {/* grid texture */}
+        <div
+          className="absolute inset-0 opacity-[0.04]"
+          style={{
+            backgroundImage:
+              "linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)",
+            backgroundSize: "40px 40px",
+          }}
+        />
+        <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-white/10 blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 right-0 w-80 h-80 rounded-full bg-black/10 blur-3xl pointer-events-none" />
+
+        {/* White logo on red */}
         <div className="relative z-10">
-          <Link href="/" className="inline-flex items-center">
-            <Logo className="h-10 w-auto" />
+          <Link href="/">
+            <Logo className="h-10" white />
           </Link>
         </div>
 
-        <div className="relative z-10 max-w-md">
-          <h1 className="text-4xl font-bold mb-4">Créer votre compte</h1>
-          <p className="text-lg opacity-90 leading-relaxed">
-            Rejoignez Mafalia et commencez à automatiser vos échanges sur WhatsApp.
+        <div className="relative z-10 space-y-5">
+          <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-medium text-white/90">
+            ✦ Inscription gratuite — prêt en 2 minutes
+          </div>
+          <h1 className="text-4xl xl:text-5xl font-bold text-white leading-tight">
+            Créer votre<br />compte
+          </h1>
+          <p className="text-base text-white/75 leading-relaxed max-w-sm">
+            Rejoignez Mafalia et automatisez vos ventes sur WhatsApp avec un assistant IA disponible 24h/24.
           </p>
+          <div className="flex gap-8 pt-2">
+            {[
+              { value: "500+", label: "Commerces actifs" },
+              { value: "98%", label: "Satisfaction" },
+              { value: "24/7", label: "Support IA" },
+            ].map((s) => (
+              <div key={s.label}>
+                <div className="text-2xl font-bold text-white">{s.value}</div>
+                <div className="text-xs text-white/60">{s.label}</div>
+              </div>
+            ))}
+          </div>
         </div>
 
-        <div className="relative z-10">
-          <p className="text-xs font-medium opacity-70 mb-4">La plateforme des partenaires commerciaux Mafalia</p>
+        <div className="relative z-10 space-y-3">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-white/50">
+            Partenaires de confiance
+          </p>
           <div className="marquee">
-            <div className="marquee-track" style={{ gap: "1rem" }}>
+            <div className="marquee-track" style={{ gap: "2.5rem" }}>
               {[...trustedLogos, ...trustedLogos].map((logo, i) => (
-                <div
-                  key={`${logo.name}-${i}`}
-                  className="flex h-10 items-center justify-center rounded-lg bg-white/10 px-3 backdrop-blur-sm"
-                >
+                <div key={`${logo.name}-${i}`} className="flex items-center justify-center flex-shrink-0">
                   <Image
                     src={logo.src}
                     alt={logo.name}
-                    width={80}
+                    width={72}
                     height={24}
-                    className="h-5 w-auto object-contain brightness-0 invert"
-                    unoptimized
+                    className="h-6 w-auto object-contain brightness-0 invert opacity-60"
                   />
                 </div>
               ))}
             </div>
           </div>
         </div>
-
-        <div className="absolute bottom-0 left-0 w-64 h-64 bg-white/5 rounded-full -translate-x-1/3 translate-y-1/3" />
-        <div className="absolute top-1/4 right-0 w-48 h-48 bg-white/5 rounded-full translate-x-1/3" />
       </div>
 
-      {/* Right Side - White Background */}
-      <div className="w-full lg:w-1/2 bg-background flex flex-col justify-center p-6 md:p-12 lg:p-16">
+      {/* Right Side */}
+      <div className="flex-1 flex flex-col justify-center px-6 py-12 sm:px-10 lg:px-16 xl:px-24 bg-background">
         <motion.div
-          initial={{ opacity: 0, y: 12 }}
+          initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: "easeOut" }}
-          className="w-full max-w-md mx-auto"
+          transition={{ duration: 0.45, ease: "easeOut" }}
+          className="w-full max-w-sm mx-auto"
         >
-          <div className="lg:hidden mb-8">
-            <Link href="/" className="inline-flex items-center">
-              <Logo className="h-10 w-auto" />
+          <div className="lg:hidden mb-10">
+            <Link href="/">
+              <Logo className="h-9" />
             </Link>
           </div>
 
           <Link
             href="/"
-            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-8"
+            className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-10"
           >
             <ArrowLeft className="h-4 w-4" />
             Retour à l&apos;accueil
           </Link>
 
           <div className="mb-8">
-            <h2 className="text-3xl font-bold tracking-tight text-foreground mb-2">Inscription</h2>
-            <p className="text-muted-foreground">Créez votre compte partenaire en quelques secondes.</p>
+            <h2 className="text-2xl font-bold tracking-tight text-foreground">Inscription</h2>
+            <p className="mt-1.5 text-sm text-muted-foreground">Créez votre compte partenaire en quelques secondes.</p>
           </div>
 
           <div className="space-y-5">
@@ -211,20 +219,20 @@ export default function RegisterPage() {
               )}
             </AnimatePresence>
 
-            <div className="space-y-2">
-              <Label className="text-sm font-semibold text-foreground">Nom du restaurant</Label>
+            <div className="space-y-1.5">
+              <Label className="text-sm font-medium text-foreground">Nom du commerce</Label>
               <Input
                 placeholder="Ex: Chez Fatou"
                 value={formData.name}
                 onChange={(e) => handleChange("name", e.target.value)}
-                className="h-12 rounded-xl border-border bg-background px-4"
+                className="h-11 rounded-xl border-border bg-background px-4 text-sm"
               />
             </div>
 
-            <div className="space-y-2">
-              <Label className="text-sm font-semibold text-foreground">Numéro WhatsApp</Label>
+            <div className="space-y-1.5">
+              <Label className="text-sm font-medium text-foreground">Numéro WhatsApp</Label>
               <div className="relative">
-                <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-2 pr-3 border-r border-border text-sm font-semibold text-foreground">
+                <div className="absolute left-3.5 top-1/2 -translate-y-1/2 flex items-center gap-2 pr-3 border-r border-border text-sm font-medium text-foreground">
                   {formData.country === "Senegal"
                     ? "🇸🇳 +221"
                     : formData.country === "Ivory Coast"
@@ -238,79 +246,80 @@ export default function RegisterPage() {
                   type="tel"
                   value={formData.whatsappNumber}
                   onChange={(e) => handleChange("whatsappNumber", e.target.value)}
-                  className="h-12 rounded-xl border-border bg-background pl-[7.25rem] pr-4"
+                  className="h-11 rounded-xl border-border bg-background pl-[7rem] pr-4 text-sm"
                 />
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label className="text-sm font-semibold text-foreground">PIN</Label>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label className="text-sm font-medium text-foreground">PIN</Label>
                 <Input
                   type="password"
                   placeholder="••••"
                   maxLength={6}
                   value={formData.pin}
                   onChange={(e) => handleChange("pin", e.target.value)}
-                  className="h-12 rounded-xl border-border bg-background px-4 text-center tracking-[0.35em] font-semibold"
+                  className="h-11 rounded-xl border-border bg-background px-4 text-center tracking-[0.35em] font-semibold text-sm"
                 />
               </div>
-              <div className="space-y-2">
-                <Label className="text-sm font-semibold text-foreground">Confirmer</Label>
+              <div className="space-y-1.5">
+                <Label className="text-sm font-medium text-foreground">Confirmer</Label>
                 <Input
                   type="password"
                   placeholder="••••"
                   maxLength={6}
                   value={confirmPin}
                   onChange={(e) => setConfirmPin(e.target.value)}
-                  className="h-12 rounded-xl border-border bg-background px-4 text-center tracking-[0.35em] font-semibold"
+                  className="h-11 rounded-xl border-border bg-background px-4 text-center tracking-[0.35em] font-semibold text-sm"
                 />
               </div>
             </div>
 
             <Button
-              className="w-full h-12 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-base"
+              className="w-full h-11 mt-1 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-sm shadow-md hover:shadow-lg transition-all"
               onClick={handleNext}
               disabled={!isFormValid() || loading}
             >
               {loading ? (
-                <div className="flex items-center gap-2">
+                <span className="flex items-center gap-2">
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  Inscription...
-                </div>
+                  Inscription…
+                </span>
               ) : (
-                <div className="flex items-center gap-2">
-                  S&apos;inscrire <ArrowRight className="h-5 w-5" />
-                </div>
+                <span className="flex items-center gap-2">
+                  S&apos;inscrire <ArrowRight className="h-4 w-4" />
+                </span>
               )}
             </Button>
           </div>
 
-          <p className="text-center mt-8 text-sm text-muted-foreground">
-            Vous avez déjà un compte ?{" "}
-            <Link href="/auth/signin" className="text-primary font-semibold hover:underline">
-              Connexion
-            </Link>
-          </p>
+          <div className="my-7 flex items-center gap-3">
+            <div className="h-px flex-1 bg-border" />
+            <span className="text-xs text-muted-foreground">Vous avez déjà un compte ?</span>
+            <div className="h-px flex-1 bg-border" />
+          </div>
 
-          <div className="lg:hidden mt-10">
-            <p className="text-xs font-medium text-muted-foreground text-center mb-4">
-              La plateforme des partenaires commerciaux Mafalia
+          <Link href="/auth/signin">
+            <Button variant="outline" className="w-full h-11 rounded-xl border-border font-semibold text-sm hover:bg-muted transition-all">
+              Se connecter
+            </Button>
+          </Link>
+
+          <div className="lg:hidden mt-12 space-y-3">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-muted-foreground/60 text-center">
+              Partenaires de confiance
             </p>
             <div className="marquee">
-              <div className="marquee-track" style={{ gap: "0.75rem" }}>
+              <div className="marquee-track" style={{ gap: "2rem" }}>
                 {[...trustedLogos, ...trustedLogos].map((logo, i) => (
-                  <div
-                    key={`${logo.name}-${i}`}
-                    className="flex h-10 items-center justify-center rounded-lg border border-border bg-muted px-3"
-                  >
+                  <div key={`m-${logo.name}-${i}`} className="flex items-center justify-center flex-shrink-0">
                     <Image
                       src={logo.src}
                       alt={logo.name}
-                      width={80}
-                      height={24}
-                      className="h-5 w-auto object-contain opacity-70"
-                      unoptimized
+                      width={64}
+                      height={22}
+                      className="h-5 w-auto object-contain [mix-blend-mode:multiply] dark:[mix-blend-mode:screen] grayscale opacity-50"
                     />
                   </div>
                 ))}

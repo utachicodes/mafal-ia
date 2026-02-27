@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { motion } from "framer-motion"
-import { Mail, Lock, LogIn, ArrowLeft, Eye, EyeOff } from "lucide-react"
+import { Mail, Lock, LogIn, ArrowLeft, Eye, EyeOff, AlertCircle } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import { signIn } from "next-auth/react"
@@ -11,14 +11,15 @@ import { Logo } from "@/src/components/logo"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
-// Partner logos - using reliable public URLs
-const trustedLogos: Array<{ name: string; src: string }> = [
-  { name: "MTN", src: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/MTN_Group_Logo.svg/120px-MTN_Group_Logo.svg.png" },
-  { name: "Orange", src: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Orange_logo.svg/120px-Orange_logo.svg.png" },
-  { name: "Wave", src: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Wave_logo.png/120px-Wave_logo.png" },
-  { name: "Jumia", src: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Jumia_logo.svg/120px-Jumia_logo.svg.png" },
-  { name: "Flutterwave", src: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Flutterwave_Logo.png/120px-Flutterwave_Logo.png" },
-  { name: "UBA", src: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/United_Bank_for_Africa_logo.svg/120px-United_Bank_for_Africa_logo.svg.png" },
+const partnerLogos = [
+  { name: "Wave",        src: "/partners/wave.jpeg" },
+  { name: "Orange Money",src: "/partners/orangemoney.jpeg" },
+  { name: "Djamo",       src: "/partners/djamo.jpeg" },
+  { name: "L'Africa Mobile", src: "/partners/lam.jpeg" },
+  { name: "Yango",       src: "/partners/yango.jpeg" },
+  { name: "Paps",        src: "/partners/paps.jpeg" },
+  { name: "Flowbot",     src: "/partners/flowbot.jpeg" },
+  { name: "Mixx",        src: "/partners/mixx.jpeg" },
 ]
 
 export default function LoginPage() {
@@ -27,9 +28,9 @@ export default function LoginPage() {
   const callbackUrl = searchParams.get("callbackUrl") || "/dashboard"
   const error = searchParams.get("error")
 
-  const [email, setEmail] = useState("")
+  const [email, setEmail]       = useState("")
   const [password, setPassword] = useState("")
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading]   = useState(false)
   const [loginError, setLoginError] = useState(error ? "Authentication failed. Please try again." : "")
   const [showPassword, setShowPassword] = useState(false)
 
@@ -37,22 +38,15 @@ export default function LoginPage() {
     e.preventDefault()
     setLoading(true)
     setLoginError("")
-
     try {
-      const result = await signIn("credentials", {
-        email,
-        password,
-        redirect: false,
-        callbackUrl
-      })
-
+      const result = await signIn("credentials", { email, password, redirect: false, callbackUrl })
       if (result?.error) {
         setLoginError("Email ou mot de passe incorrect")
       } else {
         router.push(callbackUrl)
         router.refresh()
       }
-    } catch (err) {
+    } catch {
       setLoginError("Une erreur inattendue s'est produite")
     } finally {
       setLoading(false)
@@ -60,76 +54,100 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex">
-      {/* Left Side - Red Background */}
-      <div className="hidden lg:flex lg:w-1/2 bg-primary flex-col justify-between p-12 text-primary-foreground relative overflow-hidden">
-        {/* Logo */}
+    <div className="min-h-screen flex bg-background">
+
+      {/* ── Left panel (desktop) ─────────────────────────── */}
+      <div className="hidden lg:flex lg:w-[52%] bg-primary flex-col justify-between p-14 relative overflow-hidden">
+
+        {/* background texture */}
+        <div
+          className="absolute inset-0 opacity-[0.04]"
+          style={{
+            backgroundImage:
+              "linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)",
+            backgroundSize: "40px 40px",
+          }}
+        />
+        {/* glow blobs */}
+        <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-white/10 blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 right-0 w-80 h-80 rounded-full bg-black/10 blur-3xl pointer-events-none" />
+
+        {/* Logo — white on red */}
         <div className="relative z-10">
-          <Link href="/" className="inline-flex items-center">
-            <Logo className="h-10 w-auto" />
+          <Link href="/">
+            <Logo className="h-10" white />
           </Link>
         </div>
 
-        {/* Main Content */}
-        <div className="relative z-10 max-w-md">
-          <h1 className="text-4xl font-bold mb-4">
-            Content de vous revoir
+        {/* Headline */}
+        <div className="relative z-10 space-y-5">
+          <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-medium text-white/90">
+            ✦ Plateforme IA pour commerces africains
+          </div>
+          <h1 className="text-4xl xl:text-5xl font-bold text-white leading-tight">
+            Content de<br />vous revoir
           </h1>
-          <p className="text-lg opacity-90 leading-relaxed">
-            Connectez-vous pour accéder à votre tableau de bord et suivre vos performances.
+          <p className="text-base text-white/75 leading-relaxed max-w-sm">
+            Connectez-vous pour accéder à votre tableau de bord, suivre vos commandes et analyser vos performances.
           </p>
+
+          {/* Stats row */}
+          <div className="flex gap-8 pt-2">
+            {[
+              { value: "500+", label: "Commerces actifs" },
+              { value: "98%", label: "Satisfaction" },
+              { value: "24/7", label: "Support IA" },
+            ].map((s) => (
+              <div key={s.label}>
+                <div className="text-2xl font-bold text-white">{s.value}</div>
+                <div className="text-xs text-white/60">{s.label}</div>
+              </div>
+            ))}
+          </div>
         </div>
 
-        {/* Trust Section */}
-        <div className="relative z-10">
-          <p className="text-xs font-medium opacity-70 mb-4">
-            La plateforme des partenaires commerciaux Mafalia
+        {/* Partner logos — white silhouettes */}
+        <div className="relative z-10 space-y-3">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-white/50">
+            Partenaires de confiance
           </p>
           <div className="marquee">
-            <div className="marquee-track" style={{ gap: '1rem' }}>
-              {[...trustedLogos, ...trustedLogos].map((logo, i) => (
-                <div
-                  key={`${logo.name}-${i}`}
-                  className="flex items-center justify-center px-3"
-                >
+            <div className="marquee-track" style={{ gap: "2.5rem" }}>
+              {[...partnerLogos, ...partnerLogos].map((logo, i) => (
+                <div key={`${logo.name}-${i}`} className="flex items-center justify-center flex-shrink-0">
                   <Image
                     src={logo.src}
                     alt={logo.name}
-                    width={80}
+                    width={72}
                     height={24}
-                    className="h-5 w-auto object-contain brightness-0 invert"
-                    unoptimized
+                    className="h-6 w-auto object-contain brightness-0 invert opacity-60"
                   />
                 </div>
               ))}
             </div>
           </div>
         </div>
-
-        {/* Decorative circles */}
-        <div className="absolute bottom-0 left-0 w-64 h-64 bg-white/5 rounded-full -translate-x-1/3 translate-y-1/3" />
-        <div className="absolute top-1/4 right-0 w-48 h-48 bg-white/5 rounded-full translate-x-1/3" />
       </div>
 
-      {/* Right Side - White Background */}
-      <div className="w-full lg:w-1/2 bg-background flex flex-col justify-center p-6 md:p-12 lg:p-16">
+      {/* ── Right panel (form) ───────────────────────────── */}
+      <div className="flex-1 flex flex-col justify-center px-6 py-12 sm:px-10 lg:px-16 xl:px-24">
         <motion.div
-          initial={{ opacity: 0, y: 12 }}
+          initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: "easeOut" }}
-          className="w-full max-w-md mx-auto"
+          transition={{ duration: 0.45, ease: "easeOut" }}
+          className="w-full max-w-sm mx-auto"
         >
-          {/* Mobile Logo */}
-          <div className="lg:hidden mb-8">
-            <Link href="/" className="inline-flex items-center">
-              <Logo className="h-10 w-auto" />
+          {/* Mobile logo */}
+          <div className="lg:hidden mb-10">
+            <Link href="/">
+              <Logo className="h-9" />
             </Link>
           </div>
 
-          {/* Back Link */}
-          <Link 
-            href="/" 
-            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-8"
+          {/* Back */}
+          <Link
+            href="/"
+            className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-10"
           >
             <ArrowLeft className="h-4 w-4" />
             Retour à l'accueil
@@ -137,112 +155,120 @@ export default function LoginPage() {
 
           {/* Heading */}
           <div className="mb-8">
-            <h2 className="text-3xl font-bold tracking-tight text-foreground mb-2">
-              Connexion
-            </h2>
-            <p className="text-muted-foreground">
+            <h2 className="text-2xl font-bold tracking-tight text-foreground">Connexion</h2>
+            <p className="mt-1.5 text-sm text-muted-foreground">
               Accédez à votre tableau de bord partenaire
             </p>
           </div>
 
-          {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-5">
-            {loginError && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                className="p-4 rounded-xl bg-destructive/10 border border-destructive/20 flex items-center gap-3 text-destructive text-sm font-medium"
-              >
-                <Mail className="h-4 w-4 shrink-0" />
-                {loginError}
-              </motion.div>
-            )}
+          {/* Error */}
+          {loginError && (
+            <motion.div
+              initial={{ opacity: 0, y: -6 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-5 flex items-center gap-3 rounded-xl border border-destructive/30 bg-destructive/8 px-4 py-3 text-sm text-destructive"
+            >
+              <AlertCircle className="h-4 w-4 shrink-0" />
+              {loginError}
+            </motion.div>
+          )}
 
-            <div className="space-y-2">
-              <label className="text-sm font-semibold text-foreground">Adresse email</label>
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Email */}
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-foreground">Adresse email</label>
               <div className="relative">
+                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
                 <Input
                   type="email"
                   placeholder="votre@email.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="h-12 rounded-xl border-border bg-background px-4"
+                  className="h-11 pl-10 rounded-xl border-border bg-background text-sm"
                   required
                 />
               </div>
             </div>
 
-            <div className="space-y-2">
-              <div className="flex justify-between items-center">
-                <label className="text-sm font-semibold text-foreground">Mot de passe</label>
-                <Link href="#" className="text-xs font-medium text-primary hover:underline">
+            {/* Password */}
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-medium text-foreground">Mot de passe</label>
+                <Link href="#" className="text-xs text-primary hover:underline">
                   Mot de passe oublié ?
                 </Link>
               </div>
               <div className="relative">
+                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
                 <Input
                   type={showPassword ? "text" : "password"}
-                  placeholder="Votre mot de passe"
+                  placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="h-12 rounded-xl border-border bg-background px-4 pr-12"
+                  className="h-11 pl-10 pr-11 rounded-xl border-border bg-background text-sm"
                   required
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                 >
-                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
             </div>
 
+            {/* Submit */}
             <Button
               type="submit"
-              className="w-full h-12 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-base"
+              className="w-full h-11 mt-2 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-sm shadow-md hover:shadow-lg transition-all"
               disabled={loading}
             >
               {loading ? (
-                <div className="flex items-center gap-2">
-                  <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  Connexion...
-                </div>
+                <span className="flex items-center gap-2">
+                  <span className="h-4 w-4 rounded-full border-2 border-white/30 border-t-white animate-spin" />
+                  Connexion en cours…
+                </span>
               ) : (
-                <div className="flex items-center gap-2">
-                  Se connecter <LogIn className="h-5 w-5" />
-                </div>
+                <span className="flex items-center gap-2">
+                  Se connecter <LogIn className="h-4 w-4" />
+                </span>
               )}
             </Button>
           </form>
 
-          {/* Register Link */}
-          <p className="text-center mt-8 text-sm text-muted-foreground">
-            Vous n&apos;avez pas de compte ?{" "}
-            <Link href="/register" className="text-primary font-semibold hover:underline">
-              S&apos;inscrire
-            </Link>
-          </p>
+          {/* Divider */}
+          <div className="my-7 flex items-center gap-3">
+            <div className="h-px flex-1 bg-border" />
+            <span className="text-xs text-muted-foreground">Vous n'avez pas de compte ?</span>
+            <div className="h-px flex-1 bg-border" />
+          </div>
 
-          {/* Mobile Trust Logos */}
-          <div className="lg:hidden mt-10">
-            <p className="text-xs font-medium text-muted-foreground text-center mb-4">
-              La plateforme des partenaires commerciaux Mafalia
+          <Link href="/register">
+            <Button
+              variant="outline"
+              className="w-full h-11 rounded-xl border-border font-semibold text-sm hover:bg-muted transition-all"
+            >
+              Créer un compte
+            </Button>
+          </Link>
+
+          {/* Mobile partner logos */}
+          <div className="lg:hidden mt-12 space-y-3">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-muted-foreground/60 text-center">
+              Partenaires de confiance
             </p>
             <div className="marquee">
-              <div className="marquee-track" style={{ gap: '0.75rem' }}>
-                {[...trustedLogos, ...trustedLogos].map((logo, i) => (
-                  <div
-                    key={`${logo.name}-${i}`}
-                    className="flex items-center justify-center px-3"
-                  >
+              <div className="marquee-track" style={{ gap: "2rem" }}>
+                {[...partnerLogos, ...partnerLogos].map((logo, i) => (
+                  <div key={`m-${logo.name}-${i}`} className="flex items-center justify-center flex-shrink-0">
                     <Image
                       src={logo.src}
                       alt={logo.name}
-                      width={80}
-                      height={24}
-                      className="h-5 w-auto object-contain [mix-blend-mode:multiply] dark:[mix-blend-mode:screen] grayscale opacity-60"
-                      unoptimized
+                      width={64}
+                      height={22}
+                      className="h-5 w-auto object-contain [mix-blend-mode:multiply] dark:[mix-blend-mode:screen] grayscale opacity-50"
                     />
                   </div>
                 ))}
