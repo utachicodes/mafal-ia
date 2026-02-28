@@ -35,7 +35,12 @@ interface Order {
 }
 
 export default async function OrdersPage() {
-  const orders = await OrderService.getAllOrders() as unknown as Order[]
+  let orders: Order[] = []
+  try {
+    orders = (await OrderService.getAllOrders()) as unknown as Order[]
+  } catch (e: any) {
+    console.error("Failed to load orders:", e)
+  }
 
   return (
     <div className="space-y-10">
@@ -149,7 +154,7 @@ export default async function OrdersPage() {
                         </Badge>
                       </td>
                       <td className="px-8 py-6 text-right text-muted-foreground group-hover:text-foreground whitespace-nowrap font-medium">
-                        {format(order.createdAt, "MMM d, HH:mm")}
+                        {format(new Date(order.createdAt), "MMM d, HH:mm")}
                       </td>
                       <td className="px-8 py-6 text-right">
                         <DropdownMenu>
