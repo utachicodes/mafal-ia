@@ -1,7 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { OrderService } from "@/src/lib/order-service"
-import { format } from "date-fns"
 import { Button } from "@/components/ui/button"
 import {
   Filter,
@@ -154,7 +153,7 @@ export default async function OrdersPage() {
                         </Badge>
                       </td>
                       <td className="px-8 py-6 text-right text-muted-foreground group-hover:text-foreground whitespace-nowrap font-medium">
-                        {format(new Date(order.createdAt), "MMM d, HH:mm")}
+                        {new Date(order.createdAt).toLocaleDateString("en", { month: "short", day: "numeric" })}{", "}{new Date(order.createdAt).toLocaleTimeString("en", { hour: "2-digit", minute: "2-digit", hour12: false })}
                       </td>
                       <td className="px-8 py-6 text-right">
                         <DropdownMenu>
