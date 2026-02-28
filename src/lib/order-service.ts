@@ -64,12 +64,12 @@ export class OrderService {
     })
   }
 
-  static async getAllOrders(): Promise<(OrderRecord & { restaurant: { name: string } | null })[]> {
+  static async getAllOrders(): Promise<(OrderRecord & { business: { name: string } | null })[]> {
     const prisma = await getPrisma()
     return prisma.order.findMany({
       orderBy: { createdAt: "desc" },
       include: {
-        restaurant: {
+        business: {
           select: { name: true }
         }
       },

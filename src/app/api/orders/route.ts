@@ -6,7 +6,7 @@ export async function GET() {
     const prisma = await getPrisma()
     const orders = await prisma.order.findMany({
       orderBy: { createdAt: "desc" },
-      include: { restaurant: { select: { id: true, name: true } } },
+      include: { business: { select: { id: true, name: true } } },
     })
     return NextResponse.json(orders)
   } catch (err: any) {

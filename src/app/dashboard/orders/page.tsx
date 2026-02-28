@@ -28,7 +28,7 @@ export const dynamic = "force-dynamic"
 interface Order {
   id: string
   phoneNumber: string
-  restaurant: { name: string } | null
+  business: { name: string } | null
   total: number
   status: string
   createdAt: Date
@@ -127,7 +127,7 @@ export default async function OrdersPage() {
                       <td className="px-8 py-6">
                         <div className="flex items-center gap-2 text-muted-foreground group-hover:text-foreground transition-colors">
                           <MapPin className="h-4 w-4" />
-                          <span className="font-medium">{order.restaurant?.name || "—"}</span>
+                          <span className="font-medium">{order.business?.name || "—"}</span>
                         </div>
                       </td>
                       <td className="px-8 py-6 text-right font-black text-foreground tabular-nums text-base">

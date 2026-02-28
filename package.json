@@ -5,7 +5,7 @@
   "type": "module",
   "packageManager": "npm@10",
   "scripts": {
-    "build": "next build",
+    "build": "prisma generate && prisma db push --skip-generate && next build",
     "dev": "next dev",
     "lint": "next lint",
     "start": "next start",

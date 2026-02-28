@@ -163,16 +163,16 @@ describe("OrderService.listByPhone", () => {
 describe("OrderService.getAllOrders", () => {
   beforeEach(() => vi.clearAllMocks())
 
-  it("returns orders with restaurant name included", async () => {
+  it("returns orders with business name included", async () => {
     const orders = [
-      { ...makeOrderRecord(), restaurant: { name: "Chez Fatou" } },
-      { ...makeOrderRecord({ id: "o2" }), restaurant: null },
+      { ...makeOrderRecord(), business: { name: "Chez Fatou" } },
+      { ...makeOrderRecord({ id: "o2" }), business: null },
     ]
     mockPrisma.order.findMany.mockResolvedValue(orders)
     const result = await OrderService.getAllOrders()
     expect(result).toHaveLength(2)
-    expect(result[0].restaurant?.name).toBe("Chez Fatou")
-    expect(result[1].restaurant).toBeNull()
+    expect(result[0].business?.name).toBe("Chez Fatou")
+    expect(result[1].business).toBeNull()
   })
 
   it("limits results to 100 orders", async () => {
