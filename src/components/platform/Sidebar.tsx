@@ -18,7 +18,7 @@ import {
 import Link from "next/link"
 import { cn } from "@/lib/utils"
 import { Logo } from "@/src/components/logo"
-import { useSession, signOut } from "next-auth/react"
+// import { useSession, signOut } from "next-auth/react" // Auth disabled
 
 const navigation = [
     { name: "Dashboard", href: "/dashboard", exact: true, icon: Home },
@@ -36,7 +36,8 @@ interface SidebarProps {
 
 export function Sidebar({ collapsed, setCollapsed }: SidebarProps) {
     const pathname = usePathname()
-    const { data: session } = useSession()
+    // Auth disabled — mock session
+    const session = { user: { name: "Admin", role: "ADMIN" } } as any
 
     return (
         <motion.div
@@ -124,7 +125,7 @@ export function Sidebar({ collapsed, setCollapsed }: SidebarProps) {
                             </div>
                         </div>
                         <button
-                            onClick={() => signOut()}
+                            onClick={() => { /* auth disabled */ }}
                             className="flex items-center gap-2 w-full px-3 py-2 text-sm text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors"
                         >
                             <LogOut className="h-4 w-4" />
@@ -137,7 +138,7 @@ export function Sidebar({ collapsed, setCollapsed }: SidebarProps) {
                             <User className="h-5 w-5 text-primary" />
                         </div>
                         <button
-                            onClick={() => signOut()}
+                            onClick={() => { /* auth disabled */ }}
                             className="p-2 text-muted-foreground hover:text-destructive transition-colors"
                         >
                             <LogOut className="h-5 w-5" />

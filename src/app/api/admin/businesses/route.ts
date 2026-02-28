@@ -1,16 +1,9 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/src/lib/auth";
 import { getPrisma } from "@/src/lib/db";
 import bcrypt from "bcryptjs";
 
 export async function GET() {
     try {
-        const session = await getServerSession(authOptions);
-
-        if (!session || (session.user as any).role !== "ADMIN") {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
-        }
 
         const prisma = await getPrisma();
         const restaurants = await prisma.business.findMany({
@@ -54,11 +47,6 @@ export async function GET() {
 
 export async function POST(req: Request) {
     try {
-        const session = await getServerSession(authOptions);
-
-        if (!session || (session.user as any).role !== "ADMIN") {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
-        }
 
         const body = await req.json();
         const { name, cuisine, whatsappNumber, ownerEmail, ownerName, ownerPassword } = body;
@@ -105,7 +93,7 @@ export async function POST(req: Request) {
                 whatsappNumber,
                 userId: owner.id, // Legacy compatibility
                 ownerId: owner.id,
-                createdById: (session.user as any).id,
+                createdById: owner.id,
                 supportedLanguages: ["fr"],
                 isActive: true,
                 description: "", // Default description

@@ -1,5 +1,3 @@
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/src/lib/auth"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import {
@@ -17,18 +15,11 @@ import Link from "next/link"
 import { cn } from "@/lib/utils"
 import { Badge } from "@/components/ui/badge"
 import { AnalyticsService } from "@/src/lib/analytics-service"
-import { redirect } from "next/navigation"
 
 export const dynamic = "force-dynamic"
 
 export default async function DashboardPage() {
-  const session = await getServerSession(authOptions)
-
-  if (!session) {
-    redirect("/auth/signin")
-  }
-
-  const userPlan = (session?.user as any)?.plan || "STANDARD"
+  const userPlan = "PREMIUM"
   const data = await AnalyticsService.getDashboardStats()
 
   const stats = [
@@ -71,7 +62,7 @@ export default async function DashboardPage() {
             )}
           </div>
           <p className="text-muted-foreground text-lg font-medium opacity-80">
-            Welcome back, <span className="text-foreground font-bold border-b-2 border-primary/20">{session?.user?.name || "User"}</span>
+            Welcome back, <span className="text-foreground font-bold border-b-2 border-primary/20">Admin</span>
           </p>
         </div>
         <div className="flex items-center gap-4">

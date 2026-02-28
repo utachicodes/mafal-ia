@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { usePathname } from "next/navigation"
-import { useSession } from "next-auth/react"
+// import { useSession } from "next-auth/react" // Auth disabled
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent } from "@/components/ui/sheet"
 import { Home, Store, BarChart3, Settings, PanelLeftOpen, PanelLeftClose, ShoppingBag, FlaskConical } from "lucide-react"
@@ -39,7 +39,8 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   const [collapsed, setCollapsed] = useState(false)
   const [isMounted, setIsMounted] = useState(false)
   const pathname = usePathname()
-  const { data: session } = useSession()
+  // Auth disabled — mock session
+  const session = { user: { name: "Admin", plan: "PREMIUM" } } as any
 
   useEffect(() => {
     setIsMounted(true)

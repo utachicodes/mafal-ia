@@ -1,6 +1,4 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/src/lib/auth"
 import { getPrisma } from "@/src/lib/db"
 import { ingestDocument } from "@/src/lib/knowledge-ingestor"
 
@@ -11,9 +9,6 @@ export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await getServerSession(authOptions)
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-
   const { id: businessId } = await params
   const prisma = await getPrisma()
 
@@ -45,9 +40,6 @@ export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await getServerSession(authOptions)
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-
   const { id: businessId } = await params
 
   const formData = await req.formData()

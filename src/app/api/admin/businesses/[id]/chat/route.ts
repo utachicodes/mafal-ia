@@ -1,6 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/src/lib/auth"; // Assuming authOptions is here, or I'll check imports
 import { AIClient } from "@/src/lib/ai-client";
 import { BusinessService } from "@/src/lib/business-service";
 import { ConversationManager } from "@/src/lib/conversation-manager";
@@ -26,11 +24,6 @@ export async function POST(
 ) {
     try {
         const { id } = await params;
-        const session = await getServerSession(authOptions);
-
-        if (!session || (session.user as any).role !== "ADMIN") {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
-        }
 
         const { message } = await request.json();
         if (!message) {

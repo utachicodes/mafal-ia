@@ -1,6 +1,4 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/src/lib/auth";
 import { ai } from "@/src/lib/genkit";
 import { gemini15Flash } from "@genkit-ai/googleai";
 const pdf = require("pdf-parse");
@@ -22,12 +20,6 @@ export async function POST(
     { params }: { params: { id: string } }
 ) {
     try {
-        const session = await getServerSession(authOptions);
-
-        if (!session || (session.user as any).role !== "ADMIN") {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
-        }
-
         const formData = await req.formData();
         const file = formData.get("file") as File;
 

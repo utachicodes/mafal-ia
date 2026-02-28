@@ -8,7 +8,7 @@ import { Logo } from "@/src/components/logo";
 import { SimpleThemeToggle } from "@/src/components/simple-theme-toggle";
 import { LanguageSwitcher } from "@/src/components/language-switcher";
 import { useLanguage, translations } from "@/src/lib/i18n";
-import { useSession, signOut } from "next-auth/react";
+// import { useSession, signOut } from "next-auth/react"; // Auth disabled
 import {
   Bot,
   Zap,
@@ -60,7 +60,8 @@ const scaleIn = {
 };
 
 export default function HomeClient() {
-  const { data: session } = useSession();
+  // Auth disabled — mock session
+  const session = null as any;
   const { language } = useLanguage();
   const t = translations[language];
 
@@ -230,31 +231,12 @@ export default function HomeClient() {
               <LanguageSwitcher />
               <SimpleThemeToggle />
 
-              {session ? (
-                <div className="flex items-center gap-4">
-                  <Link href="/dashboard">
-                    <Button variant="outline" className="border-primary text-primary hover:bg-primary/10">
-                      Dashboard
-                    </Button>
-                  </Link>
-                  <Button
-                    variant="ghost"
-                    onClick={() => signOut()}
-                    className="text-muted-foreground hover:text-primary"
-                  >
-                    Sign Out
-                  </Button>
-                </div>
-              ) : (
-                <div className="flex items-center gap-4">
-
-                  <Link href="/register">
-                    <Button className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 shadow-md hover:shadow-lg transition-all">
-                      {t.nav.cta}
-                    </Button>
-                  </Link>
-                </div>
-              )}
+              {/* Auth disabled — direct dashboard access */}
+              <Link href="/dashboard">
+                <Button variant="outline" className="border-primary text-primary hover:bg-primary/10">
+                  Dashboard
+                </Button>
+              </Link>
             </div>
           </div>
         </div>

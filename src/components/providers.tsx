@@ -4,7 +4,7 @@ import { ThemeProvider } from "./theme-provider"
 import { BusinessesProvider } from "@/src/hooks/use-businesses"
 import { ErrorBoundary } from "@/src/components/error-boundary"
 import { I18nProvider } from "@/src/context/i18n"
-import { SessionProvider } from "next-auth/react"
+// import { SessionProvider } from "next-auth/react" // Auth disabled
 import { Toaster } from "@/components/ui/toaster"
 
 interface ProvidersProps {
@@ -13,17 +13,15 @@ interface ProvidersProps {
 
 export function Providers({ children }: ProvidersProps) {
   return (
-    <SessionProvider>
-      <ThemeProvider>
-        <ErrorBoundary>
-          <BusinessesProvider>
-            <I18nProvider>
-              {children}
-            </I18nProvider>
-          </BusinessesProvider>
-        </ErrorBoundary>
-        <Toaster />
-      </ThemeProvider>
-    </SessionProvider>
+    <ThemeProvider>
+      <ErrorBoundary>
+        <BusinessesProvider>
+          <I18nProvider>
+            {children}
+          </I18nProvider>
+        </BusinessesProvider>
+      </ErrorBoundary>
+      <Toaster />
+    </ThemeProvider>
   )
 }

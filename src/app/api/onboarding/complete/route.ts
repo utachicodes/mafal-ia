@@ -38,13 +38,7 @@ export async function POST(req: Request) {
         // I'll update the `RegisterPage` to `signIn` after verify.
         // But for now, let's write this route to expect an Authenticated session.
 
-        const { getServerSession } = await import("next-auth");
-        const { authOptions } = await import("@/src/lib/auth"); // Assuming this exists based on usage in [...nextauth]
-        const session = await getServerSession(authOptions);
-
-        if (!session || !session.user) {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-        }
+        // Auth disabled — skip session check
 
         // Schema
         const completeSchema = z.object({
@@ -59,7 +53,7 @@ export async function POST(req: Request) {
         }
 
         const { ownerAgeRange, ownerSex, activitySector } = validation.data;
-        const email = session.user.email;
+        const email = body.email; // Passed from frontend (auth disabled)
 
         // Find restaurant by owner email (User)
         // We need to find the User first? The session has email.

@@ -1,6 +1,3 @@
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/src/lib/auth"
-import { redirect } from "next/navigation"
 import { BusinessService } from "@/src/lib/business-service"
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -29,17 +26,11 @@ import { cn } from "@/lib/utils"
 export const dynamic = "force-dynamic"
 
 export default async function BusinessesPage() {
-  const session = await getServerSession(authOptions)
-
-  if (!session?.user) {
-    redirect("/auth/signin")
-  }
-
   let restaurants: any[] = []
   let error = null
 
   try {
-    restaurants = await BusinessService.getAllBusinesses((session.user as any).id)
+    restaurants = await BusinessService.getAllBusinesses()
   } catch (e: any) {
     console.error("Failed to load restaurants:", e)
     error = e.message || "Failed to load"

@@ -1,6 +1,4 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/src/lib/auth";
 import { getPrisma } from "@/src/lib/db";
 
 
@@ -10,10 +8,6 @@ export async function PATCH(
 ) {
     try {
         const prisma = await getPrisma();
-        const session = await getServerSession(authOptions);
-        if (!session || (session.user as any).role !== "ADMIN") {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
-        }
 
         const { id } = await params;
         const body = await request.json();
