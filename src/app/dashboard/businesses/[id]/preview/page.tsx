@@ -1,7 +1,6 @@
 import { ChatSimulator } from "@/src/components/chat-simulator"
 import { BusinessService } from "@/src/lib/business-service"
 import { Sparkles, MessageSquare, ShieldCheck, Zap, ArrowLeft, Terminal, Bot, Globe, ChevronRight } from "lucide-react"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { notFound } from "next/navigation"
@@ -31,25 +30,22 @@ export default async function BusinessPreviewPage({ params }: PreviewPageProps) 
                     <Button variant="ghost" asChild className="-ml-3 mb-2 text-muted-foreground hover:text-primary transition-colors group">
                         <Link href={`/dashboard/businesses/${id}`}>
                             <ArrowLeft className="mr-2 h-4 w-4 transition-transform group-hover:-translate-x-1" />
-                            Return to Business Hub
+                            Back
                         </Link>
                     </Button>
                     <div className="flex items-center gap-4">
                         <h1 className="text-4xl font-bold tracking-tight text-gradient">
-                            Neural Playground
+                            Chat Preview
                         </h1>
-                        <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 font-black uppercase text-[10px] tracking-widest px-3 py-1">
-                            Live Inference
-                        </Badge>
                     </div>
                     <p className="text-muted-foreground text-lg">
-                        Real-time simulation for <span className="font-bold text-foreground">{restaurant.name}</span>
+                        Test the chatbot for <span className="font-bold text-foreground">{restaurant.name}</span>
                     </p>
                 </div>
                 <div className="flex gap-3">
                     <Button variant="outline" className="rounded-xl px-4 h-11 border-white/10 glass hover:bg-white/5 transition-all font-bold uppercase text-[10px] tracking-widest">
                         <Terminal className="mr-2 h-4 w-4" />
-                        Log Stream
+                        View Logs
                     </Button>
                     <Button className="rounded-xl px-6 h-11 bg-primary hover:bg-primary/90 text-white shadow-xl shadow-primary/20 transition-all font-bold gap-2">
                         <Sparkles className="h-4 w-4" />
@@ -72,13 +68,13 @@ export default async function BusinessPreviewPage({ params }: PreviewPageProps) 
                             <div className="h-4 w-px bg-white/10 mx-2" />
                             <div className="flex items-center gap-2">
                                 <Bot className="h-4 w-4 text-primary" />
-                                <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Mafal-IA Core v2.0.4</span>
+                                <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Chat Preview</span>
                             </div>
                         </div>
                         <div className="flex items-center gap-4">
                             <div className="flex items-center gap-2">
                                 <div className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-                                <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest">Sync Active</span>
+                                <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest">Online</span>
                             </div>
                         </div>
                     </div>
@@ -93,22 +89,22 @@ export default async function BusinessPreviewPage({ params }: PreviewPageProps) 
                 {[
                     {
                         icon: Globe,
-                        title: "Multilingual Grid",
-                        desc: "Seamless translation between FR, EN, and AR with local dialect awareness.",
+                        title: "Multilingual",
+                        desc: "Seamless communication in French, English, and Arabic.",
                         color: "text-primary",
                         bg: "bg-primary/10"
                     },
                     {
                         icon: ShieldCheck,
-                        title: "Instruction Guard",
-                        desc: "Strict RAG compliance ensures your agent never hallucinates or leaks internal data.",
+                        title: "Accurate Answers",
+                        desc: "Responses are based strictly on your menu data — no made-up information.",
                         color: "text-emerald-500",
                         bg: "bg-emerald-500/10"
                     },
                     {
                         icon: Zap,
-                        title: "Flash Response",
-                        desc: "Sub-100ms inference time for instant customer gratification across all devices.",
+                        title: "Instant Replies",
+                        desc: "Fast responses so your customers never have to wait.",
                         color: "text-primary",
                         bg: "bg-primary/10"
                     }
@@ -134,12 +130,12 @@ export default async function BusinessPreviewPage({ params }: PreviewPageProps) 
                         <MessageSquare className="h-10 w-10 text-white" />
                     </div>
                     <div className="space-y-1">
-                        <h4 className="font-bold text-2xl text-white">System Diagnostics</h4>
-                        <p className="text-white/70 max-w-lg">Everything looking correct? Deploy your configuration to the live WhatsApp grid to begin processing real customer payload.</p>
+                        <h4 className="font-bold text-2xl text-white">Ready to Go Live?</h4>
+                        <p className="text-white/70 max-w-lg">Everything looking good? Connect your WhatsApp number to start receiving real customer orders.</p>
                     </div>
                 </div>
                 <Button className="rounded-2xl px-12 h-16 bg-white text-primary hover:bg-white/90 font-black uppercase text-xs tracking-widest shadow-2xl relative z-10 transition-all hover:scale-[1.02]">
-                    Push to Production
+                    Go Live
                 </Button>
             </div>
         </div>

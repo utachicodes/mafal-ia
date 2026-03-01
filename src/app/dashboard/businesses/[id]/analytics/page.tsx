@@ -1,6 +1,5 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import {
     BarChart3,
     ArrowLeft,
@@ -10,7 +9,6 @@ import {
     Clock,
     Download,
     Activity,
-    BrainCircuit,
     Sparkles,
     Calendar,
     Filter,
@@ -44,19 +42,16 @@ export default async function BusinessAnalyticsPage({ params }: BusinessAnalytic
                     <Button variant="ghost" asChild className="-ml-3 mb-2 text-muted-foreground hover:text-primary transition-colors group">
                         <Link href={`/dashboard/businesses/${id}`}>
                             <ArrowLeft className="mr-2 h-4 w-4 transition-transform group-hover:-translate-x-1" />
-                            Return to Hub
+                            Back
                         </Link>
                     </Button>
                     <div className="flex items-center gap-4">
                         <h1 className="text-4xl font-bold tracking-tight text-gradient">
-                            Agent Analytics
+                            Analytics
                         </h1>
-                        <Badge className="bg-primary/10 text-primary border-primary/20 font-black uppercase text-[10px] tracking-widest px-3 py-1">
-                            Telemetric Feed
-                        </Badge>
                     </div>
                     <p className="text-muted-foreground text-lg">
-                        Operational intelligence for <span className="font-bold text-foreground">{restaurant.name}</span>
+                        Performance overview for <span className="font-bold text-foreground">{restaurant.name}</span>
                     </p>
                 </div>
                 <div className="flex gap-3">
@@ -76,7 +71,7 @@ export default async function BusinessAnalyticsPage({ params }: BusinessAnalytic
                     { label: "Conversations", value: "1,284", change: "+12.5%", icon: MessageSquare, color: "text-primary", trend: "up" },
                     { label: "Conversion Rate", value: "24.2%", change: "+4.3%", icon: Sparkles, color: "text-primary", trend: "up" },
                     { label: "Order Volume", value: "342", change: "+8.1%", icon: ShoppingBag, color: "text-emerald-500", trend: "up" },
-                    { label: "AI Response %", value: "98.8%", change: "Stable", icon: BrainCircuit, color: "text-muted-foreground", trend: "neutral" }
+                    { label: "Response Rate", value: "98.8%", change: "Stable", icon: Activity, color: "text-muted-foreground", trend: "neutral" }
                 ].map((stat, i) => (
                     <Card key={i} className="glass border-white/10 overflow-hidden group">
                         <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -102,8 +97,8 @@ export default async function BusinessAnalyticsPage({ params }: BusinessAnalytic
                     <CardHeader className="p-8 pb-0">
                         <div className="flex items-center justify-between mb-2">
                             <div>
-                                <CardTitle className="text-2xl font-bold tracking-tight">Transmission Flow</CardTitle>
-                                <CardDescription>Conversational payload over time</CardDescription>
+                                <CardTitle className="text-2xl font-bold tracking-tight">Message Volume</CardTitle>
+                                <CardDescription>Conversations over time</CardDescription>
                             </div>
                             <Button variant="ghost" size="icon" className="h-10 w-10 shrink-0 rounded-xl hover:bg-white/10">
                                 <Filter className="h-4 w-4" />
@@ -139,16 +134,16 @@ export default async function BusinessAnalyticsPage({ params }: BusinessAnalytic
 
                 <Card className="lg:col-span-3 glass border-white/10 overflow-hidden rounded-[2.5rem]">
                     <CardHeader className="p-8 pb-0">
-                        <CardTitle className="text-2xl font-bold tracking-tight">Intent Cluster</CardTitle>
-                        <CardDescription>Customer intent mapping distribution</CardDescription>
+                        <CardTitle className="text-2xl font-bold tracking-tight">Customer Intents</CardTitle>
+                        <CardDescription>What customers are asking about</CardDescription>
                     </CardHeader>
                     <CardContent className="p-8 space-y-6">
                         {[
                             { label: "Order Initiation", value: 65, color: "bg-primary" },
                             { label: "Menu Inquiry", value: 48, color: "bg-primary/60" },
-                            { label: "Location Routing", value: 32, color: "bg-emerald-500" },
-                            { label: "Price Verification", value: 25, color: "bg-primary/30" },
-                            { label: "Human Escalation", value: 12, color: "bg-orange-500" }
+                            { label: "Location & Hours", value: 32, color: "bg-emerald-500" },
+                            { label: "Price Questions", value: 25, color: "bg-primary/30" },
+                            { label: "Support Requests", value: 12, color: "bg-orange-500" }
                         ].map((item, i) => (
                             <div key={i} className="space-y-2">
                                 <div className="flex justify-between items-center text-xs">
@@ -180,13 +175,13 @@ export default async function BusinessAnalyticsPage({ params }: BusinessAnalytic
                         <Activity className="h-8 w-8 text-primary" />
                     </div>
                     <div>
-                        <h4 className="font-bold text-2xl">Telemetry Integrity</h4>
-                        <p className="text-muted-foreground">All data is processed in real-time through the AI inference engine.</p>
+                        <h4 className="font-bold text-2xl">Data Overview</h4>
+                        <p className="text-muted-foreground">All data is updated in real-time from your chatbot conversations.</p>
                     </div>
                 </div>
                 <Button variant="outline" className="rounded-xl px-10 h-16 border-white/10 glass hover:bg-white/10 relative z-10 font-bold uppercase text-xs tracking-widest gap-3">
                     <Zap className="h-4 w-4 text-primary" />
-                    Deep Audit
+                    Full Report
                 </Button>
             </div>
         </div>

@@ -66,7 +66,7 @@ export default async function DashboardPage() {
           </p>
         </div>
         <div className="flex items-center gap-4">
-          <Button asChild className="rounded-2xl px-8 h-12 bg-primary hover:bg-primary/90 text-white shadow-2xl shadow-primary/30 transition-all duration-300 transform hover:scale-[1.03] active:scale-[0.97] border border-white/20">
+          <Button asChild className="rounded-2xl px-8 h-12 bg-primary hover:bg-primary/90 text-primary-foreground shadow-2xl shadow-primary/30 transition-all duration-300 transform hover:scale-[1.03] active:scale-[0.97]">
             <Link href="/dashboard/businesses/new">
               <Plus className="h-5 w-5 mr-2" />
               Add Business
@@ -78,14 +78,14 @@ export default async function DashboardPage() {
       {/* Stats Grid */}
       <div className="grid gap-6 md:grid-cols-3">
         {stats.map((stat, index) => (
-          <Card key={index} className="glass border-white/10 hover:border-primary/40 transition-all duration-500 group overflow-hidden relative neural-border py-4">
+          <Card key={index} className="glass hover:border-primary/40 transition-all duration-500 group overflow-hidden relative neural-border py-4">
             <div className="absolute -right-4 -top-4 w-32 h-32 bg-primary/10 rounded-full blur-3xl group-hover:bg-primary/20 transition-colors" />
 
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
                 {stat.title}
               </CardTitle>
-              <div className={cn("p-2.5 rounded-xl bg-white/5 border border-white/10", stat.color)}>
+              <div className={cn("p-2.5 rounded-xl bg-muted border border-border", stat.color)}>
                 <stat.icon className="h-5 w-5" />
               </div>
             </CardHeader>
@@ -103,7 +103,7 @@ export default async function DashboardPage() {
       {/* Main Content Sections */}
       <div className="grid gap-6 lg:grid-cols-7">
         {/* Performance Chart Area */}
-        <Card className="lg:col-span-4 glass border-white/10 overflow-hidden">
+        <Card className="lg:col-span-4 glass overflow-hidden">
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
               <CardTitle className="text-xl">Performance</CardTitle>
@@ -111,7 +111,7 @@ export default async function DashboardPage() {
             </div>
             <Activity className="h-5 w-5 text-muted-foreground" />
           </CardHeader>
-          <CardContent className="h-[300px] flex items-center justify-center border-t border-white/5 bg-white/[0.02]">
+          <CardContent className="h-[300px] flex items-center justify-center border-t border-border bg-muted/30">
             <div className="text-center space-y-2">
               <BarChart3 className="h-12 w-12 text-muted-foreground/30 mx-auto" />
               <p className="text-muted-foreground font-medium italic">Chart coming soon</p>
@@ -120,13 +120,13 @@ export default async function DashboardPage() {
         </Card>
 
         {/* Quick Actions */}
-        <Card className="lg:col-span-3 glass border-white/10 overflow-hidden">
+        <Card className="lg:col-span-3 glass overflow-hidden">
           <CardHeader>
             <CardTitle className="text-xl text-gradient">Quick Actions</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4 p-6">
             <Link href="/dashboard/orders/new">
-              <div className="group flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 hover:border-primary/20 transition-all">
+              <div className="group flex items-center justify-between p-4 rounded-2xl bg-muted/50 border border-border hover:bg-muted hover:border-primary/20 transition-all">
                 <div className="flex items-center gap-4">
                   <div className="p-3 rounded-xl bg-primary/10 text-primary">
                     <ShoppingBag className="h-6 w-6" />
@@ -141,7 +141,7 @@ export default async function DashboardPage() {
             </Link>
 
             <Link href="/dashboard/businesses/new">
-              <div className="group flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 hover:border-primary/20 transition-all">
+              <div className="group flex items-center justify-between p-4 rounded-2xl bg-muted/50 border border-border hover:bg-muted hover:border-primary/20 transition-all">
                 <div className="flex items-center gap-4">
                   <div className="p-3 rounded-xl bg-primary/10 text-primary">
                     <Store className="h-6 w-6" />

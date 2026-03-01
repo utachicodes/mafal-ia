@@ -48,7 +48,7 @@ export default async function BusinessesPage() {
             Manage your restaurants and chatbot settings
           </p>
         </div>
-        <Button asChild className="rounded-xl px-6 h-12 bg-primary hover:bg-primary/90 text-white shadow-xl shadow-primary/20 transition-all">
+        <Button asChild className="rounded-xl px-6 h-12 bg-primary hover:bg-primary/90 text-primary-foreground shadow-xl shadow-primary/20 transition-all">
           <Link href="/onboarding" className="flex items-center gap-2">
             <Plus className="h-5 w-5" />
             Add Business
@@ -64,7 +64,7 @@ export default async function BusinessesPage() {
       )}
 
       {restaurants.length === 0 && !error ? (
-        <Card className="glass border-2 border-dashed border-white/10 flex flex-col items-center justify-center p-20 text-center group">
+        <Card className="glass border-2 border-dashed border-border flex flex-col items-center justify-center p-20 text-center group">
           <div className="h-20 w-20 rounded-3xl bg-primary/10 flex items-center justify-center mb-6 text-primary border border-primary/20 group-hover:scale-110 transition-transform duration-500">
             <Store className="h-10 w-10" />
           </div>
@@ -72,14 +72,14 @@ export default async function BusinessesPage() {
           <p className="text-muted-foreground max-w-sm mx-auto mb-8">
             Add your first restaurant to start taking orders via WhatsApp.
           </p>
-          <Button asChild className="rounded-xl px-8 h-12 bg-primary text-white shadow-lg">
+          <Button asChild className="rounded-xl px-8 h-12 bg-primary text-primary-foreground shadow-lg">
             <Link href="/onboarding">Add Your First Business</Link>
           </Button>
         </Card>
       ) : (
         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
           {restaurants.map((res) => (
-            <Card key={res.id} className="glass border-white/10 hover:border-primary/40 transition-all duration-500 overflow-hidden group shadow-xl neural-border">
+            <Card key={res.id} className="glass hover:border-primary/40 transition-all duration-500 overflow-hidden group shadow-xl neural-border">
               <div className="h-2 bg-primary/5 transition-colors group-hover:bg-primary/20" />
               <CardHeader className="p-6 pb-4">
                 <div className="flex justify-between items-start">
@@ -94,11 +94,11 @@ export default async function BusinessesPage() {
                   </div>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="h-10 w-10 p-0 rounded-xl hover:bg-white/10 transition-all opacity-40 group-hover:opacity-100">
+                      <Button variant="ghost" className="h-10 w-10 p-0 rounded-xl hover:bg-muted transition-all opacity-40 group-hover:opacity-100">
                         <MoreHorizontal className="h-5 w-5" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="glass border-white/10">
+                    <DropdownMenuContent align="end" className="glass">
                       <DropdownMenuLabel className="text-[10px] text-muted-foreground uppercase tracking-widest px-4 py-2">Manage</DropdownMenuLabel>
                       <DropdownMenuItem asChild className="px-4 py-2 hover:bg-primary/10 hover:text-primary transition-colors cursor-pointer rounded-lg mx-1">
                         <Link href={`/dashboard/businesses/${res.id}`}>Open</Link>
@@ -106,7 +106,7 @@ export default async function BusinessesPage() {
                       <DropdownMenuItem className="px-4 py-2 hover:bg-primary/10 hover:text-primary transition-colors cursor-pointer rounded-lg mx-1">
                         Analytics
                       </DropdownMenuItem>
-                      <DropdownMenuSeparator className="bg-white/5 mx-1 my-1" />
+                      <DropdownMenuSeparator className="mx-1 my-1" />
                       <DropdownMenuItem className="px-4 py-2 text-destructive hover:bg-destructive/10 hover:text-destructive transition-colors cursor-pointer rounded-lg mx-1 font-bold">
                         Archive
                       </DropdownMenuItem>
@@ -128,14 +128,14 @@ export default async function BusinessesPage() {
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
-                  <div className="p-4 rounded-2xl bg-white/5 border border-white/5 group-hover:bg-white/10 transition-colors">
+                  <div className="p-4 rounded-2xl bg-muted/50 border border-border group-hover:bg-muted transition-colors">
                     <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1">Menu Items</p>
                     <div className="flex items-center gap-2">
                       <LayoutGrid className="h-4 w-4 text-primary" />
                       <span className="text-lg font-bold">{(res as any).menu?.length || 0}</span>
                     </div>
                   </div>
-                  <div className="p-4 rounded-2xl bg-white/5 border border-white/5 group-hover:bg-white/10 transition-colors">
+                  <div className="p-4 rounded-2xl bg-muted/50 border border-border group-hover:bg-muted transition-colors">
                     <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1">Status</p>
                     <div className="flex items-center gap-2">
                       <UtensilsCrossed className="h-4 w-4 text-emerald-500" />
@@ -145,7 +145,7 @@ export default async function BusinessesPage() {
                 </div>
               </CardContent>
               <CardFooter className="p-6 pt-2">
-                <Button asChild variant="outline" className="w-full h-12 rounded-xl group-hover:bg-primary group-hover:text-white group-hover:border-primary transition-all shadow-sm">
+                <Button asChild variant="outline" className="w-full h-12 rounded-xl group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary transition-all shadow-sm">
                   <Link href={`/dashboard/businesses/${res.id}`} className="flex items-center justify-between w-full px-2">
                     <span className="font-bold uppercase tracking-widest text-xs">Manage</span>
                     <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
@@ -156,8 +156,8 @@ export default async function BusinessesPage() {
           ))}
 
           <Link href="/onboarding" className="group">
-            <Card className="h-full border-dashed border-2 border-white/10 glass shadow-none hover:border-primary/50 hover:bg-white/[0.02] transition-all flex flex-col items-center justify-center p-12 min-h-[300px] cursor-pointer rounded-[2rem]">
-              <div className="h-16 w-16 rounded-3xl bg-white/5 flex items-center justify-center mb-6 text-muted-foreground group-hover:text-primary group-hover:bg-primary/10 group-hover:border-primary/20 border border-white/5 transition-all group-hover:scale-110 duration-500">
+            <Card className="h-full border-dashed border-2 border-border glass shadow-none hover:border-primary/50 hover:bg-muted/30 transition-all flex flex-col items-center justify-center p-12 min-h-[300px] cursor-pointer rounded-[2rem]">
+              <div className="h-16 w-16 rounded-3xl bg-muted flex items-center justify-center mb-6 text-muted-foreground group-hover:text-primary group-hover:bg-primary/10 group-hover:border-primary/20 border border-border transition-all group-hover:scale-110 duration-500">
                 <Plus className="h-8 w-8" />
               </div>
               <p className="font-bold text-lg text-foreground mb-1 group-hover:text-primary transition-colors">Add New Business</p>

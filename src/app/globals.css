@@ -124,6 +124,10 @@
   }
 
   .premium-gradient {
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary) / 0.8) 100%);
+  }
+
+  :is(.dark) .premium-gradient {
     background: linear-gradient(135deg, hsl(var(--primary)) 0%, #1a1a1a 100%);
   }
 

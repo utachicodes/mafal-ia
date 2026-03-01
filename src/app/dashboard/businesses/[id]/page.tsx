@@ -101,15 +101,15 @@ export default async function RestaurantDashboardPage({ params }: RestaurantPage
                     <div className="flex items-center gap-2 text-sm text-muted-foreground font-medium">
                         <Store className="h-4 w-4 text-primary" />
                         {restaurant?.cuisine}
-                        <span className="text-white/10">•</span>
-                        <code className="text-[10px] font-black uppercase tracking-widest bg-white/5 px-2 py-0.5 rounded-md border border-white/5">
+                        <span className="text-muted-foreground">•</span>
+                        <code className="text-[10px] font-black uppercase tracking-widest bg-muted px-2 py-0.5 rounded-md border border-border">
                             ID: {id.slice(-8)}
                         </code>
                     </div>
                 </div>
 
                 <div className="flex gap-3">
-                    <Button variant="outline" asChild className="rounded-xl px-4 h-11 border-white/10 glass hover:bg-white/5 transition-all font-bold uppercase text-[10px] tracking-widest">
+                    <Button variant="outline" asChild className="rounded-xl px-4 h-11 glass transition-all font-bold uppercase text-[10px] tracking-widest">
                         <Link href={`/dashboard/businesses/${id}/preview`}>
                             <ExternalLink className="mr-2 h-4 w-4" />
                             Preview
@@ -125,7 +125,7 @@ export default async function RestaurantDashboardPage({ params }: RestaurantPage
                     { label: "Menu Items", value: menuItemCount, icon: UtensilsCrossed, color: "text-primary" },
                     { label: "Uptime", value: "99.8%", icon: Shield, color: "text-emerald-500" }
                 ].map((stat, i) => (
-                    <Card key={i} className="glass border-white/10 overflow-hidden group">
+                    <Card key={i} className="glass overflow-hidden group">
                         <CardHeader className="flex flex-row items-center justify-between pb-2">
                             <CardTitle className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">{stat.label}</CardTitle>
                             <stat.icon className={cn("h-4 w-4 opacity-50 transition-transform group-hover:scale-110", stat.color)} />
@@ -141,13 +141,13 @@ export default async function RestaurantDashboardPage({ params }: RestaurantPage
             <div className="grid gap-6 md:grid-cols-2">
                 {sections.map((section) => (
                     <Link key={section.title} href={section.href} className="group">
-                        <Card className="glass border-white/10 hover:border-primary/40 transition-all duration-500 h-full relative overflow-hidden">
+                        <Card className="glass hover:border-primary/40 transition-all duration-500 h-full relative overflow-hidden">
                             <div className="absolute top-0 right-0 p-10 opacity-[0.02] transition-opacity group-hover:opacity-[0.05]">
                                 <section.icon className="h-40 w-40" />
                             </div>
                             <CardHeader className="p-8">
                                 <div className="flex items-start gap-6">
-                                    <div className={cn("p-4 rounded-2xl bg-white/5 border border-white/10 transition-colors group-hover:bg-white/10", section.color)}>
+                                    <div className={cn("p-4 rounded-2xl bg-muted border border-border transition-colors group-hover:bg-white/10", section.color)}>
                                         <section.icon className="h-6 w-6" />
                                     </div>
                                     <div className="space-y-1.5 pt-1">

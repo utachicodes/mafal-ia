@@ -22,7 +22,6 @@ import {
   AlertCircle,
   Loader2,
   ChevronRight,
-  Sparkles
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -167,7 +166,7 @@ export default function RestaurantMenuPage() {
   }
 
   async function onDelete(id: string) {
-    if (!confirm("Confirm removal of this menu item from logic engine?")) return
+    if (!confirm("Are you sure you want to delete this menu item?")) return
     setLoading(true)
     try {
       const res = await fetch(`/api/businesses/${businessId}/menu/${id}`, { method: "DELETE" })
@@ -204,15 +203,12 @@ export default function RestaurantMenuPage() {
         <div className="space-y-2">
           <Button variant="ghost" onClick={() => router.back()} className="-ml-3 mb-2 text-muted-foreground hover:text-primary transition-colors group">
             <ArrowLeft className="mr-2 h-4 w-4 transition-transform group-hover:-translate-x-1" />
-            Return to Branch
+            Back
           </Button>
           <div className="flex items-center gap-4">
-            <h1 className="text-4xl font-bold tracking-tight text-gradient">Menu Terminal</h1>
-            <Badge className="bg-primary/10 text-primary border-primary/20 font-black uppercase text-[10px] tracking-widest px-3 py-1">
-              Grounding Engine
-            </Badge>
+            <h1 className="text-4xl font-bold tracking-tight text-gradient">Menu</h1>
           </div>
-          <p className="text-muted-foreground text-lg">Define the knowledge parameters for your AI server agent</p>
+          <p className="text-muted-foreground text-lg">Manage your restaurant menu items and categories</p>
         </div>
         <Button
           onClick={() => setIsAdding(!isAdding)}
@@ -237,13 +233,13 @@ export default function RestaurantMenuPage() {
                   <ChefHat className="h-6 w-6" />
                 </div>
                 <div>
-                  <CardTitle className="text-xl font-bold">New Catalog Entry</CardTitle>
-                  <CardDescription>Grounding your agent with new item data</CardDescription>
+                  <CardTitle className="text-xl font-bold">New Menu Item</CardTitle>
+                  <CardDescription>Add a new item to your menu</CardDescription>
                 </div>
               </CardHeader>
               <form onSubmit={onCreate} className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 <div className="md:col-span-2 space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Item Identity</label>
+                  <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Item Name</label>
                   <Input
                     placeholder="e.g. Signature Truffle Burger"
                     value={form.name}
@@ -264,7 +260,7 @@ export default function RestaurantMenuPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Logic Cluster</label>
+                  <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Category</label>
                   <Input
                     placeholder="e.g. Mains"
                     value={form.category}
@@ -273,9 +269,9 @@ export default function RestaurantMenuPage() {
                   />
                 </div>
                 <div className="md:col-span-3 space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">AI Context / description</label>
+                  <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Description</label>
                   <Textarea
-                    placeholder="Describe ingredients, allergens, and flavor profiles for the AI to understand..."
+                    placeholder="Describe ingredients, allergens, and flavor profiles..."
                     value={form.description}
                     onChange={e => setForm({ ...form, description: e.target.value })}
                     className="rounded-xl bg-white/5 border-white/10 focus:ring-primary/50 h-24"
@@ -283,7 +279,7 @@ export default function RestaurantMenuPage() {
                 </div>
                 <div className="flex items-end pb-1.5 px-4">
                   <Button type="submit" className="w-full h-12 bg-primary text-white rounded-xl shadow-lg font-bold" disabled={loading}>
-                    {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : "Deploy to Catalog"}
+                    {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : "Add Item"}
                   </Button>
                 </div>
               </form>
@@ -298,18 +294,18 @@ export default function RestaurantMenuPage() {
           <Card className="glass border-white/10 p-6 rounded-[2rem] relative overflow-hidden group">
             <div className="absolute -top-4 -right-4 w-20 h-20 bg-primary/10 rounded-full blur-2xl group-hover:bg-primary/20 transition-colors" />
             <div className="flex items-center justify-between mb-4">
-              <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Catalog Volume</span>
+              <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Total Items</span>
               <ShoppingBag className="h-4 w-4 text-primary" />
             </div>
             <div className="text-4xl font-black mb-1">{items.length}</div>
-            <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-tighter italic">Grounding points active</p>
+            <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-tighter italic">Items on the menu</p>
           </Card>
 
           <div className="p-6 glass border-white/10 rounded-[2rem] space-y-6">
             <div className="relative group">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
               <Input
-                placeholder="Search terminal..."
+                placeholder="Search menu..."
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
                 className="pl-10 h-10 bg-white/5 border-white/10 rounded-xl text-xs"
@@ -317,14 +313,10 @@ export default function RestaurantMenuPage() {
             </div>
 
             <div className="space-y-3">
-              <p className="text-[10px] font-black tracking-widest uppercase text-muted-foreground ml-1">Terminal Status</p>
+              <p className="text-[10px] font-black tracking-widest uppercase text-muted-foreground ml-1">Status</p>
               <div className="flex items-center gap-3 p-3 rounded-xl bg-emerald-500/5 border border-emerald-500/10">
                 <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="text-xs font-bold text-emerald-500/80">RAG Engine Online</span>
-              </div>
-              <div className="flex items-center gap-3 p-3 rounded-xl bg-primary/5 border border-primary/10">
-                <Sparkles className="h-3 w-3 text-primary" />
-                <span className="text-xs font-bold text-primary/80">LLM Cache Synced</span>
+                <span className="text-xs font-bold text-emerald-500/80">Chatbot Active</span>
               </div>
             </div>
           </div>
@@ -337,10 +329,10 @@ export default function RestaurantMenuPage() {
               <table className="w-full text-left">
                 <thead>
                   <tr className="bg-white/5 text-[10px] font-black uppercase tracking-widest text-muted-foreground border-b border-white/5">
-                    <th className="px-8 py-5">Catalog Item</th>
-                    <th className="px-8 py-5">Value</th>
-                    <th className="px-8 py-5">Cluster</th>
-                    <th className="px-8 py-5">Logic State</th>
+                    <th className="px-8 py-5">Item</th>
+                    <th className="px-8 py-5">Price</th>
+                    <th className="px-8 py-5">Category</th>
+                    <th className="px-8 py-5">Status</th>
                     <th className="px-8 py-5 text-right">Actions</th>
                   </tr>
                 </thead>
@@ -357,7 +349,7 @@ export default function RestaurantMenuPage() {
                         <td className="px-8 py-6">
                           <div className="flex flex-col gap-0.5">
                             <span className="font-bold text-lg text-foreground">{it.name}</span>
-                            <span className="text-xs text-muted-foreground line-clamp-1 max-w-[200px]">{it.description || "No logic grounding provided."}</span>
+                            <span className="text-xs text-muted-foreground line-clamp-1 max-w-[200px]">{it.description || "No description"}</span>
                           </div>
                         </td>
                         <td className="px-8 py-6">
@@ -365,7 +357,7 @@ export default function RestaurantMenuPage() {
                         </td>
                         <td className="px-8 py-6">
                           <Badge variant="outline" className="rounded-lg bg-white/5 border-white/5 text-[10px] uppercase font-bold px-2 py-0.5">
-                            {it.category || "Unclustered"}
+                            {it.category || "Uncategorized"}
                           </Badge>
                         </td>
                         <td className="px-8 py-6">
@@ -401,8 +393,8 @@ export default function RestaurantMenuPage() {
               {filteredItems.length === 0 && (
                 <div className="p-20 text-center space-y-4">
                   <AlertCircle className="h-12 w-12 text-muted-foreground mx-auto opacity-20" />
-                  <p className="text-muted-foreground font-bold italic uppercase tracking-widest text-xs">No entries detected in selected cluster.</p>
-                  <Button variant="link" onClick={() => setSearchQuery("")} className="text-primary font-black uppercase tracking-widest text-[10px]">Reset Telemetry Space</Button>
+                  <p className="text-muted-foreground font-bold italic uppercase tracking-widest text-xs">No items found.</p>
+                  <Button variant="link" onClick={() => setSearchQuery("")} className="text-primary font-black uppercase tracking-widest text-[10px]">Clear Search</Button>
                 </div>
               )}
             </div>
@@ -423,8 +415,8 @@ export default function RestaurantMenuPage() {
               <Card className="glass border-primary/20 shadow-2xl p-10 rounded-[3rem]">
                 <div className="flex justify-between items-start mb-10">
                   <div className="space-y-1">
-                    <h2 className="text-3xl font-bold tracking-tight">Modify Entity Logic</h2>
-                    <p className="text-muted-foreground text-lg">Safely updating catalog entry: <span className="text-primary font-bold">{editForm.name}</span></p>
+                    <h2 className="text-3xl font-bold tracking-tight">Edit Item</h2>
+                    <p className="text-muted-foreground text-lg">Updating: <span className="text-primary font-bold">{editForm.name}</span></p>
                   </div>
                   <Button variant="ghost" size="icon" onClick={() => setEditingId(null)} className="rounded-full h-12 w-12 hover:bg-white/10">
                     <X className="h-6 w-6" />
@@ -433,7 +425,7 @@ export default function RestaurantMenuPage() {
                 <form onSubmit={onSaveEdit} className="space-y-8">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div className="space-y-2">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Identity Override</label>
+                      <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Name</label>
                       <Input
                         value={editForm.name}
                         onChange={e => setEditForm({ ...editForm, name: e.target.value })}
@@ -441,7 +433,7 @@ export default function RestaurantMenuPage() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Value Refactor</label>
+                      <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Price (FCFA)</label>
                       <Input
                         type="number"
                         value={editForm.price}
@@ -450,7 +442,7 @@ export default function RestaurantMenuPage() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Grounding Category</label>
+                      <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Category</label>
                       <Input
                         value={editForm.category}
                         onChange={e => setEditForm({ ...editForm, category: e.target.value })}
@@ -458,7 +450,7 @@ export default function RestaurantMenuPage() {
                       />
                     </div>
                     <div className="flex items-center gap-4 pt-10">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Visibility Protocol</label>
+                      <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Availability</label>
                       <Button
                         type="button"
                         onClick={() => setEditForm({ ...editForm, isAvailable: !editForm.isAvailable })}
@@ -469,12 +461,12 @@ export default function RestaurantMenuPage() {
                             : "bg-white/5 text-muted-foreground border-white/10"
                         )}
                       >
-                        {editForm.isAvailable ? "Active Transmission" : "Silent Mode"}
+                        {editForm.isAvailable ? "Available" : "Hidden"}
                       </Button>
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Contextual Description Refinement</label>
+                    <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Description</label>
                     <Textarea
                       value={editForm.description}
                       onChange={e => setEditForm({ ...editForm, description: e.target.value })}

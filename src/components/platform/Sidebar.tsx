@@ -44,28 +44,19 @@ export function Sidebar({ collapsed, setCollapsed }: SidebarProps) {
             initial={false}
             animate={{ width: collapsed ? 80 : 260 }}
             className={cn(
-                "relative h-screen flex flex-col border-r border-white/10 glass bg-background/50 transition-colors duration-500",
+                "relative h-screen flex flex-col border-r glass bg-background/50 transition-colors duration-500",
                 "z-50"
             )}
         >
             {/* Header / Logo */}
             <div className={cn(
-                "h-20 flex items-center px-6 mb-4 border-b border-white/5",
+                "h-20 flex items-center px-6 mb-4 border-b border-border",
                 collapsed && "justify-center px-0"
             )}>
                 <Link href="/" className="flex items-center gap-3 group">
                     <div className="p-2 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
                         <Logo className="h-6 w-auto" />
                     </div>
-                    {!collapsed && (
-                        <motion.span
-                            initial={{ opacity: 0, x: -10 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            className="font-bold text-xl tracking-tight text-gradient"
-                        >
-                            Mafal-IA
-                        </motion.span>
-                    )}
                 </Link>
             </div>
 
@@ -82,8 +73,8 @@ export function Sidebar({ collapsed, setCollapsed }: SidebarProps) {
                             <div className={cn(
                                 "group relative flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-300",
                                 isActive
-                                    ? "bg-primary text-white shadow-lg shadow-primary/20"
-                                    : "text-muted-foreground hover:bg-white/5 hover:text-foreground"
+                                    ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20"
+                                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
                             )}>
                                 <Icon className={cn(
                                     "h-5 w-5 shrink-0 transition-transform duration-300 group-hover:scale-110",
@@ -102,7 +93,7 @@ export function Sidebar({ collapsed, setCollapsed }: SidebarProps) {
                                 {isActive && !collapsed && (
                                     <motion.div
                                         layoutId="active-pill"
-                                        className="absolute right-3 w-1.5 h-1.5 rounded-full bg-white"
+                                        className="absolute right-3 w-1.5 h-1.5 rounded-full bg-primary-foreground"
                                     />
                                 )}
                             </div>
@@ -112,10 +103,10 @@ export function Sidebar({ collapsed, setCollapsed }: SidebarProps) {
             </nav>
 
             {/* Footer / User */}
-            <div className="p-4 border-t border-white/5">
+            <div className="p-4 border-t border-border">
                 {!collapsed ? (
                     <div className="flex flex-col gap-2">
-                        <div className="flex items-center gap-3 p-2 rounded-xl bg-white/5 border border-white/10">
+                        <div className="flex items-center gap-3 p-2 rounded-xl bg-muted border border-border">
                             <div className="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center border border-primary/30">
                                 <User className="h-5 w-5 text-primary" />
                             </div>
@@ -150,7 +141,7 @@ export function Sidebar({ collapsed, setCollapsed }: SidebarProps) {
             {/* Toggle Button */}
             <button
                 onClick={() => setCollapsed(!collapsed)}
-                className="absolute -right-3 top-24 h-6 w-6 rounded-full bg-primary text-white flex items-center justify-center shadow-lg hover:scale-110 transition-transform z-50 border border-white/10"
+                className="absolute -right-3 top-24 h-6 w-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-lg hover:scale-110 transition-transform z-50 border border-border"
             >
                 {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
             </button>
