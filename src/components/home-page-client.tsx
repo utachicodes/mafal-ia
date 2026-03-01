@@ -27,9 +27,20 @@ import {
   CheckCircle2,
   Star,
   Store,
+  Megaphone,
+  QrCode,
+  MousePointerClick,
+  ClipboardList,
+  Sparkles,
+  CreditCard,
+  RefreshCcw,
+  Heart,
+  Gift,
+  Crown,
+  Send,
 } from "lucide-react";
 import { WhatsAppMockup } from "@/src/components/whatsapp-mockup";
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 
 const fadeInUp = {
@@ -58,6 +69,99 @@ const scaleIn = {
     }
   }
 };
+
+const growthTabIcons = [
+  [<Megaphone key="0" className="h-5 w-5" />, <QrCode key="1" className="h-5 w-5" />, <MousePointerClick key="2" className="h-5 w-5" />, <ClipboardList key="3" className="h-5 w-5" />],
+  [<Sparkles key="0" className="h-5 w-5" />, <ShoppingCart key="1" className="h-5 w-5" />, <CreditCard key="2" className="h-5 w-5" />, <Send key="3" className="h-5 w-5" />],
+  [<RefreshCcw key="0" className="h-5 w-5" />, <Gift key="1" className="h-5 w-5" />, <Heart key="2" className="h-5 w-5" />, <Crown key="3" className="h-5 w-5" />],
+];
+
+const growthTabHeaderIcons = [
+  <Megaphone key="acq" className="h-5 w-5" />,
+  <ShoppingCart key="conv" className="h-5 w-5" />,
+  <Heart key="ret" className="h-5 w-5" />,
+];
+
+function GrowthTabs({ t }: { t: any }) {
+  const [activeTab, setActiveTab] = useState(0);
+  const tabKeys = ['acquisition', 'conversion', 'retention'] as const;
+  const data = t.growth[tabKeys[activeTab]];
+  const icons = growthTabIcons[activeTab];
+
+  return (
+    <section id="how" className="py-24">
+      <div className="container mx-auto px-6 max-w-6xl">
+        {/* Tab Headers */}
+        <div className="flex justify-center mb-14">
+          <div className="inline-flex rounded-2xl border border-border bg-card p-1.5 gap-1">
+            {t.growth.tabs.map((label: string, i: number) => (
+              <button
+                key={i}
+                onClick={() => setActiveTab(i)}
+                className={`flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold transition-all duration-300 ${
+                  activeTab === i
+                    ? 'bg-primary text-primary-foreground shadow-md'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                }`}
+              >
+                {growthTabHeaderIcons[i]}
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Tab Content */}
+        <motion.div
+          key={activeTab}
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, ease: "easeOut" }}
+        >
+          {/* Headline */}
+          <div className="text-center max-w-3xl mx-auto mb-14">
+            <h2 className="text-3xl md:text-4xl lg:text-[2.75rem] font-bold text-foreground leading-tight mb-4">
+              {data.headline}{' '}
+              <span className="text-primary">{data.headlineHighlight}</span>
+            </h2>
+            <p className="text-lg text-muted-foreground leading-relaxed">
+              {data.subtitle}
+            </p>
+          </div>
+
+          {/* Two-column: Feature list + Mockup */}
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Left — Feature Items */}
+            <div className="space-y-4">
+              {data.items.map((item: { title: string; desc: string }, i: number) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.4, delay: i * 0.1 }}
+                  className="flex items-start gap-4 rounded-2xl border border-border/50 bg-card p-5 hover:border-primary/20 hover:shadow-sm transition-all"
+                >
+                  <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-primary/8 flex items-center justify-center text-primary">
+                    {icons[i]}
+                  </div>
+                  <p className="text-[15px] text-foreground leading-relaxed pt-1.5">
+                    <strong>{item.title}</strong>{' '}
+                    <span className="text-muted-foreground">{item.desc}</span>
+                  </p>
+                </motion.div>
+              ))}
+            </div>
+
+            {/* Right — WhatsApp Mockup */}
+            <div className="relative flex justify-center">
+              <WhatsAppMockup />
+            </div>
+          </div>
+        </motion.div>
+      </div>
+    </section>
+  );
+}
 
 export default function HomeClient() {
   // Auth disabled — mock session
@@ -432,91 +536,29 @@ export default function HomeClient() {
             whileInView="visible"
             viewport={{ once: true }}
             variants={staggerContainer}
-            className="grid md:grid-cols-3 lg:grid-cols-4 gap-6"
+            className="grid grid-cols-2 lg:grid-cols-4 gap-5"
           >
             {features.map((feature, i) => (
               <motion.div
                 key={i}
                 variants={fadeInUp}
-                whileHover={{ y: -8, transition: { duration: 0.2 } }}
+                className="group"
               >
-                <Card className="p-6 h-full bg-card border border-border hover:border-primary/30 hover:shadow-lg transition-all duration-300">
-                  <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center text-primary mb-4">
+                <div className="h-full rounded-2xl border border-border/60 bg-card p-6 transition-all duration-300 hover:shadow-lg hover:border-primary/20 hover:-translate-y-1">
+                  <div className="w-11 h-11 rounded-xl bg-primary/8 flex items-center justify-center text-primary mb-5 group-hover:bg-primary/12 transition-colors">
                     {feature.icon}
                   </div>
-                  <h3 className="font-semibold text-foreground mb-2">{feature.title}</h3>
+                  <h3 className="font-bold text-foreground text-[15px] mb-2">{feature.title}</h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">{feature.desc}</p>
-                </Card>
+                </div>
               </motion.div>
             ))}
           </motion.div>
         </div>
       </section>
 
-      {/* How it Works */}
-      <section id="how" className="py-24">
-        <div className="container mx-auto px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center max-w-3xl mx-auto mb-16"
-          >
-            <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
-              {t.howItWorks.title}
-            </h2>
-            <p className="text-xl text-muted-foreground">
-              {t.howItWorks.description}
-            </p>
-          </motion.div>
-
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={staggerContainer}
-            className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto"
-          >
-            {[
-              {
-                step: "1",
-                title: t.howItWorks.step1Title,
-                desc: t.howItWorks.step1Desc,
-                icon: <Users className="h-8 w-8" />
-              },
-              {
-                step: "2",
-                title: t.howItWorks.step2Title,
-                desc: t.howItWorks.step2Desc,
-                icon: <Package className="h-8 w-8" />
-              },
-              {
-                step: "3",
-                title: t.howItWorks.step3Title,
-                desc: t.howItWorks.step3Desc,
-                icon: <Zap className="h-8 w-8" />
-              },
-            ].map((item, i) => (
-              <motion.div
-                key={i}
-                variants={fadeInUp}
-                className="relative"
-              >
-                <Card className="p-8 bg-card border-2 border-border hover:border-primary/50 transition-all duration-300 h-full">
-                  <div className="absolute -top-6 left-8 w-12 h-12 bg-primary text-primary-foreground rounded-full flex items-center justify-center font-bold text-xl shadow-lg">
-                    {item.step}
-                  </div>
-                  <div className="mt-4 mb-4 text-primary dark:text-primary">
-                    {item.icon}
-                  </div>
-                  <h3 className="text-xl font-bold text-foreground mb-3">{item.title}</h3>
-                  <p className="text-muted-foreground">{item.desc}</p>
-                </Card>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
+      {/* Growth Tabs — Acquisition / Conversion / Retention */}
+      <GrowthTabs t={t} />
 
       {/* Testimonials */}
       <section id="testimonials" className="py-24 bg-gradient-to-b from-muted/20 to-background">

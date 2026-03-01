@@ -106,6 +106,42 @@ export const translations = {
             step3Title: 'Connect WhatsApp',
             step3Desc: 'Link your account and let AI handle it',
         },
+        growth: {
+            tabs: ['Acquisition', 'Conversion', 'Retention'],
+            acquisition: {
+                headline: 'Turn engagement into sales',
+                headlineHighlight: 'with WhatsApp marketing',
+                subtitle: 'Mafal-IA helps you reach more customers and convert interactions into revenue directly in chat.',
+                items: [
+                    { title: 'Launch WhatsApp campaigns', desc: 'that engage customers wherever they are.' },
+                    { title: 'Use QR codes', desc: 'to generate instant conversions from offline to online.' },
+                    { title: 'Run Click-to-WhatsApp ads', desc: 'that turn clicks into conversations.' },
+                    { title: 'Use surveys, quizzes and more', desc: 'to spark interest and guide users to the right products.' },
+                ],
+            },
+            conversion: {
+                headline: 'Convert conversations',
+                headlineHighlight: 'into confirmed orders',
+                subtitle: 'AI-powered product recommendations and seamless ordering right inside WhatsApp.',
+                items: [
+                    { title: 'Smart product suggestions', desc: 'based on customer preferences and order history.' },
+                    { title: 'One-tap ordering', desc: 'with integrated menu browsing inside the chat.' },
+                    { title: 'Mobile payment integration', desc: 'with Wave, Orange Money, and Free Money.' },
+                    { title: 'Automated order confirmation', desc: 'with real-time status updates sent to customers.' },
+                ],
+            },
+            retention: {
+                headline: 'Build loyalty',
+                headlineHighlight: 'that keeps customers coming back',
+                subtitle: 'Personalized follow-ups and smart re-engagement campaigns to maximize lifetime value.',
+                items: [
+                    { title: 'Automated follow-ups', desc: 'after each order to collect feedback and build loyalty.' },
+                    { title: 'Personalized offers', desc: 'based on purchase history and preferences.' },
+                    { title: 'Re-engagement campaigns', desc: 'to bring back inactive customers automatically.' },
+                    { title: 'VIP customer programs', desc: 'with special deals and early access to new products.' },
+                ],
+            },
+        },
         testimonials: {
             title: 'Discover what our customers say',
             description: 'Join hundreds of businesses that trust Mafal-IA',
@@ -258,6 +294,42 @@ export const translations = {
             step3Title: 'Connectez WhatsApp',
             step3Desc: 'Liez votre compte et laissez l\'IA gérer',
         },
+        growth: {
+            tabs: ['Acquisition', 'Conversion', 'Rétention'],
+            acquisition: {
+                headline: 'Transformez l\'engagement en ventes',
+                headlineHighlight: 'grâce au marketing WhatsApp',
+                subtitle: 'Mafal-IA vous aide à toucher plus de clients et à convertir les interactions en revenus directement dans le chat.',
+                items: [
+                    { title: 'Lancez des campagnes WhatsApp', desc: 'qui engagent les clients là où ils se trouvent.' },
+                    { title: 'Utilisez les codes QR', desc: 'pour générer des conversions instantanées du hors ligne vers le en ligne.' },
+                    { title: 'Diffusez des publicités Click-to-WhatsApp', desc: 'qui transforment les clics en conversations.' },
+                    { title: 'Utilisez des sondages, des quiz et bien plus encore', desc: 'pour susciter l\'intérêt des utilisateurs et les guider vers les produits qui leur conviennent.' },
+                ],
+            },
+            conversion: {
+                headline: 'Convertissez les conversations',
+                headlineHighlight: 'en commandes confirmées',
+                subtitle: 'Recommandations de produits par IA et commandes fluides directement dans WhatsApp.',
+                items: [
+                    { title: 'Suggestions de produits intelligentes', desc: 'basées sur les préférences et l\'historique des commandes.' },
+                    { title: 'Commande en un clic', desc: 'avec navigation du menu intégrée dans le chat.' },
+                    { title: 'Intégration paiement mobile', desc: 'avec Wave, Orange Money et Free Money.' },
+                    { title: 'Confirmation de commande automatique', desc: 'avec mises à jour en temps réel envoyées aux clients.' },
+                ],
+            },
+            retention: {
+                headline: 'Fidélisez vos clients',
+                headlineHighlight: 'pour qu\'ils reviennent encore et encore',
+                subtitle: 'Suivis personnalisés et campagnes de réengagement intelligentes pour maximiser la valeur à vie.',
+                items: [
+                    { title: 'Suivis automatiques', desc: 'après chaque commande pour collecter des avis et fidéliser.' },
+                    { title: 'Offres personnalisées', desc: 'basées sur l\'historique d\'achat et les préférences.' },
+                    { title: 'Campagnes de réengagement', desc: 'pour ramener les clients inactifs automatiquement.' },
+                    { title: 'Programmes clients VIP', desc: 'avec des offres spéciales et un accès anticipé aux nouveaux produits.' },
+                ],
+            },
+        },
         testimonials: {
             title: 'Découvrez ce que nos clients disent',
             description: 'Rejoignez des centaines de commerces qui font confiance à Mafal-IA',
@@ -409,6 +481,42 @@ export const translations = {
             step2Desc: 'استورد الكتالوج الخاص بك مع الصور والأسعار',
             step3Title: 'اربط واتساب',
             step3Desc: 'اربط حسابك ودع الذكاء الاصطناعي يتولى الأمر',
+        },
+        growth: {
+            tabs: ['الاستقطاب', 'التحويل', 'الاحتفاظ'],
+            acquisition: {
+                headline: 'حوّل التفاعل إلى مبيعات',
+                headlineHighlight: 'عبر تسويق واتساب',
+                subtitle: 'مفال-IA يساعدك على الوصول إلى عملاء أكثر وتحويل التفاعلات إلى إيرادات مباشرة في المحادثة.',
+                items: [
+                    { title: 'أطلق حملات واتساب', desc: 'تصل إلى العملاء أينما كانوا.' },
+                    { title: 'استخدم رموز QR', desc: 'لتحقيق تحويلات فورية من الواقع إلى الإنترنت.' },
+                    { title: 'انشر إعلانات Click-to-WhatsApp', desc: 'التي تحول النقرات إلى محادثات.' },
+                    { title: 'استخدم الاستطلاعات والمسابقات والمزيد', desc: 'لجذب اهتمام المستخدمين وتوجيههم نحو المنتجات المناسبة.' },
+                ],
+            },
+            conversion: {
+                headline: 'حوّل المحادثات',
+                headlineHighlight: 'إلى طلبات مؤكدة',
+                subtitle: 'توصيات منتجات بالذكاء الاصطناعي وطلبات سلسة مباشرة داخل واتساب.',
+                items: [
+                    { title: 'اقتراحات منتجات ذكية', desc: 'بناءً على تفضيلات العملاء وسجل الطلبات.' },
+                    { title: 'طلب بنقرة واحدة', desc: 'مع تصفح القائمة داخل المحادثة.' },
+                    { title: 'تكامل الدفع الإلكتروني', desc: 'مع Wave و Orange Money و Free Money.' },
+                    { title: 'تأكيد تلقائي للطلبات', desc: 'مع تحديثات فورية تُرسل للعملاء.' },
+                ],
+            },
+            retention: {
+                headline: 'ابنِ ولاء',
+                headlineHighlight: 'يجعل العملاء يعودون دائمًا',
+                subtitle: 'متابعات مخصصة وحملات إعادة تفاعل ذكية لتعظيم القيمة الدائمة.',
+                items: [
+                    { title: 'متابعات تلقائية', desc: 'بعد كل طلب لجمع التقييمات وبناء الولاء.' },
+                    { title: 'عروض مخصصة', desc: 'بناءً على تاريخ الشراء والتفضيلات.' },
+                    { title: 'حملات إعادة التفاعل', desc: 'لإعادة العملاء غير النشطين تلقائيًا.' },
+                    { title: 'برامج عملاء VIP', desc: 'مع عروض خاصة ووصول مبكر للمنتجات الجديدة.' },
+                ],
+            },
         },
         testimonials: {
             title: 'اكتشف ما يقوله عملاؤنا',
