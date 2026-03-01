@@ -1,8 +1,6 @@
 import { ChatSimulator } from "@/src/components/chat-simulator"
 import { BusinessService } from "@/src/lib/business-service"
 import { MessageSquare, ShieldCheck, Search } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
 
 export const dynamic = "force-dynamic"
 
@@ -11,87 +9,61 @@ export default async function PlaygroundPage() {
   const simpleRestaurants = restaurants.map(r => ({ id: r.id, name: r.name }))
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-6">
       {/* Page Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-        <div className="space-y-2">
-          <h1 className="text-4xl font-bold tracking-tight text-gradient">
-            Playground
-          </h1>
-          <p className="text-muted-foreground text-lg max-w-2xl">
-            Test your chatbot with any business. Send messages and see exactly how your customers will experience it.
-          </p>
-        </div>
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight">Playground</h1>
+        <p className="text-muted-foreground mt-1">
+          Test your chatbot with any business. Send messages and see how your customers will experience it.
+        </p>
       </div>
 
       {/* Simulator Container */}
-      <div className="relative group">
-        <div className="absolute -inset-1 bg-gradient-to-r from-primary/30 to-primary/10 rounded-[2.5rem] blur-2xl opacity-10 group-hover:opacity-20 transition duration-1000" />
-        <div className="relative glass rounded-[2.5rem] overflow-hidden shadow-2xl bg-background/40 backdrop-blur-3xl">
-          <div className="bg-muted/50 px-8 py-5 border-b border-border flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="flex gap-1.5">
-                <div className="h-3 w-3 rounded-full bg-red-500/20 border border-red-500/30" />
-                <div className="h-3 w-3 rounded-full bg-amber-500/20 border border-amber-500/30" />
-                <div className="h-3 w-3 rounded-full bg-emerald-500/20 border border-emerald-500/30" />
-              </div>
-              <div className="h-5 w-px bg-white/10 mx-2" />
-              <div className="flex items-center gap-2">
-                <MessageSquare className="h-4 w-4 text-primary" />
-                <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Chat Simulator</span>
-              </div>
+      <div className="border border-border rounded-xl bg-card overflow-hidden">
+        <div className="bg-muted/50 px-5 py-3 border-b border-border flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="flex gap-1.5">
+              <div className="h-3 w-3 rounded-full bg-red-400/20" />
+              <div className="h-3 w-3 rounded-full bg-amber-400/20" />
+              <div className="h-3 w-3 rounded-full bg-emerald-400/20" />
             </div>
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-1.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[9px] font-black tracking-widest px-3 py-1 rounded-full">
-                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                ONLINE
-              </div>
-            </div>
+            <span className="text-xs text-muted-foreground font-medium">Chat Simulator</span>
           </div>
-          <div className="p-0 md:p-6 min-h-[650px] flex flex-col">
-            <ChatSimulator restaurants={simpleRestaurants} />
+          <div className="flex items-center gap-1.5 text-xs text-emerald-600 dark:text-emerald-400">
+            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+            Online
           </div>
+        </div>
+        <div className="p-0 md:p-4 min-h-[550px] flex flex-col">
+          <ChatSimulator restaurants={simpleRestaurants} />
         </div>
       </div>
 
       {/* Feature Cards */}
-      <div className="grid gap-8 md:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-3">
         {[
           {
             icon: MessageSquare,
             title: "Order Testing",
             desc: "Test how your chatbot handles orders, menu questions, and customer requests.",
-            color: "text-primary",
-            bg: "bg-primary/10",
           },
           {
             icon: ShieldCheck,
             title: "Data Isolation",
-            desc: "Each business's data stays completely separate — your customers only see their restaurant's menu.",
-            color: "text-emerald-500",
-            bg: "bg-emerald-500/10",
+            desc: "Each business's data stays separate — customers only see their restaurant's menu.",
           },
           {
             icon: Search,
             title: "Menu Search",
-            desc: "See how the smart search finds items from your menu based on natural language queries.",
-            color: "text-muted-foreground",
-            bg: "bg-muted/50",
+            desc: "See how smart search finds items from your menu based on natural language queries.",
           }
         ].map((feature, i) => (
-          <div key={i} className="p-10 rounded-[2.5rem] glass hover:border-primary/20 transition-all duration-500 group relative overflow-hidden">
-            <div className="absolute top-0 right-0 p-8 opacity-[0.03] group-hover:opacity-[0.06] transition-opacity">
-              <feature.icon className="h-32 w-32" />
+          <div key={i} className="p-5 rounded-xl border border-border bg-card">
+            <div className="h-9 w-9 rounded-lg bg-muted flex items-center justify-center mb-3 text-muted-foreground">
+              <feature.icon className="h-5 w-5" />
             </div>
-            <div className={cn("h-14 w-14 rounded-2xl flex items-center justify-center border transition-all duration-500 group-hover:scale-110 mb-8", feature.bg, feature.color, "border-border shadow-inner")}>
-              <feature.icon className="h-7 w-7" />
-            </div>
-            <div className="space-y-3">
-              <h3 className="text-2xl font-bold text-foreground">
-                {feature.title}
-              </h3>
-              <p className="text-muted-foreground text-base leading-relaxed">{feature.desc}</p>
-            </div>
+            <h3 className="font-semibold text-sm mb-1">{feature.title}</h3>
+            <p className="text-muted-foreground text-sm">{feature.desc}</p>
           </div>
         ))}
       </div>

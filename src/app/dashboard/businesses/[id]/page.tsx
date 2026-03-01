@@ -41,121 +41,114 @@ export default async function RestaurantDashboardPage({ params }: RestaurantPage
             title: "Menu",
             description: "Add and manage your menu items",
             icon: UtensilsCrossed,
-            color: "text-primary",
             href: `/dashboard/businesses/${id}/menu`,
         },
         {
             title: "Analytics",
             description: "View conversation and order statistics",
             icon: BarChart3,
-            color: "text-primary",
             href: `/dashboard/businesses/${id}/analytics`,
         },
         {
             title: "WhatsApp",
             description: "Connect your WhatsApp Business account",
             icon: MessageSquare,
-            color: "text-emerald-500",
             href: `/dashboard/businesses/${id}/whatsapp`,
         },
         {
             title: "Knowledge Base",
-            description: "Upload documents to enrich your chatbot's knowledge",
+            description: "Upload documents to enrich your chatbot",
             icon: BookOpen,
-            color: "text-primary",
             href: `/dashboard/businesses/${id}/knowledge`,
         },
         {
             title: "Settings",
             description: "Configure your business profile and chatbot",
             icon: Settings,
-            color: "text-muted-foreground",
             href: `/dashboard/businesses/${id}/settings`,
         }
     ]
 
     return (
-        <div className="space-y-10">
+        <div className="space-y-6">
             {/* Page Header */}
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-                <div className="space-y-2">
-                    <Button variant="ghost" asChild className="-ml-3 mb-2 text-muted-foreground hover:text-primary transition-colors group">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div className="space-y-1">
+                    <Button variant="ghost" asChild className="-ml-3 mb-1 text-muted-foreground hover:text-foreground">
                         <Link href="/dashboard/businesses">
-                            <ArrowLeft className="mr-2 h-4 w-4 transition-transform group-hover:-translate-x-1" />
+                            <ArrowLeft className="mr-2 h-4 w-4" />
                             Back to Businesses
                         </Link>
                     </Button>
-                    <div className="flex items-center gap-4">
-                        <h1 className="text-4xl font-bold tracking-tight text-gradient">
+                    <div className="flex items-center gap-3">
+                        <h1 className="text-3xl font-bold tracking-tight">
                             {restaurant?.name}
                         </h1>
-                        <Badge className={cn(
-                            "rounded-full px-4 py-1 text-[10px] font-black uppercase tracking-widest border-2",
-                            restaurant?.isActive
-                                ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20 shadow-[0_0_15px_-5px_theme(colors.emerald.500)]"
-                                : "bg-neutral-500/10 text-neutral-400 border-neutral-500/20"
-                        )}>
+                        <Badge
+                            variant="outline"
+                            className={cn(
+                                "rounded-full text-xs font-medium",
+                                restaurant?.isActive
+                                    ? "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20"
+                                    : "bg-muted text-muted-foreground border-border"
+                            )}
+                        >
                             {restaurant?.isActive ? "Online" : "Offline"}
                         </Badge>
                     </div>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground font-medium">
-                        <Store className="h-4 w-4 text-primary" />
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <Store className="h-4 w-4" />
                         {restaurant?.cuisine}
-                        <span className="text-muted-foreground">•</span>
-                        <code className="text-[10px] font-black uppercase tracking-widest bg-muted px-2 py-0.5 rounded-md border border-border">
-                            ID: {id.slice(-8)}
+                        <span>·</span>
+                        <code className="text-xs bg-muted px-1.5 py-0.5 rounded border border-border">
+                            {id.slice(-8)}
                         </code>
                     </div>
                 </div>
 
-                <div className="flex gap-3">
-                    <Button variant="outline" asChild className="rounded-xl px-4 h-11 glass transition-all font-bold uppercase text-[10px] tracking-widest">
-                        <Link href={`/dashboard/businesses/${id}/preview`}>
-                            <ExternalLink className="mr-2 h-4 w-4" />
-                            Preview
-                        </Link>
-                    </Button>
-                </div>
+                <Button variant="outline" asChild className="rounded-lg h-9">
+                    <Link href={`/dashboard/businesses/${id}/preview`}>
+                        <ExternalLink className="mr-2 h-4 w-4" />
+                        Preview
+                    </Link>
+                </Button>
             </div>
 
             {/* Stats Grid */}
-            <div className="grid gap-6 md:grid-cols-3">
+            <div className="grid gap-4 md:grid-cols-3">
                 {[
-                    { label: "Total Orders", value: orderCount, icon: ShoppingBag, color: "text-primary" },
-                    { label: "Menu Items", value: menuItemCount, icon: UtensilsCrossed, color: "text-primary" },
-                    { label: "Uptime", value: "99.8%", icon: Shield, color: "text-emerald-500" }
+                    { label: "Total Orders", value: orderCount, icon: ShoppingBag },
+                    { label: "Menu Items", value: menuItemCount, icon: UtensilsCrossed },
+                    { label: "Uptime", value: "99.8%", icon: Shield }
                 ].map((stat, i) => (
-                    <Card key={i} className="glass overflow-hidden group">
+                    <Card key={i} className="border border-border bg-card">
                         <CardHeader className="flex flex-row items-center justify-between pb-2">
-                            <CardTitle className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">{stat.label}</CardTitle>
-                            <stat.icon className={cn("h-4 w-4 opacity-50 transition-transform group-hover:scale-110", stat.color)} />
+                            <CardTitle className="text-sm font-medium text-muted-foreground">{stat.label}</CardTitle>
+                            <stat.icon className="h-4 w-4 text-muted-foreground" />
                         </CardHeader>
                         <CardContent>
-                            <div className="text-3xl font-bold tracking-tight">{stat.value}</div>
+                            <div className="text-2xl font-semibold tracking-tight">{stat.value}</div>
                         </CardContent>
                     </Card>
                 ))}
             </div>
 
             {/* Management Grid */}
-            <div className="grid gap-6 md:grid-cols-2">
+            <div className="grid gap-4 md:grid-cols-2">
                 {sections.map((section) => (
                     <Link key={section.title} href={section.href} className="group">
-                        <Card className="glass hover:border-primary/40 transition-all duration-500 h-full relative overflow-hidden">
-                            <div className="absolute top-0 right-0 p-10 opacity-[0.02] transition-opacity group-hover:opacity-[0.05]">
-                                <section.icon className="h-40 w-40" />
-                            </div>
-                            <CardHeader className="p-8">
-                                <div className="flex items-start gap-6">
-                                    <div className={cn("p-4 rounded-2xl bg-muted border border-border transition-colors group-hover:bg-white/10", section.color)}>
-                                        <section.icon className="h-6 w-6" />
+                        <Card className="border border-border bg-card hover:border-primary/30 transition-colors h-full">
+                            <CardHeader className="p-5">
+                                <div className="flex items-start gap-4">
+                                    <div className="p-2.5 rounded-lg bg-muted text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary transition-colors">
+                                        <section.icon className="h-5 w-5" />
                                     </div>
-                                    <div className="space-y-1.5 pt-1">
-                                        <CardTitle className="text-2xl font-bold tracking-tight flex items-center gap-2">
+                                    <div className="flex-1 min-w-0">
+                                        <CardTitle className="text-base font-semibold flex items-center gap-1">
                                             {section.title}
-                                            <ChevronRight className="h-5 w-5 opacity-0 -translate-x-2 transition-all group-hover:opacity-100 group-hover:translate-x-0 text-primary" />
+                                            <ChevronRight className="h-4 w-4 opacity-0 -translate-x-1 transition-all group-hover:opacity-100 group-hover:translate-x-0 text-primary" />
                                         </CardTitle>
-                                        <CardDescription className="text-lg leading-relaxed text-muted-foreground/80">
+                                        <CardDescription className="mt-0.5">
                                             {section.description}
                                         </CardDescription>
                                     </div>

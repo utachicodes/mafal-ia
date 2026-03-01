@@ -7,9 +7,7 @@ import {
   Plus,
   ChevronRight,
   UtensilsCrossed,
-  MapPin,
   MoreHorizontal,
-  CircleDot,
   LayoutGrid
 } from "lucide-react"
 import Link from "next/link"
@@ -17,7 +15,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
@@ -37,118 +34,111 @@ export default async function BusinessesPage() {
   }
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-6">
       {/* Page Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-        <div className="space-y-1">
-          <h1 className="text-5xl font-black tracking-tighter text-gradient py-2">
-            Businesses
-          </h1>
-          <p className="text-muted-foreground text-lg font-medium opacity-70">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Businesses</h1>
+          <p className="text-muted-foreground mt-1">
             Manage your restaurants and chatbot settings
           </p>
         </div>
-        <Button asChild className="rounded-xl px-6 h-12 bg-primary hover:bg-primary/90 text-primary-foreground shadow-xl shadow-primary/20 transition-all">
+        <Button asChild className="rounded-lg h-10 bg-primary hover:bg-primary/90 text-primary-foreground">
           <Link href="/onboarding" className="flex items-center gap-2">
-            <Plus className="h-5 w-5" />
+            <Plus className="h-4 w-4" />
             Add Business
           </Link>
         </Button>
       </div>
 
       {error && (
-        <div className="p-6 rounded-2xl bg-destructive/10 border border-destructive/20 text-destructive text-sm font-bold flex items-center gap-3">
-          <CircleDot className="h-5 w-5 animate-pulse" />
+        <div className="p-4 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive text-sm">
           Failed to load businesses: {error}
         </div>
       )}
 
       {restaurants.length === 0 && !error ? (
-        <Card className="glass border-2 border-dashed border-border flex flex-col items-center justify-center p-20 text-center group">
-          <div className="h-20 w-20 rounded-3xl bg-primary/10 flex items-center justify-center mb-6 text-primary border border-primary/20 group-hover:scale-110 transition-transform duration-500">
-            <Store className="h-10 w-10" />
+        <Card className="border-2 border-dashed border-border flex flex-col items-center justify-center p-16 text-center">
+          <div className="h-14 w-14 rounded-xl bg-muted flex items-center justify-center mb-4 text-muted-foreground">
+            <Store className="h-7 w-7" />
           </div>
-          <h3 className="text-2xl font-bold mb-2">No businesses yet</h3>
-          <p className="text-muted-foreground max-w-sm mx-auto mb-8">
+          <h3 className="text-lg font-semibold mb-1">No businesses yet</h3>
+          <p className="text-muted-foreground text-sm max-w-sm mx-auto mb-6">
             Add your first restaurant to start taking orders via WhatsApp.
           </p>
-          <Button asChild className="rounded-xl px-8 h-12 bg-primary text-primary-foreground shadow-lg">
+          <Button asChild className="rounded-lg bg-primary text-primary-foreground">
             <Link href="/onboarding">Add Your First Business</Link>
           </Button>
         </Card>
       ) : (
-        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {restaurants.map((res) => (
-            <Card key={res.id} className="glass hover:border-primary/40 transition-all duration-500 overflow-hidden group shadow-xl neural-border">
-              <div className="h-2 bg-primary/5 transition-colors group-hover:bg-primary/20" />
-              <CardHeader className="p-6 pb-4">
+            <Card key={res.id} className="border border-border bg-card hover:border-primary/30 transition-colors group">
+              <CardHeader className="p-5 pb-3">
                 <div className="flex justify-between items-start">
-                  <div className="space-y-1.5">
-                    <CardTitle className="text-xl font-bold text-foreground">
+                  <div>
+                    <CardTitle className="text-lg font-semibold">
                       {res.name}
                     </CardTitle>
-                    <div className="flex items-center gap-2 text-muted-foreground text-xs font-medium uppercase tracking-widest">
-                      <MapPin className="h-3 w-3 text-primary" />
+                    <p className="text-sm text-muted-foreground mt-0.5">
                       {res.cuisine || "Business"}
-                    </div>
+                    </p>
                   </div>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="h-10 w-10 p-0 rounded-xl hover:bg-muted transition-all opacity-40 group-hover:opacity-100">
-                        <MoreHorizontal className="h-5 w-5" />
+                      <Button variant="ghost" className="h-8 w-8 p-0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
+                        <MoreHorizontal className="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="glass">
-                      <DropdownMenuLabel className="text-[10px] text-muted-foreground uppercase tracking-widest px-4 py-2">Manage</DropdownMenuLabel>
-                      <DropdownMenuItem asChild className="px-4 py-2 hover:bg-primary/10 hover:text-primary transition-colors cursor-pointer rounded-lg mx-1">
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem asChild>
                         <Link href={`/dashboard/businesses/${res.id}`}>Open</Link>
                       </DropdownMenuItem>
-                      <DropdownMenuItem className="px-4 py-2 hover:bg-primary/10 hover:text-primary transition-colors cursor-pointer rounded-lg mx-1">
-                        Analytics
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator className="mx-1 my-1" />
-                      <DropdownMenuItem className="px-4 py-2 text-destructive hover:bg-destructive/10 hover:text-destructive transition-colors cursor-pointer rounded-lg mx-1 font-bold">
-                        Archive
-                      </DropdownMenuItem>
+                      <DropdownMenuItem>Analytics</DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem className="text-destructive">Archive</DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
               </CardHeader>
-              <CardContent className="px-6 py-4 space-y-6">
+              <CardContent className="px-5 py-3 space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-black uppercase tracking-widest text-muted-foreground">Status</span>
-                  <Badge className={cn(
-                    "rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-widest border-2",
-                    res.isActive
-                      ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20 shadow-[0_0_10px_-2px_theme(colors.emerald.500)]"
-                      : "bg-neutral-500/10 text-neutral-400 border-neutral-500/20"
-                  )}>
+                  <span className="text-xs text-muted-foreground">Status</span>
+                  <Badge
+                    variant="outline"
+                    className={cn(
+                      "rounded-full text-xs font-medium",
+                      res.isActive
+                        ? "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20"
+                        : "bg-muted text-muted-foreground border-border"
+                    )}
+                  >
                     {res.isActive ? "Online" : "Paused"}
                   </Badge>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="p-4 rounded-2xl bg-muted/50 border border-border group-hover:bg-muted transition-colors">
-                    <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1">Menu Items</p>
-                    <div className="flex items-center gap-2">
-                      <LayoutGrid className="h-4 w-4 text-primary" />
-                      <span className="text-lg font-bold">{(res as any).menu?.length || 0}</span>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="p-3 rounded-lg bg-muted/50 border border-border">
+                    <p className="text-xs text-muted-foreground mb-0.5">Menu Items</p>
+                    <div className="flex items-center gap-1.5">
+                      <LayoutGrid className="h-3.5 w-3.5 text-muted-foreground" />
+                      <span className="text-sm font-semibold">{(res as any).menu?.length || 0}</span>
                     </div>
                   </div>
-                  <div className="p-4 rounded-2xl bg-muted/50 border border-border group-hover:bg-muted transition-colors">
-                    <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1">Status</p>
-                    <div className="flex items-center gap-2">
-                      <UtensilsCrossed className="h-4 w-4 text-emerald-500" />
-                      <span className="text-lg font-bold">Active</span>
+                  <div className="p-3 rounded-lg bg-muted/50 border border-border">
+                    <p className="text-xs text-muted-foreground mb-0.5">Status</p>
+                    <div className="flex items-center gap-1.5">
+                      <UtensilsCrossed className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+                      <span className="text-sm font-semibold">Active</span>
                     </div>
                   </div>
                 </div>
               </CardContent>
-              <CardFooter className="p-6 pt-2">
-                <Button asChild variant="outline" className="w-full h-12 rounded-xl group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary transition-all shadow-sm">
-                  <Link href={`/dashboard/businesses/${res.id}`} className="flex items-center justify-between w-full px-2">
-                    <span className="font-bold uppercase tracking-widest text-xs">Manage</span>
-                    <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+              <CardFooter className="p-5 pt-2">
+                <Button asChild variant="outline" className="w-full h-9 rounded-lg group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary transition-colors">
+                  <Link href={`/dashboard/businesses/${res.id}`} className="flex items-center justify-between w-full">
+                    <span className="text-sm font-medium">Manage</span>
+                    <ChevronRight className="h-4 w-4" />
                   </Link>
                 </Button>
               </CardFooter>
@@ -156,12 +146,12 @@ export default async function BusinessesPage() {
           ))}
 
           <Link href="/onboarding" className="group">
-            <Card className="h-full border-dashed border-2 border-border glass shadow-none hover:border-primary/50 hover:bg-muted/30 transition-all flex flex-col items-center justify-center p-12 min-h-[300px] cursor-pointer rounded-[2rem]">
-              <div className="h-16 w-16 rounded-3xl bg-muted flex items-center justify-center mb-6 text-muted-foreground group-hover:text-primary group-hover:bg-primary/10 group-hover:border-primary/20 border border-border transition-all group-hover:scale-110 duration-500">
-                <Plus className="h-8 w-8" />
+            <Card className="h-full border-2 border-dashed border-border hover:border-primary/30 transition-colors flex flex-col items-center justify-center p-10 min-h-[280px] cursor-pointer">
+              <div className="h-12 w-12 rounded-xl bg-muted flex items-center justify-center mb-4 text-muted-foreground group-hover:text-primary group-hover:bg-primary/10 transition-colors">
+                <Plus className="h-6 w-6" />
               </div>
-              <p className="font-bold text-lg text-foreground mb-1 group-hover:text-primary transition-colors">Add New Business</p>
-              <p className="text-xs text-muted-foreground text-center max-w-[180px] leading-relaxed">Expand by adding another restaurant or location.</p>
+              <p className="font-medium text-foreground mb-0.5 group-hover:text-primary transition-colors">Add New Business</p>
+              <p className="text-xs text-muted-foreground text-center max-w-[180px]">Expand by adding another restaurant or location.</p>
             </Card>
           </Link>
         </div>

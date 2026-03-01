@@ -3,7 +3,7 @@
 import { useState, useRef, ReactNode } from "react"
 import { useRouter } from "next/navigation"
 import { Sidebar } from "./Sidebar"
-import { motion, AnimatePresence } from "framer-motion"
+import { AnimatePresence, motion } from "framer-motion"
 import { Bell, Search, Moon, Sun, X } from "lucide-react"
 import { useTheme } from "next-themes"
 import { Button } from "@/components/ui/button"
@@ -61,24 +61,18 @@ export function PlatformLayout({ children }: PlatformLayoutProps) {
 
     return (
         <div className="flex h-screen bg-background overflow-hidden">
-            {/* Sidebar */}
             <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
 
-            {/* Main Content */}
-            <div className="flex-1 flex flex-col min-w-0 bg-background/50 relative">
-                {/* Ambient Background Glows */}
-                <div className="absolute top-0 right-0 -z-10 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px] pointer-events-none" />
-                <div className="absolute bottom-0 left-0 -z-10 w-[500px] h-[500px] bg-accent/5 rounded-full blur-[120px] pointer-events-none" />
-
+            <div className="flex-1 flex flex-col min-w-0">
                 {/* Header */}
-                <header className="h-20 flex items-center justify-between px-8 border-b border-border glass bg-background/30 z-40">
-                    <div className="flex items-center gap-6 flex-1">
-                        <div className="relative max-w-md w-full group">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                <header className="h-14 flex items-center justify-between px-6 border-b border-border bg-card z-40">
+                    <div className="flex items-center gap-4 flex-1">
+                        <div className="relative max-w-sm w-full">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                             <input
                                 ref={searchRef}
                                 type="text"
-                                placeholder="Search business, orders..."
+                                placeholder="Search..."
                                 value={searchQuery}
                                 onChange={(e) => {
                                     setSearchQuery(e.target.value)
@@ -87,7 +81,7 @@ export function PlatformLayout({ children }: PlatformLayoutProps) {
                                 onFocus={() => searchQuery.trim() && setSearchOpen(true)}
                                 onBlur={() => setTimeout(() => setSearchOpen(false), 200)}
                                 onKeyDown={handleSearchKeyDown}
-                                className="w-full bg-muted border border-border rounded-xl py-2 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all"
+                                className="w-full bg-muted border border-border rounded-lg py-1.5 pl-9 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/30 transition-colors"
                             />
                             {searchQuery && (
                                 <button
@@ -103,13 +97,13 @@ export function PlatformLayout({ children }: PlatformLayoutProps) {
                                         initial={{ opacity: 0, y: -4 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         exit={{ opacity: 0, y: -4 }}
-                                        className="absolute top-full mt-2 left-0 right-0 glass rounded-xl border border-border shadow-xl overflow-hidden z-50"
+                                        className="absolute top-full mt-1 left-0 right-0 bg-card rounded-lg border border-border shadow-lg overflow-hidden z-50"
                                     >
                                         {searchResults.map((result) => (
                                             <button
                                                 key={result.path}
                                                 onMouseDown={() => handleSearchSelect(result.path)}
-                                                className="w-full text-left px-4 py-3 text-sm hover:bg-primary/10 hover:text-primary transition-colors flex items-center gap-3"
+                                                className="w-full text-left px-3 py-2 text-sm hover:bg-muted transition-colors flex items-center gap-2"
                                             >
                                                 <Search className="h-3.5 w-3.5 text-muted-foreground" />
                                                 {result.label}
@@ -122,9 +116,9 @@ export function PlatformLayout({ children }: PlatformLayoutProps) {
                                         initial={{ opacity: 0, y: -4 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         exit={{ opacity: 0, y: -4 }}
-                                        className="absolute top-full mt-2 left-0 right-0 glass rounded-xl border border-border shadow-xl overflow-hidden z-50"
+                                        className="absolute top-full mt-1 left-0 right-0 bg-card rounded-lg border border-border shadow-lg overflow-hidden z-50"
                                     >
-                                        <div className="px-4 py-3 text-sm text-muted-foreground">
+                                        <div className="px-3 py-2 text-sm text-muted-foreground">
                                             No results found
                                         </div>
                                     </motion.div>
@@ -133,33 +127,31 @@ export function PlatformLayout({ children }: PlatformLayoutProps) {
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2">
                         <LanguageSwitcher />
-
-                        <div className="h-6 w-px bg-border mx-2" />
 
                         <Button
                             variant="ghost"
                             size="icon"
                             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                            className="rounded-xl hover:bg-muted"
+                            className="rounded-lg h-8 w-8"
                         >
-                            {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+                            {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
                         </Button>
 
                         <Popover>
                             <PopoverTrigger asChild>
-                                <Button variant="ghost" size="icon" className="rounded-xl hover:bg-muted relative">
-                                    <Bell className="h-5 w-5" />
-                                    <span className="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full border-2 border-background" />
+                                <Button variant="ghost" size="icon" className="rounded-lg h-8 w-8 relative">
+                                    <Bell className="h-4 w-4" />
+                                    <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-primary rounded-full" />
                                 </Button>
                             </PopoverTrigger>
-                            <PopoverContent align="end" className="w-80 p-0">
-                                <div className="p-4 border-b border-border">
-                                    <h4 className="font-semibold text-sm">Notifications</h4>
+                            <PopoverContent align="end" className="w-72 p-0">
+                                <div className="p-3 border-b border-border">
+                                    <h4 className="font-medium text-sm">Notifications</h4>
                                 </div>
-                                <div className="p-8 text-center">
-                                    <Bell className="h-8 w-8 text-muted-foreground/30 mx-auto mb-3" />
+                                <div className="p-6 text-center">
+                                    <Bell className="h-6 w-6 text-muted-foreground/30 mx-auto mb-2" />
                                     <p className="text-sm text-muted-foreground">No new notifications</p>
                                 </div>
                             </PopoverContent>
@@ -168,15 +160,10 @@ export function PlatformLayout({ children }: PlatformLayoutProps) {
                 </header>
 
                 {/* Page Content */}
-                <main className="flex-1 overflow-y-auto p-8 custom-scrollbar relative">
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5, ease: "easeOut" }}
-                        className="max-w-7xl mx-auto"
-                    >
+                <main className="flex-1 overflow-y-auto p-6 custom-scrollbar">
+                    <div className="max-w-7xl mx-auto">
                         {children}
-                    </motion.div>
+                    </div>
                 </main>
             </div>
         </div>

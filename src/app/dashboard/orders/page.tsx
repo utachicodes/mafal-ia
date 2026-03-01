@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { OrderService } from "@/src/lib/order-service"
 import { Button } from "@/components/ui/button"
@@ -16,7 +16,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
@@ -42,23 +41,21 @@ export default async function OrdersPage() {
   }
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-6">
       {/* Page Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-        <div className="space-y-1">
-          <h1 className="text-4xl font-bold tracking-tight text-gradient">
-            Orders
-          </h1>
-          <p className="text-muted-foreground text-lg">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Orders</h1>
+          <p className="text-muted-foreground mt-1">
             Track and manage incoming customer orders
           </p>
         </div>
-        <div className="flex gap-3">
-          <Button variant="outline" className="rounded-xl px-4 h-11 glass transition-all">
+        <div className="flex gap-2">
+          <Button variant="outline" className="rounded-lg h-9">
             <Download className="h-4 w-4 mr-2" />
-            Export CSV
+            Export
           </Button>
-          <Button className="rounded-xl px-6 h-11 bg-primary hover:bg-primary/90 text-primary-foreground shadow-xl shadow-primary/20 transition-all">
+          <Button className="rounded-lg h-9 bg-primary hover:bg-primary/90 text-primary-foreground">
             <Filter className="h-4 w-4 mr-2" />
             Filter
           </Button>
@@ -66,112 +63,101 @@ export default async function OrdersPage() {
       </div>
 
       {/* Orders Table */}
-      <Card className="glass overflow-hidden">
-        <CardHeader className="p-6 border-b border-border flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="relative w-full max-w-md group">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+      <Card className="border border-border bg-card overflow-hidden">
+        <CardHeader className="p-4 border-b border-border flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="relative w-full max-w-sm">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               type="search"
               placeholder="Search by ID or customer..."
-              className="pl-10 h-11 bg-muted border-border rounded-xl focus:ring-primary/50 transition-all"
+              className="pl-9 h-9 bg-muted border-border rounded-lg"
             />
           </div>
-          <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground bg-muted px-4 py-2 rounded-full border border-border">
-            <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-            {orders.length} TOTAL
-          </div>
+          <span className="text-xs text-muted-foreground font-medium">
+            {orders.length} orders
+          </span>
         </CardHeader>
         <CardContent className="p-0">
           {orders.length === 0 ? (
-            <div className="text-center py-32">
-              <div className="h-20 w-20 mx-auto mb-6 flex items-center justify-center rounded-3xl bg-primary/10 text-primary border border-primary/20">
-                <ShoppingBag className="h-10 w-10" />
+            <div className="text-center py-20">
+              <div className="h-14 w-14 mx-auto mb-4 flex items-center justify-center rounded-xl bg-muted text-muted-foreground">
+                <ShoppingBag className="h-7 w-7" />
               </div>
-              <h3 className="text-2xl font-bold">No orders yet</h3>
-              <p className="text-muted-foreground max-w-sm mx-auto mt-2">
+              <h3 className="text-lg font-semibold">No orders yet</h3>
+              <p className="text-muted-foreground text-sm max-w-sm mx-auto mt-1">
                 Orders placed via WhatsApp will appear here automatically.
               </p>
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full text-sm text-left border-collapse">
-                <thead className="bg-muted/50 text-muted-foreground font-semibold border-b border-border">
+              <table className="w-full text-sm">
+                <thead className="bg-muted/50 text-muted-foreground border-b border-border">
                   <tr>
-                    <th className="px-8 py-4 uppercase tracking-wider text-[10px]">Order ID</th>
-                    <th className="px-8 py-4 uppercase tracking-wider text-[10px]">Customer</th>
-                    <th className="px-8 py-4 uppercase tracking-wider text-[10px]">Business</th>
-                    <th className="px-8 py-4 uppercase tracking-wider text-[10px] text-right">Total</th>
-                    <th className="px-8 py-4 uppercase tracking-wider text-[10px] text-center">Status</th>
-                    <th className="px-8 py-4 uppercase tracking-wider text-[10px] text-right">Date</th>
-                    <th className="px-8 py-4 uppercase tracking-wider text-[10px] text-right">Actions</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium">Order ID</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium">Customer</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium">Business</th>
+                    <th className="px-4 py-3 text-right text-xs font-medium">Total</th>
+                    <th className="px-4 py-3 text-center text-xs font-medium">Status</th>
+                    <th className="px-4 py-3 text-right text-xs font-medium">Date</th>
+                    <th className="px-4 py-3 text-right text-xs font-medium"></th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
                   {orders.map((order) => (
-                    <tr key={order.id} className="group hover:bg-muted/50 transition-all duration-300">
-                      <td className="px-8 py-6">
-                        <span className="font-mono text-xs text-primary bg-primary/10 px-2 py-1 rounded-md border border-primary/20">
+                    <tr key={order.id} className="group hover:bg-muted/30 transition-colors">
+                      <td className="px-4 py-3">
+                        <span className="font-mono text-xs text-muted-foreground">
                           #{order.id.slice(0, 8)}
                         </span>
                       </td>
-                      <td className="px-8 py-6">
-                        <div className="flex items-center gap-3">
-                          <div className="h-10 w-10 rounded-xl bg-muted border border-border flex items-center justify-center text-muted-foreground group-hover:text-primary transition-colors">
-                            <User className="h-5 w-5" />
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2">
+                          <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center text-muted-foreground">
+                            <User className="h-4 w-4" />
                           </div>
-                          <div className="flex flex-col">
-                            <span className="font-bold text-foreground">{order.phoneNumber}</span>
-                            <span className="text-[10px] text-muted-foreground flex items-center gap-1 mt-0.5">
-                              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-sm shadow-emerald-500/50" />
-                              WhatsApp
-                            </span>
+                          <div>
+                            <span className="font-medium text-foreground text-sm">{order.phoneNumber}</span>
+                            <span className="block text-xs text-muted-foreground">WhatsApp</span>
                           </div>
                         </div>
                       </td>
-                      <td className="px-8 py-6">
-                        <div className="flex items-center gap-2 text-muted-foreground group-hover:text-foreground transition-colors">
-                          <MapPin className="h-4 w-4" />
-                          <span className="font-medium">{order.business?.name || "—"}</span>
-                        </div>
+                      <td className="px-4 py-3">
+                        <span className="text-muted-foreground text-sm">{order.business?.name || "—"}</span>
                       </td>
-                      <td className="px-8 py-6 text-right font-black text-foreground tabular-nums text-base">
+                      <td className="px-4 py-3 text-right font-semibold tabular-nums">
                         {new Intl.NumberFormat().format(order.total)}
-                        <span className="text-[10px] text-muted-foreground font-medium ml-1">FCFA</span>
+                        <span className="text-xs text-muted-foreground ml-1">FCFA</span>
                       </td>
-                      <td className="px-8 py-6 text-center">
+                      <td className="px-4 py-3 text-center">
                         <Badge
+                          variant="outline"
                           className={cn(
-                            "rounded-full px-4 py-1 text-[10px] font-black uppercase tracking-widest border-2",
+                            "rounded-full text-xs font-medium capitalize",
                             order.status === 'completed'
-                              ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20 shadow-[0_0_15px_-5px_theme(colors.emerald.500)]"
+                              ? "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20"
                               : order.status === 'processing'
-                                ? "bg-blue-500/10 text-blue-500 border-blue-500/20 shadow-[0_0_15px_-5px_theme(colors.blue.500)]"
-                                : "bg-neutral-500/10 text-neutral-400 border-neutral-500/20"
+                                ? "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20"
+                                : "bg-muted text-muted-foreground border-border"
                           )}
                         >
                           {order.status}
                         </Badge>
                       </td>
-                      <td className="px-8 py-6 text-right text-muted-foreground group-hover:text-foreground whitespace-nowrap font-medium">
+                      <td className="px-4 py-3 text-right text-sm text-muted-foreground whitespace-nowrap">
                         {new Date(order.createdAt).toLocaleDateString("en", { month: "short", day: "numeric" })}{", "}{new Date(order.createdAt).toLocaleTimeString("en", { hour: "2-digit", minute: "2-digit", hour12: false })}
                       </td>
-                      <td className="px-8 py-6 text-right">
+                      <td className="px-4 py-3 text-right">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="h-10 w-10 p-0 rounded-xl hover:bg-muted transition-all opacity-40 group-hover:opacity-100">
-                              <MoreHorizontal className="h-5 w-5" />
+                            <Button variant="ghost" className="h-8 w-8 p-0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
+                              <MoreHorizontal className="h-4 w-4" />
                             </Button>
                           </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="glass">
-                            <DropdownMenuLabel className="text-[10px] text-muted-foreground uppercase tracking-widest px-4 py-2">Actions</DropdownMenuLabel>
-                            <DropdownMenuItem className="px-4 py-2 hover:bg-primary/10 hover:text-primary transition-colors cursor-pointer rounded-lg mx-1">
-                              View Details
-                            </DropdownMenuItem>
-                            <DropdownMenuItem className="px-4 py-2 hover:bg-primary/10 hover:text-primary transition-colors cursor-pointer rounded-lg mx-1">
-                              Generate Invoice
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator className="mx-1 my-1" />
-                            <DropdownMenuItem className="px-4 py-2 text-destructive hover:bg-destructive/10 hover:text-destructive transition-colors cursor-pointer rounded-lg mx-1 font-bold">
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem>View Details</DropdownMenuItem>
+                            <DropdownMenuItem>Generate Invoice</DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem className="text-destructive">
                               Cancel Order
                             </DropdownMenuItem>
                           </DropdownMenuContent>

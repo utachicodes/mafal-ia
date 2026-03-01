@@ -6,22 +6,16 @@ import { motion, AnimatePresence } from "framer-motion"
 import {
   Plus,
   Search,
-  Filter,
-  MoreHorizontal,
   Trash2,
   Edit3,
-  Check,
   X,
   ChefHat,
   ShoppingBag,
   ArrowLeft,
-  Zap,
-  Tag,
   Eye,
   EyeOff,
   AlertCircle,
   Loader2,
-  ChevronRight,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -197,27 +191,31 @@ export default function RestaurantMenuPage() {
   }
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-6">
       {/* Page Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-        <div className="space-y-2">
-          <Button variant="ghost" onClick={() => router.back()} className="-ml-3 mb-2 text-muted-foreground hover:text-primary transition-colors group">
-            <ArrowLeft className="mr-2 h-4 w-4 transition-transform group-hover:-translate-x-1" />
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div className="space-y-1">
+          <Button variant="ghost" onClick={() => router.back()} className="-ml-3 mb-1 text-muted-foreground hover:text-foreground">
+            <ArrowLeft className="mr-2 h-4 w-4" />
             Back
           </Button>
-          <div className="flex items-center gap-4">
-            <h1 className="text-4xl font-bold tracking-tight text-gradient">Menu</h1>
-          </div>
-          <p className="text-muted-foreground text-lg">Manage your restaurant menu items and categories</p>
+          <h1 className="text-3xl font-bold tracking-tight">Menu</h1>
+          <p className="text-muted-foreground">Manage your restaurant menu items and categories</p>
         </div>
         <Button
           onClick={() => setIsAdding(!isAdding)}
-          className="rounded-xl px-6 h-12 bg-primary hover:bg-primary/90 text-white shadow-xl shadow-primary/20 transition-all gap-2"
+          className="rounded-lg h-9 bg-primary hover:bg-primary/90 text-primary-foreground gap-2"
         >
-          {isAdding ? <X className="h-5 w-5" /> : <Plus className="h-5 w-5" />}
-          {isAdding ? "Cancel Entry" : "Register Item"}
+          {isAdding ? <X className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+          {isAdding ? "Cancel" : "Add Item"}
         </Button>
       </div>
+
+      {error && (
+        <div className="p-3 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive text-sm">
+          {error}
+        </div>
+      )}
 
       <AnimatePresence>
         {isAdding && (
@@ -227,161 +225,153 @@ export default function RestaurantMenuPage() {
             exit={{ opacity: 0, height: 0 }}
             className="overflow-hidden"
           >
-            <Card className="glass border-primary/30 shadow-2xl shadow-primary/5 p-8 rounded-[2.5rem]">
-              <CardHeader className="p-0 mb-8 flex flex-row items-center gap-4">
-                <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
-                  <ChefHat className="h-6 w-6" />
+            <Card className="border border-border bg-card">
+              <CardHeader className="flex flex-row items-center gap-3 border-b border-border">
+                <div className="p-2 rounded-lg bg-primary/10">
+                  <ChefHat className="h-5 w-5 text-primary" />
                 </div>
                 <div>
-                  <CardTitle className="text-xl font-bold">New Menu Item</CardTitle>
+                  <CardTitle className="text-lg">New Menu Item</CardTitle>
                   <CardDescription>Add a new item to your menu</CardDescription>
                 </div>
               </CardHeader>
-              <form onSubmit={onCreate} className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <div className="md:col-span-2 space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Item Name</label>
-                  <Input
-                    placeholder="e.g. Signature Truffle Burger"
-                    value={form.name}
-                    onChange={e => setForm({ ...form, name: e.target.value })}
-                    className="h-12 rounded-xl bg-white/5 border-white/10 focus:ring-primary/50"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Value (FCFA)</label>
-                  <Input
-                    type="number"
-                    placeholder="3500"
-                    value={form.price}
-                    onChange={e => setForm({ ...form, price: e.target.value })}
-                    className="h-12 rounded-xl bg-white/5 border-white/10 focus:ring-primary/50"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Category</label>
-                  <Input
-                    placeholder="e.g. Mains"
-                    value={form.category}
-                    onChange={e => setForm({ ...form, category: e.target.value })}
-                    className="h-12 rounded-xl bg-white/5 border-white/10 focus:ring-primary/50"
-                  />
-                </div>
-                <div className="md:col-span-3 space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Description</label>
-                  <Textarea
-                    placeholder="Describe ingredients, allergens, and flavor profiles..."
-                    value={form.description}
-                    onChange={e => setForm({ ...form, description: e.target.value })}
-                    className="rounded-xl bg-white/5 border-white/10 focus:ring-primary/50 h-24"
-                  />
-                </div>
-                <div className="flex items-end pb-1.5 px-4">
-                  <Button type="submit" className="w-full h-12 bg-primary text-white rounded-xl shadow-lg font-bold" disabled={loading}>
-                    {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : "Add Item"}
-                  </Button>
-                </div>
-              </form>
+              <CardContent className="pt-6">
+                <form onSubmit={onCreate} className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  <div className="md:col-span-2 space-y-1.5">
+                    <label className="text-sm font-medium text-muted-foreground">Item Name</label>
+                    <Input
+                      placeholder="e.g. Signature Burger"
+                      value={form.name}
+                      onChange={e => setForm({ ...form, name: e.target.value })}
+                      className="h-10 rounded-lg bg-muted border-border"
+                      required
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-sm font-medium text-muted-foreground">Price (FCFA)</label>
+                    <Input
+                      type="number"
+                      placeholder="3500"
+                      value={form.price}
+                      onChange={e => setForm({ ...form, price: e.target.value })}
+                      className="h-10 rounded-lg bg-muted border-border"
+                      required
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-sm font-medium text-muted-foreground">Category</label>
+                    <Input
+                      placeholder="e.g. Mains"
+                      value={form.category}
+                      onChange={e => setForm({ ...form, category: e.target.value })}
+                      className="h-10 rounded-lg bg-muted border-border"
+                    />
+                  </div>
+                  <div className="md:col-span-3 space-y-1.5">
+                    <label className="text-sm font-medium text-muted-foreground">Description</label>
+                    <Textarea
+                      placeholder="Describe ingredients and flavor..."
+                      value={form.description}
+                      onChange={e => setForm({ ...form, description: e.target.value })}
+                      className="rounded-lg bg-muted border-border h-20 resize-none"
+                    />
+                  </div>
+                  <div className="flex items-end">
+                    <Button type="submit" className="w-full h-10 bg-primary text-primary-foreground rounded-lg" disabled={loading}>
+                      {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Add Item"}
+                    </Button>
+                  </div>
+                </form>
+              </CardContent>
             </Card>
           </motion.div>
         )}
       </AnimatePresence>
 
-      <div className="flex flex-col md:flex-row gap-6">
-        {/* Sidebar Stats */}
-        <div className="w-full md:w-80 space-y-6">
-          <Card className="glass border-white/10 p-6 rounded-[2rem] relative overflow-hidden group">
-            <div className="absolute -top-4 -right-4 w-20 h-20 bg-primary/10 rounded-full blur-2xl group-hover:bg-primary/20 transition-colors" />
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Total Items</span>
-              <ShoppingBag className="h-4 w-4 text-primary" />
+      <div className="flex flex-col md:flex-row gap-4">
+        {/* Sidebar */}
+        <div className="w-full md:w-64 space-y-4">
+          <Card className="border border-border bg-card p-5">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm font-medium text-muted-foreground">Total Items</span>
+              <ShoppingBag className="h-4 w-4 text-muted-foreground" />
             </div>
-            <div className="text-4xl font-black mb-1">{items.length}</div>
-            <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-tighter italic">Items on the menu</p>
+            <div className="text-3xl font-semibold">{items.length}</div>
           </Card>
 
-          <div className="p-6 glass border-white/10 rounded-[2rem] space-y-6">
-            <div className="relative group">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+          <div className="space-y-3">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Search menu..."
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
-                className="pl-10 h-10 bg-white/5 border-white/10 rounded-xl text-xs"
+                className="pl-9 h-9 bg-muted border-border rounded-lg text-sm"
               />
-            </div>
-
-            <div className="space-y-3">
-              <p className="text-[10px] font-black tracking-widest uppercase text-muted-foreground ml-1">Status</p>
-              <div className="flex items-center gap-3 p-3 rounded-xl bg-emerald-500/5 border border-emerald-500/10">
-                <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="text-xs font-bold text-emerald-500/80">Chatbot Active</span>
-              </div>
             </div>
           </div>
         </div>
 
         {/* Items Table */}
         <div className="flex-1">
-          <Card className="glass border-white/10 overflow-hidden rounded-[2.5rem] shadow-2xl">
+          <Card className="border border-border bg-card overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="w-full text-left">
+              <table className="w-full text-left text-sm">
                 <thead>
-                  <tr className="bg-white/5 text-[10px] font-black uppercase tracking-widest text-muted-foreground border-b border-white/5">
-                    <th className="px-8 py-5">Item</th>
-                    <th className="px-8 py-5">Price</th>
-                    <th className="px-8 py-5">Category</th>
-                    <th className="px-8 py-5">Status</th>
-                    <th className="px-8 py-5 text-right">Actions</th>
+                  <tr className="bg-muted/50 text-muted-foreground border-b border-border">
+                    <th className="px-4 py-3 text-xs font-medium">Item</th>
+                    <th className="px-4 py-3 text-xs font-medium">Price</th>
+                    <th className="px-4 py-3 text-xs font-medium">Category</th>
+                    <th className="px-4 py-3 text-xs font-medium">Status</th>
+                    <th className="px-4 py-3 text-xs font-medium text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-white/5">
+                <tbody className="divide-y divide-border">
                   <AnimatePresence initial={false}>
                     {filteredItems.map((it, idx) => (
                       <motion.tr
                         key={it.id}
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: idx * 0.05 }}
-                        className="group hover:bg-white/[0.02] transition-colors"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: idx * 0.03 }}
+                        className="group hover:bg-muted/30 transition-colors"
                       >
-                        <td className="px-8 py-6">
-                          <div className="flex flex-col gap-0.5">
-                            <span className="font-bold text-lg text-foreground">{it.name}</span>
-                            <span className="text-xs text-muted-foreground line-clamp-1 max-w-[200px]">{it.description || "No description"}</span>
+                        <td className="px-4 py-3">
+                          <div>
+                            <span className="font-medium text-foreground">{it.name}</span>
+                            <span className="block text-xs text-muted-foreground line-clamp-1 max-w-[200px]">{it.description || "No description"}</span>
                           </div>
                         </td>
-                        <td className="px-8 py-6">
-                          <span className="text-sm font-black text-white/90">{new Intl.NumberFormat().format(it.price)} <span className="text-[10px] opacity-50">FCFA</span></span>
+                        <td className="px-4 py-3">
+                          <span className="font-semibold tabular-nums">{new Intl.NumberFormat().format(it.price)}</span>
+                          <span className="text-xs text-muted-foreground ml-1">FCFA</span>
                         </td>
-                        <td className="px-8 py-6">
-                          <Badge variant="outline" className="rounded-lg bg-white/5 border-white/5 text-[10px] uppercase font-bold px-2 py-0.5">
+                        <td className="px-4 py-3">
+                          <Badge variant="outline" className="rounded-md text-xs">
                             {it.category || "Uncategorized"}
                           </Badge>
                         </td>
-                        <td className="px-8 py-6">
-                          <motion.button
-                            whileTap={{ scale: 0.9 }}
+                        <td className="px-4 py-3">
+                          <button
                             onClick={() => toggleAvailability(it)}
                             className={cn(
-                              "flex items-center gap-2 text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full border-2 transition-all",
+                              "flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full transition-colors",
                               it.isAvailable
-                                ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20 shadow-[0_0_10px_-4px_theme(colors.emerald.500)]"
-                                : "bg-neutral-500/10 text-neutral-400 border-neutral-500/20"
+                                ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400"
+                                : "bg-muted text-muted-foreground"
                             )}
                           >
                             {it.isAvailable ? <Eye className="h-3 w-3" /> : <EyeOff className="h-3 w-3" />}
                             {it.isAvailable ? "Visible" : "Hidden"}
-                          </motion.button>
+                          </button>
                         </td>
-                        <td className="px-8 py-6 text-right">
-                          <div className="flex items-center justify-end gap-2 opacity-20 group-hover:opacity-100 transition-opacity">
-                            <Button variant="ghost" size="icon" onClick={() => startEdit(it)} className="h-9 w-9 rounded-xl hover:bg-primary/20 hover:text-primary transition-colors">
-                              <Edit3 className="h-4 w-4" />
+                        <td className="px-4 py-3 text-right">
+                          <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <Button variant="ghost" size="icon" onClick={() => startEdit(it)} className="h-8 w-8 rounded-lg">
+                              <Edit3 className="h-3.5 w-3.5" />
                             </Button>
-                            <Button variant="ghost" size="icon" onClick={() => onDelete(it.id)} className="h-9 w-9 rounded-xl hover:bg-destructive/20 hover:text-destructive transition-colors">
-                              <Trash2 className="h-4 w-4" />
+                            <Button variant="ghost" size="icon" onClick={() => onDelete(it.id)} className="h-8 w-8 rounded-lg text-muted-foreground hover:text-destructive">
+                              <Trash2 className="h-3.5 w-3.5" />
                             </Button>
                           </div>
                         </td>
@@ -391,10 +381,14 @@ export default function RestaurantMenuPage() {
                 </tbody>
               </table>
               {filteredItems.length === 0 && (
-                <div className="p-20 text-center space-y-4">
-                  <AlertCircle className="h-12 w-12 text-muted-foreground mx-auto opacity-20" />
-                  <p className="text-muted-foreground font-bold italic uppercase tracking-widest text-xs">No items found.</p>
-                  <Button variant="link" onClick={() => setSearchQuery("")} className="text-primary font-black uppercase tracking-widest text-[10px]">Clear Search</Button>
+                <div className="p-12 text-center">
+                  <AlertCircle className="h-8 w-8 text-muted-foreground/30 mx-auto mb-2" />
+                  <p className="text-sm text-muted-foreground">No items found.</p>
+                  {searchQuery && (
+                    <Button variant="link" onClick={() => setSearchQuery("")} className="text-primary text-sm mt-1">
+                      Clear search
+                    </Button>
+                  )}
                 </div>
               )}
             </div>
@@ -402,83 +396,84 @@ export default function RestaurantMenuPage() {
         </div>
       </div>
 
-      {/* Edit Modal (Portal-like Overlay) */}
+      {/* Edit Modal */}
       <AnimatePresence>
         {editingId && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-background/80 backdrop-blur-xl">
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-background/80 backdrop-blur-sm">
             <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
+              initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              className="w-full max-w-2xl"
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="w-full max-w-lg"
             >
-              <Card className="glass border-primary/20 shadow-2xl p-10 rounded-[3rem]">
-                <div className="flex justify-between items-start mb-10">
-                  <div className="space-y-1">
-                    <h2 className="text-3xl font-bold tracking-tight">Edit Item</h2>
-                    <p className="text-muted-foreground text-lg">Updating: <span className="text-primary font-bold">{editForm.name}</span></p>
+              <Card className="border border-border bg-card shadow-lg">
+                <div className="flex justify-between items-center p-5 border-b border-border">
+                  <div>
+                    <h2 className="text-lg font-semibold">Edit Item</h2>
+                    <p className="text-sm text-muted-foreground">{editForm.name}</p>
                   </div>
-                  <Button variant="ghost" size="icon" onClick={() => setEditingId(null)} className="rounded-full h-12 w-12 hover:bg-white/10">
-                    <X className="h-6 w-6" />
+                  <Button variant="ghost" size="icon" onClick={() => setEditingId(null)} className="h-8 w-8 rounded-lg">
+                    <X className="h-4 w-4" />
                   </Button>
                 </div>
-                <form onSubmit={onSaveEdit} className="space-y-8">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Name</label>
+                <form onSubmit={onSaveEdit} className="p-5 space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <label className="text-sm font-medium text-muted-foreground">Name</label>
                       <Input
                         value={editForm.name}
                         onChange={e => setEditForm({ ...editForm, name: e.target.value })}
-                        className="h-14 bg-white/5 border-white/10 rounded-2xl text-lg font-bold"
+                        className="h-10 bg-muted border-border rounded-lg"
                       />
                     </div>
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Price (FCFA)</label>
+                    <div className="space-y-1.5">
+                      <label className="text-sm font-medium text-muted-foreground">Price (FCFA)</label>
                       <Input
                         type="number"
                         value={editForm.price}
                         onChange={e => setEditForm({ ...editForm, price: e.target.value })}
-                        className="h-14 bg-white/5 border-white/10 rounded-2xl text-lg font-bold"
+                        className="h-10 bg-muted border-border rounded-lg"
                       />
                     </div>
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Category</label>
+                    <div className="space-y-1.5">
+                      <label className="text-sm font-medium text-muted-foreground">Category</label>
                       <Input
                         value={editForm.category}
                         onChange={e => setEditForm({ ...editForm, category: e.target.value })}
-                        className="h-14 bg-white/5 border-white/10 rounded-2xl"
+                        className="h-10 bg-muted border-border rounded-lg"
                       />
                     </div>
-                    <div className="flex items-center gap-4 pt-10">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Availability</label>
+                    <div className="space-y-1.5">
+                      <label className="text-sm font-medium text-muted-foreground">Availability</label>
                       <Button
                         type="button"
+                        variant="outline"
                         onClick={() => setEditForm({ ...editForm, isAvailable: !editForm.isAvailable })}
                         className={cn(
-                          "flex-1 h-12 rounded-xl border-2 font-black uppercase tracking-widest transition-all",
+                          "w-full h-10 rounded-lg font-medium",
                           editForm.isAvailable
-                            ? "bg-emerald-500 text-white border-emerald-400 shadow-xl shadow-emerald-500/20"
-                            : "bg-white/5 text-muted-foreground border-white/10"
+                            ? "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20"
+                            : "bg-muted text-muted-foreground border-border"
                         )}
                       >
                         {editForm.isAvailable ? "Available" : "Hidden"}
                       </Button>
                     </div>
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Description</label>
+                  <div className="space-y-1.5">
+                    <label className="text-sm font-medium text-muted-foreground">Description</label>
                     <Textarea
                       value={editForm.description}
                       onChange={e => setEditForm({ ...editForm, description: e.target.value })}
-                      className="bg-white/5 border-white/10 rounded-2xl h-32 text-base leading-relaxed"
+                      className="bg-muted border-border rounded-lg h-24 resize-none"
                     />
                   </div>
-                  <div className="flex gap-4 pt-4">
-                    <Button type="submit" disabled={loading} className="flex-1 h-14 bg-primary text-white text-lg font-bold rounded-2xl shadow-xl shadow-primary/20">
-                      {loading ? <Loader2 className="h-6 w-6 animate-spin" /> : "Commit Changes"}
+                  <div className="flex gap-3 pt-2">
+                    <Button type="submit" disabled={loading} className="flex-1 h-10 bg-primary text-primary-foreground rounded-lg">
+                      {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save Changes"}
                     </Button>
-                    <Button type="button" variant="outline" onClick={() => setEditingId(null)} className="h-14 px-8 rounded-2xl border-white/10 font-bold glass">
-                      Abort
+                    <Button type="button" variant="outline" onClick={() => setEditingId(null)} className="h-10 rounded-lg">
+                      Cancel
                     </Button>
                   </div>
                 </form>

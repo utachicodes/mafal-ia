@@ -51,8 +51,8 @@ export default function NewBusinessPage() {
     }
 
     return (
-        <div className="max-w-3xl mx-auto py-8">
-            <div className="mb-8 flex items-center gap-4">
+        <div className="max-w-2xl mx-auto py-4">
+            <div className="mb-6">
                 <Button variant="ghost" asChild className="-ml-2 text-muted-foreground hover:text-foreground">
                     <Link href="/dashboard/businesses">
                         <ArrowLeft className="mr-2 h-4 w-4" />
@@ -62,96 +62,95 @@ export default function NewBusinessPage() {
             </div>
 
             <div className="space-y-6">
-                <div className="space-y-2">
-                    <h1 className="text-3xl font-extrabold tracking-tight text-gradient">
+                <div>
+                    <h1 className="text-3xl font-bold tracking-tight">
                         Create a New Business
                     </h1>
-                    <p className="text-muted-foreground text-lg">
+                    <p className="text-muted-foreground mt-1">
                         Fill in the details below to set up your new restaurant.
                     </p>
                 </div>
 
-                <form onSubmit={handleSubmit} className="space-y-8">
-                    <Card className="glass border-white/10 overflow-hidden">
-                        <div className="h-1.5 w-full bg-primary/20" />
-                        <CardHeader className="pt-8">
-                            <div className="flex items-center gap-4 pb-2">
-                                <div className="p-3 bg-primary/10 rounded-2xl border border-primary/20">
-                                    <Store className="h-6 w-6 text-primary" />
+                <form onSubmit={handleSubmit} className="space-y-6">
+                    <Card className="border border-border bg-card">
+                        <CardHeader>
+                            <div className="flex items-center gap-3">
+                                <div className="p-2 bg-primary/10 rounded-lg">
+                                    <Store className="h-5 w-5 text-primary" />
                                 </div>
                                 <div>
-                                    <CardTitle className="text-2xl">Business Details</CardTitle>
+                                    <CardTitle className="text-lg">Business Details</CardTitle>
                                     <CardDescription>Basic information about your restaurant.</CardDescription>
                                 </div>
                             </div>
                         </CardHeader>
-                        <CardContent className="space-y-6 pt-2">
-                            <div className="grid gap-3">
-                                <Label htmlFor="name" className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Business Name</Label>
-                                <Input name="name" id="name" placeholder="e.g. Gourmet Burger Dakar" required className="h-12 text-lg rounded-xl bg-white/5 border-white/10 focus:ring-primary/50" />
+                        <CardContent className="space-y-5 border-t border-border pt-6">
+                            <div className="space-y-2">
+                                <Label htmlFor="name">Business Name</Label>
+                                <Input name="name" id="name" placeholder="e.g. Gourmet Burger Dakar" required className="h-10 rounded-lg bg-muted border-border" />
                             </div>
 
-                            <div className="grid gap-3">
-                                <Label htmlFor="businessType" className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Business Type</Label>
-                                <div className="grid grid-cols-3 gap-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="businessType">Business Type</Label>
+                                <div className="grid grid-cols-3 gap-3">
                                     <label className="cursor-pointer">
                                         <input type="radio" name="businessType" value="RESTAURANT" className="peer sr-only" defaultChecked />
-                                        <div className="rounded-xl border-2 border-white/10 p-4 hover:bg-white/5 peer-checked:border-primary peer-checked:bg-primary/5 transition-all text-center">
-                                            <span className="block font-bold">Business</span>
+                                        <div className="rounded-lg border-2 border-border p-3 hover:bg-muted peer-checked:border-primary peer-checked:bg-primary/5 transition-colors text-center">
+                                            <span className="block font-medium text-sm">Business</span>
                                             <span className="text-xs text-muted-foreground">Menu & Dishes</span>
                                         </div>
                                     </label>
                                     <label className="cursor-pointer">
                                         <input type="radio" name="businessType" value="RETAIL" className="peer sr-only" />
-                                        <div className="rounded-xl border-2 border-white/10 p-4 hover:bg-white/5 peer-checked:border-primary peer-checked:bg-primary/5 transition-all text-center">
-                                            <span className="block font-bold">Retail</span>
+                                        <div className="rounded-lg border-2 border-border p-3 hover:bg-muted peer-checked:border-primary peer-checked:bg-primary/5 transition-colors text-center">
+                                            <span className="block font-medium text-sm">Retail</span>
                                             <span className="text-xs text-muted-foreground">Products & Catalog</span>
                                         </div>
                                     </label>
                                     <label className="cursor-pointer">
                                         <input type="radio" name="businessType" value="SERVICE" className="peer sr-only" />
-                                        <div className="rounded-xl border-2 border-white/10 p-4 hover:bg-white/5 peer-checked:border-primary peer-checked:bg-primary/5 transition-all text-center">
-                                            <span className="block font-bold">Service</span>
+                                        <div className="rounded-lg border-2 border-border p-3 hover:bg-muted peer-checked:border-primary peer-checked:bg-primary/5 transition-colors text-center">
+                                            <span className="block font-medium text-sm">Service</span>
                                             <span className="text-xs text-muted-foreground">Booking & Rates</span>
                                         </div>
                                     </label>
                                 </div>
                             </div>
 
-                            <div className="grid gap-3">
-                                <Label htmlFor="cuisine" className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Category / Tags</Label>
-                                <Input name="cuisine" id="cuisine" placeholder="e.g. Fast Food, Sports, Taxi" required className="h-12 rounded-xl bg-white/5 border-white/10 focus:ring-primary/50" />
+                            <div className="space-y-2">
+                                <Label htmlFor="cuisine">Category / Tags</Label>
+                                <Input name="cuisine" id="cuisine" placeholder="e.g. Fast Food, Sports, Taxi" required className="h-10 rounded-lg bg-muted border-border" />
                             </div>
 
-                            <div className="grid gap-3">
-                                <Label htmlFor="description" className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Description</Label>
+                            <div className="space-y-2">
+                                <Label htmlFor="description">Description</Label>
                                 <Textarea
                                     name="description"
                                     id="description"
-                                    placeholder="Briefly describe your business to help customers understand what you offer..."
-                                    className="min-h-[120px] rounded-2xl bg-white/5 border-white/10 focus:ring-primary/50 resize-none p-4"
+                                    placeholder="Briefly describe your business..."
+                                    className="min-h-[100px] rounded-lg bg-muted border-border resize-none"
                                 />
                             </div>
                         </CardContent>
                     </Card>
 
-                    <div className="flex justify-end gap-4">
-                        <Button type="button" variant="ghost" asChild className="rounded-xl h-12 px-8">
+                    <div className="flex justify-end gap-3">
+                        <Button type="button" variant="ghost" asChild>
                             <Link href="/dashboard/businesses">Cancel</Link>
                         </Button>
                         <Button
                             type="submit"
                             disabled={loading}
-                            className="bg-primary hover:bg-primary/90 text-white rounded-xl h-12 px-10 shadow-xl shadow-primary/20 gap-2 font-bold"
+                            className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg gap-2"
                         >
                             {loading ? (
                                 <>
-                                    <Loader2 className="h-5 w-5 animate-spin" />
+                                    <Loader2 className="h-4 w-4 animate-spin" />
                                     Creating...
                                 </>
                             ) : (
                                 <>
-                                    <Plus className="h-5 w-5" />
+                                    <Plus className="h-4 w-4" />
                                     Create Business
                                 </>
                             )}

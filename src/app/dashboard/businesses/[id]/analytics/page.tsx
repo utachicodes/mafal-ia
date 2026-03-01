@@ -6,19 +6,14 @@ import {
     TrendingUp,
     MessageSquare,
     ShoppingBag,
-    Clock,
     Download,
     Activity,
-    Sparkles,
     Calendar,
-    Filter,
-    Zap
 } from "lucide-react"
 import Link from "next/link"
 import { BusinessService } from "@/src/lib/business-service"
 import { notFound } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { motion } from "framer-motion"
 
 interface BusinessAnalyticsPageProps {
     params: { id: string }
@@ -35,55 +30,51 @@ export default async function BusinessAnalyticsPage({ params }: BusinessAnalytic
     }
 
     return (
-        <div className="space-y-10">
+        <div className="space-y-6">
             {/* Page Header */}
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-                <div className="space-y-2">
-                    <Button variant="ghost" asChild className="-ml-3 mb-2 text-muted-foreground hover:text-primary transition-colors group">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div className="space-y-1">
+                    <Button variant="ghost" asChild className="-ml-3 mb-1 text-muted-foreground hover:text-foreground">
                         <Link href={`/dashboard/businesses/${id}`}>
-                            <ArrowLeft className="mr-2 h-4 w-4 transition-transform group-hover:-translate-x-1" />
+                            <ArrowLeft className="mr-2 h-4 w-4" />
                             Back
                         </Link>
                     </Button>
-                    <div className="flex items-center gap-4">
-                        <h1 className="text-4xl font-bold tracking-tight text-gradient">
-                            Analytics
-                        </h1>
-                    </div>
-                    <p className="text-muted-foreground text-lg">
-                        Performance overview for <span className="font-bold text-foreground">{restaurant.name}</span>
+                    <h1 className="text-3xl font-bold tracking-tight">Analytics</h1>
+                    <p className="text-muted-foreground">
+                        Performance overview for <span className="font-medium text-foreground">{restaurant.name}</span>
                     </p>
                 </div>
-                <div className="flex gap-3">
-                    <Button variant="outline" className="rounded-xl px-4 h-11 border-white/10 glass hover:bg-white/5 transition-all font-bold uppercase text-[10px] tracking-widest">
+                <div className="flex gap-2">
+                    <Button variant="outline" className="rounded-lg h-9">
                         <Calendar className="mr-2 h-4 w-4" />
                         Last 30 Days
                     </Button>
-                    <Button className="rounded-xl px-4 h-11 bg-primary hover:bg-primary/90 text-white shadow-xl shadow-primary/20 transition-all">
+                    <Button className="rounded-lg h-9 bg-primary hover:bg-primary/90 text-primary-foreground">
                         <Download className="h-4 w-4" />
                     </Button>
                 </div>
             </div>
 
-            {/* Intelligence Grid */}
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+            {/* Stats Grid */}
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                 {[
-                    { label: "Conversations", value: "1,284", change: "+12.5%", icon: MessageSquare, color: "text-primary", trend: "up" },
-                    { label: "Conversion Rate", value: "24.2%", change: "+4.3%", icon: Sparkles, color: "text-primary", trend: "up" },
-                    { label: "Order Volume", value: "342", change: "+8.1%", icon: ShoppingBag, color: "text-emerald-500", trend: "up" },
-                    { label: "Response Rate", value: "98.8%", change: "Stable", icon: Activity, color: "text-muted-foreground", trend: "neutral" }
+                    { label: "Conversations", value: "1,284", change: "+12.5%", icon: MessageSquare, up: true },
+                    { label: "Conversion Rate", value: "24.2%", change: "+4.3%", icon: TrendingUp, up: true },
+                    { label: "Order Volume", value: "342", change: "+8.1%", icon: ShoppingBag, up: true },
+                    { label: "Response Rate", value: "98.8%", change: "Stable", icon: Activity, up: false }
                 ].map((stat, i) => (
-                    <Card key={i} className="glass border-white/10 overflow-hidden group">
+                    <Card key={i} className="border border-border bg-card">
                         <CardHeader className="flex flex-row items-center justify-between pb-2">
-                            <CardTitle className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">{stat.label}</CardTitle>
-                            <stat.icon className={cn("h-4 w-4 opacity-50 transition-transform group-hover:scale-110", stat.color)} />
+                            <CardTitle className="text-sm font-medium text-muted-foreground">{stat.label}</CardTitle>
+                            <stat.icon className="h-4 w-4 text-muted-foreground" />
                         </CardHeader>
                         <CardContent>
-                            <div className="text-3xl font-bold tracking-tight">{stat.value}</div>
+                            <div className="text-2xl font-semibold tracking-tight">{stat.value}</div>
                             <div className="flex items-center gap-1.5 mt-1">
-                                <TrendingUp className={cn("h-3 w-3", stat.trend === "up" ? "text-emerald-500" : "text-muted-foreground")} />
-                                <span className={cn("text-[10px] font-bold uppercase", stat.trend === "up" ? "text-emerald-500" : "text-muted-foreground")}>
-                                    {stat.change} vs v.prev
+                                <TrendingUp className={cn("h-3 w-3", stat.up ? "text-emerald-600 dark:text-emerald-400" : "text-muted-foreground")} />
+                                <span className={cn("text-xs", stat.up ? "text-emerald-600 dark:text-emerald-400" : "text-muted-foreground")}>
+                                    {stat.change}
                                 </span>
                             </div>
                         </CardContent>
@@ -91,38 +82,24 @@ export default async function BusinessAnalyticsPage({ params }: BusinessAnalytic
                 ))}
             </div>
 
-            {/* Deep Insights Row */}
-            <div className="grid gap-8 lg:grid-cols-7">
-                <Card className="lg:col-span-4 glass border-white/10 overflow-hidden rounded-[2.5rem]">
-                    <CardHeader className="p-8 pb-0">
-                        <div className="flex items-center justify-between mb-2">
-                            <div>
-                                <CardTitle className="text-2xl font-bold tracking-tight">Message Volume</CardTitle>
-                                <CardDescription>Conversations over time</CardDescription>
-                            </div>
-                            <Button variant="ghost" size="icon" className="h-10 w-10 shrink-0 rounded-xl hover:bg-white/10">
-                                <Filter className="h-4 w-4" />
-                            </Button>
-                        </div>
+            {/* Charts Row */}
+            <div className="grid gap-4 lg:grid-cols-7">
+                <Card className="lg:col-span-4 border border-border bg-card overflow-hidden">
+                    <CardHeader>
+                        <CardTitle className="text-lg font-semibold">Message Volume</CardTitle>
+                        <CardDescription>Conversations over time</CardDescription>
                     </CardHeader>
-                    <CardContent className="p-8 h-[360px] flex flex-col items-center justify-center">
-                        <div className="w-full flex items-end justify-between h-48 gap-3 px-4">
+                    <CardContent className="h-[300px] flex flex-col items-center justify-center border-t border-border bg-muted/30">
+                        <div className="w-full flex items-end justify-between h-40 gap-2 px-4">
                             {[40, 60, 45, 90, 65, 80, 55, 70, 85, 40, 95, 75, 50, 65].map((h, i) => (
-                                <motion.div
+                                <div
                                     key={i}
-                                    initial={{ height: 0 }}
-                                    animate={{ height: `${h}%` }}
-                                    transition={{ duration: 1, delay: i * 0.05 }}
-                                    className="flex-1 bg-gradient-to-t from-primary/40 to-primary/10 border-t border-primary/30 rounded-t-lg relative group/bar"
-                                >
-                                    <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-black/80 backdrop-blur-md border border-white/10 text-[10px] p-2 rounded-lg opacity-0 group-hover/bar:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
-                                        <span className="font-bold">{h * 12}</span> Units
-                                    </div>
-                                </motion.div>
+                                    className="flex-1 bg-primary/20 rounded-t transition-all hover:bg-primary/40"
+                                    style={{ height: `${h}%` }}
+                                />
                             ))}
                         </div>
-                        <div className="w-full h-px bg-white/5 mt-8" />
-                        <div className="w-full flex justify-between px-4 mt-4 text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                        <div className="w-full border-t border-border mt-4 pt-3 flex justify-between px-4 text-xs text-muted-foreground">
                             <span>01 Feb</span>
                             <span>07 Feb</span>
                             <span>14 Feb</span>
@@ -132,12 +109,12 @@ export default async function BusinessAnalyticsPage({ params }: BusinessAnalytic
                     </CardContent>
                 </Card>
 
-                <Card className="lg:col-span-3 glass border-white/10 overflow-hidden rounded-[2.5rem]">
-                    <CardHeader className="p-8 pb-0">
-                        <CardTitle className="text-2xl font-bold tracking-tight">Customer Intents</CardTitle>
+                <Card className="lg:col-span-3 border border-border bg-card overflow-hidden">
+                    <CardHeader>
+                        <CardTitle className="text-lg font-semibold">Customer Intents</CardTitle>
                         <CardDescription>What customers are asking about</CardDescription>
                     </CardHeader>
-                    <CardContent className="p-8 space-y-6">
+                    <CardContent className="space-y-4">
                         {[
                             { label: "Order Initiation", value: 65, color: "bg-primary" },
                             { label: "Menu Inquiry", value: 48, color: "bg-primary/60" },
@@ -145,44 +122,21 @@ export default async function BusinessAnalyticsPage({ params }: BusinessAnalytic
                             { label: "Price Questions", value: 25, color: "bg-primary/30" },
                             { label: "Support Requests", value: 12, color: "bg-orange-500" }
                         ].map((item, i) => (
-                            <div key={i} className="space-y-2">
-                                <div className="flex justify-between items-center text-xs">
-                                    <span className="font-bold flex items-center gap-2">
-                                        <div className={cn("h-1.5 w-1.5 rounded-full", item.color)} />
-                                        {item.label}
-                                    </span>
-                                    <span className="text-muted-foreground font-mono">{item.value}%</span>
+                            <div key={i}>
+                                <div className="flex justify-between items-center mb-1.5">
+                                    <span className="text-sm font-medium">{item.label}</span>
+                                    <span className="text-xs text-muted-foreground">{item.value}%</span>
                                 </div>
-                                <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden">
-                                    <motion.div
-                                        initial={{ width: 0 }}
-                                        animate={{ width: `${item.value}%` }}
-                                        transition={{ duration: 1.5, delay: 0.5 + (i * 0.1) }}
-                                        className={cn("h-full", item.color)}
+                                <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
+                                    <div
+                                        className={cn("h-full rounded-full", item.color)}
+                                        style={{ width: `${item.value}%` }}
                                     />
                                 </div>
                             </div>
                         ))}
                     </CardContent>
                 </Card>
-            </div>
-
-            {/* Diagnostic Footer */}
-            <div className="p-8 rounded-[2.5rem] bg-white/[0.02] border border-white/5 flex flex-col sm:flex-row items-center justify-between gap-6 overflow-hidden relative group">
-                <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-1000 blur-3xl pointer-events-none" />
-                <div className="flex items-center gap-6 relative z-10">
-                    <div className="h-16 w-16 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20">
-                        <Activity className="h-8 w-8 text-primary" />
-                    </div>
-                    <div>
-                        <h4 className="font-bold text-2xl">Data Overview</h4>
-                        <p className="text-muted-foreground">All data is updated in real-time from your chatbot conversations.</p>
-                    </div>
-                </div>
-                <Button variant="outline" className="rounded-xl px-10 h-16 border-white/10 glass hover:bg-white/10 relative z-10 font-bold uppercase text-xs tracking-widest gap-3">
-                    <Zap className="h-4 w-4 text-primary" />
-                    Full Report
-                </Button>
             </div>
         </div>
     )
