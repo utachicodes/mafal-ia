@@ -124,11 +124,11 @@
   }
 
   .premium-gradient {
-    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary) / 0.8) 100%);
+    background: linear-gradient(135deg, #991b1b 0%, #dc2626 100%);
   }
 
   :is(.dark) .premium-gradient {
-    background: linear-gradient(135deg, hsl(var(--primary)) 0%, #1a1a1a 100%);
+    background: linear-gradient(135deg, #991b1b 0%, #1a1a1a 100%);
   }
 
   /* Subtle Gradients (Premium Slate) */

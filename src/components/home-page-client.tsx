@@ -163,6 +163,45 @@ function GrowthTabs({ t }: { t: any }) {
   );
 }
 
+// Color palette for testimonial avatars (deterministic by name)
+const avatarColors = [
+  'bg-emerald-700', 'bg-amber-700', 'bg-teal-700', 'bg-rose-700',
+  'bg-indigo-700', 'bg-orange-700', 'bg-cyan-700', 'bg-violet-700',
+];
+
+function TestimonialCard({ item }: { item: { name: string; subtitle: string; quote: string; stars: number } }) {
+  const colorIdx = item.name.charCodeAt(0) % avatarColors.length;
+  const initials = item.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+
+  return (
+    <div className="flex-shrink-0 w-[340px] rounded-2xl border border-border bg-card p-6 space-y-4">
+      {/* Header: Avatar + Name */}
+      <div className="flex items-center gap-3">
+        <div className={`w-10 h-10 rounded-full ${avatarColors[colorIdx]} flex items-center justify-center text-white text-xs font-bold`}>
+          {initials}
+        </div>
+        <div className="min-w-0">
+          <h4 className="font-bold text-foreground text-sm truncate">{item.name}</h4>
+          <p className="text-xs text-muted-foreground truncate">{item.subtitle}</p>
+        </div>
+      </div>
+      {/* Stars */}
+      <div className="flex gap-0.5">
+        {[...Array(5)].map((_, i) => (
+          <Star
+            key={i}
+            className={`h-4 w-4 ${i < item.stars ? 'text-yellow-400 fill-yellow-400' : 'text-muted-foreground/20'}`}
+          />
+        ))}
+      </div>
+      {/* Quote */}
+      <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
+        &ldquo;{item.quote}&rdquo;
+      </p>
+    </div>
+  );
+}
+
 export default function HomeClient() {
   // Auth disabled — mock session
   const session = null as any;
@@ -297,23 +336,9 @@ export default function HomeClient() {
 
   // Stats are now in t.hero.stats array directly
 
-  const testimonials = [
-    {
-      name: t.testimonials.testimonial1.name,
-      business: t.testimonials.testimonial1.business,
-      quote: t.testimonials.testimonial1.quote,
-    },
-    {
-      name: t.testimonials.testimonial2.name,
-      business: t.testimonials.testimonial2.business,
-      quote: t.testimonials.testimonial2.quote,
-    },
-    {
-      name: t.testimonials.testimonial3.name,
-      business: t.testimonials.testimonial3.business,
-      quote: t.testimonials.testimonial3.quote,
-    }
-  ];
+  const testimonialItems = t.testimonials.items || [];
+  const row1 = testimonialItems.slice(0, 4);
+  const row2 = testimonialItems.slice(4, 8);
 
   return (
     <div className="min-h-screen bg-background">
@@ -560,8 +585,8 @@ export default function HomeClient() {
       {/* Growth Tabs — Acquisition / Conversion / Retention */}
       <GrowthTabs t={t} />
 
-      {/* Testimonials */}
-      <section id="testimonials" className="py-24 bg-gradient-to-b from-muted/20 to-background">
+      {/* Testimonials — Scrolling Marquee */}
+      <section id="testimonials" className="py-24 overflow-hidden">
         <div className="container mx-auto px-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -570,48 +595,28 @@ export default function HomeClient() {
             className="text-center max-w-3xl mx-auto mb-16"
           >
             <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
-              {t.testimonials.title}
+              {t.testimonials.title}{' '}
+              <span className="text-primary">{t.testimonials.titleHighlight}</span>
             </h2>
-            <p className="text-xl text-muted-foreground">
-              {t.testimonials.description}
-            </p>
           </motion.div>
+        </div>
 
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={staggerContainer}
-            className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto"
-          >
-            {testimonials.map((testimonial, i) => (
-              <motion.div
-                key={i}
-                variants={fadeInUp}
-                whileHover={{ y: -8 }}
-              >
-                <Card className="p-8 bg-card border border-border hover:shadow-xl transition-all duration-300 h-full">
-                  <div className="flex items-center gap-4 mb-6">
-                    <div className="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center">
-                      <Users className="h-7 w-7 text-primary" />
-                    </div>
-                    <div>
-                      <h4 className="font-bold text-foreground">{testimonial.name}</h4>
-                      <p className="text-sm text-muted-foreground">{testimonial.business}</p>
-                    </div>
-                  </div>
-                  <p className="text-muted-foreground italic leading-relaxed mb-6">
-                    "{testimonial.quote}"
-                  </p>
-                  <div className="flex gap-1">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="h-5 w-5 text-yellow-400 fill-yellow-400" />
-                    ))}
-                  </div>
-                </Card>
-              </motion.div>
+        {/* Row 1 — scrolls left */}
+        <div className="marquee mb-6">
+          <div className="marquee-track" style={{ gap: '1.5rem' }}>
+            {[...row1, ...row1, ...row1].map((item: any, i: number) => (
+              <TestimonialCard key={`r1-${i}`} item={item} />
             ))}
-          </motion.div>
+          </div>
+        </div>
+
+        {/* Row 2 — scrolls right */}
+        <div className="marquee">
+          <div className="marquee-track-reverse" style={{ gap: '1.5rem' }}>
+            {[...row2, ...row2, ...row2].map((item: any, i: number) => (
+              <TestimonialCard key={`r2-${i}`} item={item} />
+            ))}
+          </div>
         </div>
       </section>
 
@@ -711,7 +716,7 @@ export default function HomeClient() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, ease: "easeOut" }}
-            className="relative overflow-hidden rounded-3xl border border-border bg-primary text-primary-foreground"
+            className="relative overflow-hidden rounded-3xl border border-red-900/20 bg-gradient-to-r from-red-800 to-red-600 text-white"
           >
             <div
               className="absolute inset-0 opacity-20"
@@ -727,7 +732,7 @@ export default function HomeClient() {
                 <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight">
                   {t.cta.title}
                 </h2>
-                <p className="mt-5 text-base md:text-lg text-primary-foreground/80 leading-relaxed">
+                <p className="mt-5 text-base md:text-lg text-white/80 leading-relaxed">
                   {t.cta.description}
                 </p>
                 <div className="mt-8 flex flex-col sm:flex-row gap-3">
@@ -742,7 +747,7 @@ export default function HomeClient() {
                   <Button
                     size="lg"
                     variant="outline"
-                    className="border-primary-foreground/30 bg-transparent text-primary-foreground hover:bg-primary-foreground/10 px-8 py-6 text-base font-semibold"
+                    className="border-white/30 bg-transparent text-white hover:bg-white/10 px-8 py-6 text-base font-semibold"
                   >
                     {t.cta.ctaSecondary}
                   </Button>
@@ -791,40 +796,40 @@ export default function HomeClient() {
       </section>
 
       {/* Footer */}
-      <footer className="py-12 bg-background text-foreground border-t border-border">
+      <footer className="py-12 bg-gradient-to-r from-red-800 to-red-600 text-white">
         <div className="container mx-auto px-6">
           <div className="grid md:grid-cols-4 gap-8">
             <div>
-              <Logo className="h-10 mb-4" />
-              <p className="text-sm text-muted-foreground">
+              <Logo className="h-10 mb-4" white />
+              <p className="text-sm text-white/80">
                 {t.footer.tagline}
               </p>
             </div>
             <div>
               <h4 className="font-semibold mb-4">{t.footer.product}</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="#features" className="hover:text-foreground transition-colors">{t.footer.features}</a></li>
-                <li><a href="#how" className="hover:text-foreground transition-colors">{t.footer.howItWorks}</a></li>
-                <li><a href="#pricing" className="hover:text-foreground transition-colors">{t.footer.pricing}</a></li>
+              <ul className="space-y-2 text-sm text-white/80">
+                <li><a href="#features" className="hover:text-white transition-colors">{t.footer.features}</a></li>
+                <li><a href="#how" className="hover:text-white transition-colors">{t.footer.howItWorks}</a></li>
+                <li><a href="#pricing" className="hover:text-white transition-colors">{t.footer.pricing}</a></li>
               </ul>
             </div>
             <div>
               <h4 className="font-semibold mb-4">{t.footer.company}</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="#" className="hover:text-foreground transition-colors">{t.footer.about}</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">{t.footer.blog}</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">{t.footer.contact}</a></li>
+              <ul className="space-y-2 text-sm text-white/80">
+                <li><a href="#" className="hover:text-white transition-colors">{t.footer.about}</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">{t.footer.blog}</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">{t.footer.contact}</a></li>
               </ul>
             </div>
             <div>
               <h4 className="font-semibold mb-4">{t.footer.legal}</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="#" className="hover:text-foreground transition-colors">{t.footer.privacy}</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">{t.footer.terms}</a></li>
+              <ul className="space-y-2 text-sm text-white/80">
+                <li><a href="#" className="hover:text-white transition-colors">{t.footer.privacy}</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">{t.footer.terms}</a></li>
               </ul>
             </div>
           </div>
-          <div className="mt-12 pt-8 border-t border-border text-center text-sm text-muted-foreground">
+          <div className="mt-12 pt-8 border-t border-white/20 text-center text-sm text-white/60">
             <p>{t.footer.copyright}</p>
           </div>
         </div>
